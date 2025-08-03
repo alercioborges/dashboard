@@ -1,0 +1,17 @@
+# Redireciona todas as requisições para a pasta public
+# Funciona tanto na raiz quanto em subdiretórios
+
+RewriteEngine On
+
+# Se o arquivo/diretório não existir na raiz
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# E não for uma requisição para a pasta public
+RewriteCond %{REQUEST_URI} !^/public/
+
+# Redireciona para public/ mantendo a query string
+RewriteRule ^(.*)$ public/$1 [QSA,L]
+
+# Se a requisição for para a raiz, redireciona para public/
+RewriteRule ^$ public/ [L]

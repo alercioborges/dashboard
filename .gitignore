@@ -1,0 +1,5 @@
+# Ignorar o diretório de dependências do Composer
+/vendor/
+
+# Variavais de ambiente
+.env

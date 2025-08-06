@@ -1,10 +1,11 @@
 <?php
 
-use DI\Container;
+use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
-use Zeuxisoo\Whoops\Slim\WhoopsMiddleware;
 use Middlewares\TrailingSlash;
+use Slim\Views\Twig;
+use Slim\Views\TwigMiddleware;
 
 
 if (!session_status() !== PHP_SESSION_ACTIVE) {
@@ -21,17 +22,14 @@ $dotenv->load();
 // Load app config
 $appConfig = require __DIR__ . '/app/config/app.php';
 
-// Create container DI
-$container = new Container();
+// Setting container DI
+$containerBuilder = new ContainerBuilder();
+$containerBuilder->addDefinitions(__DIR__ . '/app/config/dependencies.php');
+$container = $containerBuilder->build();
 
 // Create aplication
 AppFactory::setContainer($container);
 $app = AppFactory::create();
-
-// Middleware error (Whoops)
-if ($appConfig['debug'] === 'true') {
-    $app->add(new WhoopsMiddleware());
-}
 
 // Middleware of trailing slash
 $app->add(new TrailingSlash(false));
@@ -46,3 +44,9 @@ $app->addRoutingMiddleware();
 
 // add error middleware
 $app->addErrorMiddleware($appConfig['debug'], true, true);
+
+// Trailing slash
+$app->add(new TrailingSlash(false));
+
+// Twig middleware
+$app->add(TwigMiddleware::createFromContainer($app, Twig::class));

@@ -1,5 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../bootstrap.php';
+require "../app/routes/web/web.php";
 
 $app->run();

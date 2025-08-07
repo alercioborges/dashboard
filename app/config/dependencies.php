@@ -10,7 +10,7 @@ $appConfig = require __DIR__ . '/app.php';
 return [
 
     Twig::class => function (ContainerInterface $c) use ($appConfig) {
-        $twig = Twig::create(dirname(__DIR__) . "/views/pages/", [
+        $twig = Twig::create(__DIR__ . "/../../templates/pages/", [
             'cache' => $appConfig['env'] === 'production' 
                 ? __DIR__ . '/../../storage/localcache' 
                 : false,

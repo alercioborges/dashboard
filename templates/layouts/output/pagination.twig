@@ -1,0 +1,84 @@
+{% macro pagination(numPages) %}
+{% set pageRequest = get.search is defined ? '?search=' ~ get.search ~ '&page=' : '?page=' %}
+{% set currentPage = get.page ?? 1 %}
+
+{% if numPages > 1 %}
+<nav class="mt-4" aria-label="Navegação da página">
+    <ul class="pagination justify-content-center">
+        {# Previous Page Link #}
+        {% if currentPage > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{pageRequest}}{{ currentPage - 1 }}">
+                    <span aria-hidden="true">«</span>
+                    <span class="sr-only">Anterior</span>
+                </a>
+            </li>
+        {% endif %}
+
+        {# Page Number Links #}
+        {% if numPages <= 10 %}
+            {# Show all pages if 10 or fewer #}
+            {% for i in 1..numPages %}
+                <li class="page-item {{ currentPage == i ? 'active' }}">
+                    <a class="page-link" href="{{pageRequest}}{{ i }}">{{ i }}</a>
+                </li>
+            {% endfor %}
+        {% else %}
+            {# Complex pagination with ellipsis #}
+            {% if currentPage <= 4 %}
+                {# First few pages #}
+                {% for i in 1..5 %}
+                    <li class="page-item {{ currentPage == i ? 'active' }}">
+                        <a class="page-link" href="{{pageRequest}}{{ i }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+                <li class="page-item">
+                    <a class="page-link" href="{{pageRequest}}{{ numPages }}">{{ numPages }}</a>
+                </li>
+            {% elseif currentPage >= (numPages - 3) %}
+                {# Last few pages #}
+                <li class="page-item">
+                    <a class="page-link" href="{{pageRequest}}1">1</a>
+                </li>
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% for i in (numPages - 4)..numPages %}
+                    <li class="page-item {{ currentPage == i ? 'active' }}">
+                        <a class="page-link" href="{{pageRequest}}{{ i }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                {# Middle pages #}
+                <li class="page-item">
+                    <a class="page-link" href="{{pageRequest}}1">1</a>
+                </li>
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+                
+                {% for i in (currentPage - 1)..(currentPage + 1) %}
+                    <li class="page-item {{ currentPage == i ? 'active' }}">
+                        <a class="page-link" href="{{pageRequest}}{{ i }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+                
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+                <li class="page-item">
+                    <a class="page-link" href="{{pageRequest}}{{ numPages }}">{{ numPages }}</a>
+                </li>
+            {% endif %}
+        {% endif %}
+
+        {# Next Page Link #}
+        {% if currentPage < numPages %}
+            <li class="page-item">
+                <a class="page-link" href="{{pageRequest}}{{ currentPage + 1 }}">
+                    <span aria-hidden="true">»</span>
+                    <span class="sr-only">Próximo</span>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endmacro %}
+
+{{ _self.pagination(numPages) }}

@@ -17,6 +17,6 @@ class DashboardController
     
     public function index(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {        
-        return $this->twig->render($response, 'main.html');
+        return $this->twig->render($response, 'dashboard.html');
     }
 }

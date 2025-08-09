@@ -19,7 +19,12 @@ return [
 
         // Adiciona variáveis globais no Twig
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
-        $twig->getEnvironment()->addGlobal('session', $_SESSION ?? []);
+
+        if ($appConfig['env'] === 'development') {
+            $twig->addExtension(new \Twig\Extension\DebugExtension());
+            $twig->getEnvironment()->addGlobal('session', $_SESSION ?? []);
+            $twig->getEnvironment()->addGlobal('get', $_GET ?? []);
+        }
 
         return $twig;
     },

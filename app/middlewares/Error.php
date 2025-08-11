@@ -1,6 +1,6 @@
 <?php
 
-namespace app\middlewares;
+namespace App\middlewares;
 
 use Slim\App;
 use Slim\Exception\HttpNotFoundException;
@@ -35,14 +35,18 @@ class Error
             $errorMiddleware->setErrorHandler(
                 HttpNotFoundException::class,
                 function (Request $request, \Throwable $exception, bool $displayErrorDetails) use ($app): Response {
-                    $response = $this->app->getResponseFactory()->createResponse(404);
+                    $response = $app->getResponseFactory()->createResponse(404);
 
                     // Carregar arquivo HTML externo
-                    $htmlFile = dirname(__DIR__) . '/views/templates/pages/404.html';
+                    $htmlFile = __DIR__ . '/../../ttemplates/pages/404.html';
 
-                    $html = file_get_contents($htmlFile);
+                    if (file_exists($htmlFile)) {
+                        $html = file_get_contents($htmlFile);
+                        $response->getBody()->write($html);
+                    } else {
+                        $response->getBody()->write('<div style="display: flex; justify-content: center; align-items: center; height: 100vh;" ><div><h1>404 Page not found</h1></div><br><div><button onclick="history.back()">Voltar</button></div>');
+                    }
 
-                    $response->getBody()->write($html);
                     return $response->withHeader('Content-Type', 'text/html');
                 }
             );

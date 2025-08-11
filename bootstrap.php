@@ -6,6 +6,7 @@ use Dotenv\Dotenv;
 use Middlewares\TrailingSlash;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
+use App\middlewares\Error;
 
 
 if (!session_status() !== PHP_SESSION_ACTIVE) {
@@ -31,22 +32,25 @@ $container = $containerBuilder->build();
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 
+// Register the App instance in the container
+$container->set(Slim\App::class, $app);
+
 // Middleware of trailing slash
 $app->add(new TrailingSlash(false));
 
-// Adicionando diretório do dominio
+// Add  directory if exist
 if (!empty($appConfig['baseDir'])) {
-	$app->setBasePath($appConfig['baseDir']);
+    $app->setBasePath($appConfig['baseDir']);
 }
 
 // Add routs middleware
 $app->addRoutingMiddleware();
 
-// add error middleware
-$app->addErrorMiddleware($appConfig['debug'], true, true);
-
 // Trailing slash
 $app->add(new TrailingSlash(false));
+
+// add error middleware
+$container->get(Error::class);
 
 // Twig middleware
 $app->add(TwigMiddleware::createFromContainer($app, Twig::class));

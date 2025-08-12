@@ -15,7 +15,7 @@ use Twig\Template;
 use Twig\TemplateWrapper;
 
 /* dashboard.html */
-class __TwigTemplate_721c25d284f60c6b08b4be5a188f8024 extends Template
+class __TwigTemplate_e0b51a28f20adda87e9db7c33e1a2d8c extends Template
 {
     private Source $source;
     /**
@@ -87,11 +87,6 @@ class __TwigTemplate_721c25d284f60c6b08b4be5a188f8024 extends Template
 
     public function getSourceContext(): Source
     {
-        return new Source("{% extends \"base.twig\" %}
-
-{% block content %}
-    <h1>Bem-vindo ao Dashboard!</h1>
-    <p>Este conteúdo foi injetado no bloco \"content\".</p>
-{% endblock %}", "dashboard.html", "C:\\wamp64\\www\\dashboard\\templates\\pages\\dashboard.html");
+        return new Source("", "dashboard.html", "C:\\wamp64\\www\\dashboard\\templates\\pages\\dashboard.html");
     }
 }

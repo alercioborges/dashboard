@@ -1,22 +1,16 @@
 <?php
 
-namespace App\controllers;
+namespace App\Controllers;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Slim\Views\Twig;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
-class DashboardController
+use App\Core\Controller;
+
+class DashboardController extends Controller
 {
-    private Twig $twig;
-    
-    public function __construct(Twig $twig)
+    public function index(Request $request, Response $response): Response
     {
-        $this->twig = $twig;
-    }
-    
-    public function index(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {        
         return $this->twig->render($response, 'dashboard.html');
     }
 }

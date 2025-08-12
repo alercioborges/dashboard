@@ -2,23 +2,25 @@
 
 use Psr\Container\ContainerInterface;
 use Slim\Views\Twig;
+use Slim\Views\TwigMiddleware;
 use Slim\App;
 
-Use App\middlewares\Error;
+use App\Middlewares\Error;
 
 $appConfig = require __DIR__ . '/app.php';
 
 return [
 
-    Twig::class => function (ContainerInterface $c) use ($appConfig):Twig {
+    Twig::class => function (ContainerInterface $c) use ($appConfig): Twig {
         $twig = Twig::create(__DIR__ . "/../../templates/pages/", [
-            'cache' => $appConfig['env'] === 'production' 
-                ? __DIR__ . '/../../storage/localcache' 
+            'cache' => $appConfig['env'] === 'production'
+                ? __DIR__ . '/../../storage/localcache'
                 : false,
-            'debug' => $appConfig['debug']
+            'debug' => $appConfig['debug'],
+            'auto_reload' => $appConfig['debug']
         ]);
 
-        // add globais variables on Twig
+        // Add globais variables on Twig
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);
 
@@ -28,6 +30,14 @@ return [
         }
 
         return $twig;
+    },
+
+    // Twig Middleware
+    TwigMiddleware::class => function (ContainerInterface $c) {
+        return TwigMiddleware::createFromContainer(
+            $c->get(App::class),
+            Twig::class
+        );
     },
 
     // Middleware error

@@ -15,7 +15,7 @@ use Twig\Template;
 use Twig\TemplateWrapper;
 
 /* base.twig */
-class __TwigTemplate_b14b79ec6b5f671f3b46943e05e74859 extends Template
+class __TwigTemplate_180aadf8f41cc85a1c48c833fcd4f705 extends Template
 {
     private Source $source;
     /**
@@ -132,46 +132,6 @@ class __TwigTemplate_b14b79ec6b5f671f3b46943e05e74859 extends Template
 
     public function getSourceContext(): Source
     {
-        return new Source("{% include 'partials/head.twig' %}
-
-{% include 'partials/header.twig' %}
-
-{% include 'partials/sidebar.twig' %}
-
-<!--begin::App Main-->
-<main class=\"app-main\">
-\t<!--begin::App Content Header-->
-\t<div class=\"app-content-header\">
-\t\t<!--begin::Container-->
-\t\t<div class=\"container-fluid\">
-\t\t\t<!--begin::Row-->
-\t\t\t<div class=\"row\">
-\t\t\t\t<div class=\"col-sm-6\"><h3 class=\"mb-0\">Dashboard v3</h3></div>
-\t\t\t\t<div class=\"col-sm-6\">
-\t\t\t\t\t<ol class=\"breadcrumb float-sm-end\">
-\t\t\t\t\t\t<li class=\"breadcrumb-item\"><a href=\"#\">Home</a></li>
-\t\t\t\t\t\t<li class=\"breadcrumb-item active\" aria-current=\"page\">Dashboard v3</li>
-\t\t\t\t\t</ol>
-\t\t\t\t</div>
-\t\t\t</div>
-\t\t\t<!--end::Row-->
-\t\t</div>
-\t\t<!--end::Container-->
-\t</div>
-\t<div class=\"app-content\">
-\t\t<!--begin::Container-->
-\t\t<div class=\"container-fluid\">
-\t\t\t<!-- Start Contant -->
-\t\t\t{% block content %}{% endblock %}
-\t\t\t\t<!-- End Contant -->
-\t\t\t</div>
-\t\t\t<!--end::Container-->
-\t\t</div>
-\t\t<!--end::App Content-->
-\t</main>
-\t<!--end::App Main-->
-
-
-{% include 'partials/footer.twig' %}", "base.twig", "C:\\wamp64\\www\\dashboard\\templates\\pages\\base.twig");
+        return new Source("", "base.twig", "C:\\wamp64\\www\\dashboard\\templates\\pages\\base.twig");
     }
 }

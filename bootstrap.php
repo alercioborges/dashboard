@@ -3,11 +3,8 @@
 use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
-use Middlewares\TrailingSlash;
-use App\Middlewares\Error;
 
-
-if (!session_status() !== PHP_SESSION_ACTIVE) {
+if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
@@ -25,6 +22,11 @@ $appConfig = require __DIR__ . '/app/config/app.php';
 $containerBuilder = new ContainerBuilder();
 $containerBuilder->addDefinitions(__DIR__ . '/app/config/dependencies.php');
 
+// Compile container in production
+if ($appConfig['env'] === 'production') {
+    $containerBuilder->enableCompilation(__DIR__ . '/storage/cache');
+}
+
 // Create variable container
 $container = $containerBuilder->build();
 
@@ -40,11 +42,9 @@ if (!empty($appConfig['baseDir'])) {
     $app->setBasePath($appConfig['baseDir']);
 }
 
-// Add routs middleware
+// Add Middlewares routs
 $app->addRoutingMiddleware();
 
-// Trailing slash
-$app->add(new TrailingSlash(false));
-
-// add error middleware
-$container->get(Error::class);
+// Setting middlewares
+$middleware = require __DIR__ . '/app/config/middlewares.php';
+$middleware($app);

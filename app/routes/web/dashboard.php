@@ -1,5 +1,5 @@
 <?php
 
-use App\controllers\DashboardController;
+use App\Controllers\DashboardController;
 
-$app->get('', [DashboardController::class, 'index']);
+$app->get('', [DashboardController::class, 'index'])->setName('dashboard');

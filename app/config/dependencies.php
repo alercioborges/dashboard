@@ -4,14 +4,16 @@ use Psr\Container\ContainerInterface;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Slim\App;
-
-use App\Middlewares\Error;
-
-$appConfig = require __DIR__ . '/app.php';
+use App\Middlewares\MiddlewareError;
 
 return [
 
-    Twig::class => function (ContainerInterface $c) use ($appConfig): Twig {
+    // Register the appConfig in the container
+    'config' => require __DIR__ . '/app.php',
+
+    Twig::class => function (ContainerInterface $c): Twig {
+        $appConfig = $c->get('config');
+
         $twig = Twig::create(__DIR__ . "/../../templates/pages/", [
             'cache' => $appConfig['env'] === 'production'
                 ? __DIR__ . '/../../storage/localcache'
@@ -20,7 +22,7 @@ return [
             'auto_reload' => $appConfig['debug']
         ]);
 
-        // Add globais variables on Twig
+        // Variáveis globais
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);
 
@@ -40,12 +42,16 @@ return [
         );
     },
 
-    // Middleware error
-    Error::class => function (ContainerInterface $c) use ($appConfig) {
+    // Middleware de erro
+    /*
+    Error::class => function (ContainerInterface $c) {
+        $appConfig = $c->get('config');
         $app = $c->get(App::class);
-        $mdwrError = new Error($app);
+
+        $mdwrError = new MiddlewareError($app);
         $mdwrError->getError($appConfig['env'], $appConfig['debug']);
+
         return $mdwrError;
     },
-
+    */
 ];

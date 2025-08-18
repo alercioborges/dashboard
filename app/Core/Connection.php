@@ -43,11 +43,11 @@ abstract class Connection
     {
         $message = "Erro de conexão com o banco de dados.";
 
-        //error_log("Database Connection Error: " . $e->getMessage());
+        error_log("Database Connection Error: " . $e->getMessage());
 
         $appConfig = require __DIR__ . '/../config/app.php';
 
-        // DO not show details errots in production
+        // DO not show details errors in production
         if ($appConfig['env'] === 'production') {
             throw new RuntimeException($message);
         }

@@ -29,7 +29,8 @@ class User extends Model implements UserRepositoryInterface
      */
     public function getAll(int $page = 1, int $perPage = 10): array
     {
-        return [];
+        $all = $this->queryBuilder->select()->get();
+        return $all;
     }
 
     /**

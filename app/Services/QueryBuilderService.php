@@ -18,48 +18,56 @@ class QueryBuilderService
         $this->queryBuilder = $queryBuilder;
     }
 
-    public function executeQuery($query)
+    /**
+     * Execute a query and return appropriate result
+     */
+    public function execute($query, string $queryString, array $queryParameters)
     {
-        list($queryString, $queryParameters) = $query->build();
+        try {
+            $statement = $this->connection->prepare($queryString);
+            $statement->execute($queryParameters);
 
-        $statement = $this->connection->prepare($queryString);
-        $statement->execute($queryParameters);
-
-        if ($query instanceof FetchableInterface) {
-            return $statement->fetchAll(PDO::FETCH_ASSOC);
-        } elseif ($query instanceof Insert) {
-            return $this->connection->lastInsertId();
-        } else {
-            return $statement->rowCount();
+            if ($query instanceof FetchableInterface) {
+                return $statement->fetchAll(PDO::FETCH_ASSOC);
+            } elseif ($query instanceof Insert) {
+                return $this->connection->lastInsertId();
+            } else {
+                return $statement->rowCount();
+            }
+        } catch (\Exception $e) {
+            throw new \RuntimeException($e->getMessage());
         }
     }
 
-    // Métodos de conveniência para diferentes tipos de queries
-    public function select(string $table): \ClanCats\Hydrahon\Query\Sql\Select
+    /**
+     * Create a select query
+     */
+    public function select(mixed $columnsOrTable = ['*'], ?string $table = null): \ClanCats\Hydrahon\Query\Sql\Select
     {
-        return $this->queryBuilder->table($table)->select();
+        if (func_num_args() === 1 && is_string($columnsOrTable)) {
+            $table = $columnsOrTable;
+            $columns = ['*'];
+        } elseif (func_num_args() === 2 && is_array($columnsOrTable) && is_string($table)) {
+            $columns = $columnsOrTable;
+        } elseif (func_num_args() === 0) {
+            $columns = ['*'];
+            $table = null; // Table must be specified when using this service
+        } else {
+            throw new \InvalidArgumentException("Argumentos inválidos para o método");
+        }
+
+        if (!$table || !is_string($table)) {
+            throw new \InvalidArgumentException("The table name must be string type");
+        }
+
+        return $this->queryBuilder->table($table)->select((array) $columns);
     }
 
-    public function insert(string $table): Insert
+    /**
+     * Get the query builder instance
+     */
+    public function getBuilder(): Builder
     {
-        return $this->queryBuilder->table($table)->insert();
-    }
-
-    public function update(string $table): \ClanCats\Hydrahon\Query\Sql\Update
-    {
-        return $this->queryBuilder->table($table)->update();
-    }
-
-    public function delete(string $table): \ClanCats\Hydrahon\Query\Sql\Delete
-    {
-        return $this->queryBuilder->table($table)->delete();
-    }
-
-    // Método para executar queries cruas se necessário
-    public function raw(string $sql, array $parameters = []): array
-    {
-        $statement = $this->connection->prepare($sql);
-        $statement->execute($parameters);
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+        return $this->queryBuilder;
     }
 }

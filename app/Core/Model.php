@@ -2,10 +2,14 @@
 
 namespace App\Core;
 
+use ClanCats\Hydrahon\Builder;
+
 abstract class Model
 {
-    public function __construct()
+    protected Builder $queryBuilder;
+
+    public function __construct(Builder $queryBuilder)
     {
-        
+        $this->queryBuilder = $queryBuilder;
     }
 }

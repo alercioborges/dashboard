@@ -8,6 +8,7 @@ use Slim\App;
 use ClanCats\Hydrahon\Builder;
 
 use App\Core\Connection;
+use App\Services\QueryBuilderService;
 
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
@@ -80,6 +81,8 @@ return [
 
 
     // Repository
-    UserRepositoryInterface::class => DI\autowire(User::class),
+    UserRepositoryInterface::class => function (ContainerInterface $c): User {
+        return new User($c->get(Builder::class));
+    },
 
 ];

@@ -4,15 +4,25 @@ use Psr\Container\ContainerInterface;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Slim\App;
-use App\Middlewares\MiddlewareError;
+
+use ClanCats\Hydrahon\Builder;
+
+use App\Core\Connection;
+
+use App\Interfaces\UserRepositoryInterface;
+use App\Models\User;
 
 return [
 
     // Register the appConfig in the container
-    'config' => require __DIR__ . '/app.php',
+    'appConfig' => require __DIR__ . '/app.php',
 
+    // Register the dbConfig in the container
+    'dbConfig' => require __DIR__ . '/database.php',
+
+    // Twig
     Twig::class => function (ContainerInterface $c): Twig {
-        $appConfig = $c->get('config');
+        $appConfig = $c->get('appConfig');
 
         $twig = Twig::create(__DIR__ . "/../../templates/pages/", [
             'cache' => $appConfig['env'] === 'production'
@@ -21,6 +31,7 @@ return [
             'debug' => $appConfig['debug'],
             'auto_reload' => $appConfig['debug']
         ]);
+
 
         // Variáveis globais
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
@@ -34,24 +45,41 @@ return [
         return $twig;
     },
 
+
     // Twig Middleware
     TwigMiddleware::class => function (ContainerInterface $c) {
-        return TwigMiddleware::createFromContainer(
-            $c->get(App::class),
-            Twig::class
+        return TwigMiddleware::createFromContainer($c->get(App::class), Twig::class);
+    },
+
+
+    // Database Connection
+    PDO::class => function (ContainerInterface $c) {
+        $dbConfig = $c->get('dbConfig');
+        return Connection::getInstance($dbConfig);
+    },
+
+
+    // Query Builder
+    Builder::class => function (ContainerInterface $c): Builder {
+        $pdo = $c->get(PDO::class);
+
+        return new Builder('mysql', function ($query, $queryString, $queryParameters) use ($pdo) {
+            $statement = $pdo->prepare($queryString);
+            $statement->execute($queryParameters);
+            return $statement;
+        });
+    },
+
+
+    QueryBuilderService::class => function (ContainerInterface $c): QueryBuilderService {
+        return new QueryBuilderService(
+            $c->get(PDO::class),
+            $c->get(Builder::class)
         );
     },
 
-    // Middleware de erro
-    /*
-    Error::class => function (ContainerInterface $c) {
-        $appConfig = $c->get('config');
-        $app = $c->get(App::class);
 
-        $mdwrError = new MiddlewareError($app);
-        $mdwrError->getError($appConfig['env'], $appConfig['debug']);
+    // Repository
+    UserRepositoryInterface::class => DI\autowire(User::class),
 
-        return $mdwrError;
-    },
-    */
 ];

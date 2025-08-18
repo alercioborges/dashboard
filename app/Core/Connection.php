@@ -19,30 +19,24 @@ abstract class Connection
         throw new RuntimeException('Cannot unserialize singleton');
     }
 
-    public static function getInstance(): PDO
+    public static function getInstance(array $dbConfig): PDO
     {
         if (self::$instance === null) {
-            self::createConnection();
+            try {
+                self::$instance = new PDO(
+                    $dbConfig['driver']
+                        . ":dbname=" . $dbConfig['database']
+                        . ";host=" . $dbConfig['host'] . ":" . $dbConfig['port'],
+                    $dbConfig['username'],
+                    $dbConfig['password'],
+                    $dbConfig['options']
+                );
+            } catch (PDOException $e) {
+                self::handleConnectionError($e);
+            }
         }
 
         return self::$instance;
-    }
-
-    private static function createConnection(): void
-    {
-        try {
-            $dbConfig = require __DIR__ . '/../config/database.php';
-            self::$instance = new PDO(
-                $dbConfig['driver']
-                    . ":dbname=" . $dbConfig['database']
-                    . ";host=" . $dbConfig['host'] . ":" . $dbConfig['port'],
-                $dbConfig['username'],
-                $dbConfig['password'],
-                $dbConfig['options']
-            );
-        } catch (PDOException $e) {
-            self::handleConnectionError($e);
-        }
     }
 
     private static function handleConnectionError(PDOException $e): void

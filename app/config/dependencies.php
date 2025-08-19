@@ -5,7 +5,8 @@ use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Slim\App;
 
-use ClanCats\Hydrahon\Builder;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Connection as DBALConn;
 
 use App\Core\Connection;
 use App\Services\QueryBuilderService;
@@ -60,29 +61,31 @@ return [
     },
 
 
-    // Query Builder
-    Builder::class => function (ContainerInterface $c): Builder {
+    // Setting Doctrine DBAL Connection
+    DBALConn::class => function (ContainerInterface $c) {
         $pdo = $c->get(PDO::class);
 
-        return new Builder('mysql', function ($query, $queryString, $queryParameters) use ($pdo) {
-            $statement = $pdo->prepare($queryString);
-            $statement->execute($queryParameters);
-            return $statement;
-        });
+        // Configuration parameters of Doctrine DBAL
+        $connectionParams = [
+            'pdo' => $pdo,
+            'driver' => 'pdo_mysql', // ou outro driver adequado
+        ];
+
+        return DriverManager::getConnection($connectionParams);
     },
+    
 
-
+    // Query Builder
     QueryBuilderService::class => function (ContainerInterface $c): QueryBuilderService {
         return new QueryBuilderService(
-            $c->get(PDO::class),
-            $c->get(Builder::class)
+            $c->get(DBALConn::class)
         );
     },
 
 
     // Repository
     UserRepositoryInterface::class => function (ContainerInterface $c): User {
-        return new User($c->get(Builder::class));
+        return new User($c->get(QueryBuilderService::class));
     },
 
 ];

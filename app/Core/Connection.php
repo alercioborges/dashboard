@@ -25,8 +25,10 @@ abstract class Connection
             try {
                 self::$instance = new PDO(
                     $dbConfig['driver']
-                        . ":dbname=" . $dbConfig['database']
-                        . ";host=" . $dbConfig['host'] . ":" . $dbConfig['port'],
+                        . ":host=" . $dbConfig['host'] .
+                        ";port=" . $dbConfig['port'] .
+                        ";dbname=" . $dbConfig['database'] .
+                        ";charset=" . $dbConfig['charset'],
                     $dbConfig['username'],
                     $dbConfig['password'],
                     $dbConfig['options']
@@ -35,7 +37,7 @@ abstract class Connection
                 self::handleConnectionError($e);
             }
         }
-
+        
         return self::$instance;
     }
 

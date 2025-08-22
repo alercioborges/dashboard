@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Views\Twig;
 
 use App\Core\Controller;
 use App\Services\UserService;
@@ -12,8 +13,9 @@ class UserController extends Controller
 {
     private UserService $userService;
 
-    public function __construct(UserService $userService)
+    public function __construct(Twig $twig, UserService $userService)
     {
+        parent::__construct($twig);
         $this->userService = $userService;
     }
 
@@ -21,6 +23,13 @@ class UserController extends Controller
     {
         $users = $this->userService->getAllUsers();
 
-        return $this->twig->render($response, 'users.html', $users);
+        return $this->twig->render(
+            $response,
+            'users.html',
+            [
+                'TITLE' => 'Lista de usuários',
+                'USERS' => $users
+            ]
+        );
     }
 }

@@ -7,6 +7,9 @@ use App\Interfaces\UserRepositoryInterface;
 
 class User extends Model implements UserRepositoryInterface
 {
+
+    private $table = 'tbl_users';
+
     /**
      * Find user by ID
      */
@@ -29,7 +32,7 @@ class User extends Model implements UserRepositoryInterface
      */
     public function getAll(int $page = 1, int $perPage = 10): array
     {
-        $all = $this->queryBuilder->select()->get();
+        $all = $this->queryBuilder->select($this->table);
         return $all;
     }
 

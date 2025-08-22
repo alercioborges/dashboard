@@ -12,6 +12,9 @@ use App\Core\Connection;
 use App\Services\QueryBuilderService;
 
 use App\Interfaces\UserRepositoryInterface;
+use App\Services\UserService;
+use App\Controllers\UserController;
+use App\Core\Controller;
 use App\Models\User;
 
 return [
@@ -54,7 +57,7 @@ return [
     },
 
 
-    // Database Connection
+    // Database Connection PDO
     PDO::class => function (ContainerInterface $c) {
         $dbConfig = $c->get('dbConfig');
         return Connection::getInstance($dbConfig);
@@ -63,17 +66,23 @@ return [
 
     // Setting Doctrine DBAL Connection
     DBALConn::class => function (ContainerInterface $c) {
-        $pdo = $c->get(PDO::class);
+        $dbConfig = $c->get('dbConfig');
+        PDO::class;
 
         // Configuration parameters of Doctrine DBAL
         $connectionParams = [
-            'pdo' => $pdo,
-            'driver' => 'pdo_mysql', // ou outro driver adequado
+            'driver' => 'pdo_mysql',
+            'host' => $dbConfig['host'],
+            'port' => $dbConfig['port'],
+            'dbname' => $dbConfig['database'],
+            'user' => $dbConfig['username'],
+            'password' => $dbConfig['password'],
+            'charset' => $dbConfig['charset']
         ];
 
         return DriverManager::getConnection($connectionParams);
     },
-    
+
 
     // Query Builder
     QueryBuilderService::class => function (ContainerInterface $c): QueryBuilderService {
@@ -83,9 +92,31 @@ return [
     },
 
 
-    // Repository
-    UserRepositoryInterface::class => function (ContainerInterface $c): User {
+    Controller::class => function (ContainerInterface $c): Controller {
+        return new Controller(
+            $c->get(Twig::class)
+        );
+    },
+
+
+    // Repository User implements UserRepositoryInterface
+    UserRepositoryInterface::class => function (ContainerInterface $c): UserRepositoryInterface {
         return new User($c->get(QueryBuilderService::class));
+    },
+
+
+    // UserService
+    UserService::class => function (ContainerInterface $c): UserService {
+        return new UserService($c->get(UserRepositoryInterface::class));
+    },
+
+
+    // UserController
+    UserController::class => function (ContainerInterface $c) {
+        return new UserController(    
+            $c->get(Twig::class),
+            $c->get(UserService::class)
+        );
     },
 
 ];

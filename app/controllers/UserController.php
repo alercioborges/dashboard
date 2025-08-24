@@ -19,6 +19,17 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
+    public function index(Request $request, Response $response): Response
+    {
+        return $this->twig->render(
+            $response,
+            'admin.html',
+            [
+                'TITLE' => 'Administração do site'
+            ]
+        );
+    }
+
     public function show(Request $request, Response $response): Response
     {
         $users = $this->userService->getAllUsers();

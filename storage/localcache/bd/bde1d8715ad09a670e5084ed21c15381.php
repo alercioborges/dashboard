@@ -61,11 +61,20 @@ class __TwigTemplate_b14b79ec6b5f671f3b46943e05e74859 extends Template
 \t\t<div class=\"container-fluid\">
 \t\t\t<!--begin::Row-->
 \t\t\t<div class=\"row\">
-\t\t\t\t<div class=\"col-sm-6\"><h3 class=\"mb-0\">Dashboard v3</h3></div>
+\t\t\t\t<div class=\"col-sm-6\"><h3 class=\"mb-0\">";
+        // line 15
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(($context["TITLE"] ?? null), "html", null, true);
+        yield "</h3></div>
 \t\t\t\t<div class=\"col-sm-6\">
 \t\t\t\t\t<ol class=\"breadcrumb float-sm-end\">
-\t\t\t\t\t\t<li class=\"breadcrumb-item\"><a href=\"#\">Home</a></li>
-\t\t\t\t\t\t<li class=\"breadcrumb-item active\" aria-current=\"page\">Dashboard v3</li>
+\t\t\t\t\t\t<li class=\"breadcrumb-item\"><a href=\"";
+        // line 18
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(($context["base_path"] ?? null), "html", null, true);
+        yield "\">Home</a></li>
+\t\t\t\t\t\t<li class=\"breadcrumb-item active\" aria-current=\"page\">";
+        // line 19
+        yield $this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape(($context["TITLE"] ?? null), "html", null, true);
+        yield "</li>
 \t\t\t\t\t</ol>
 \t\t\t\t</div>
 \t\t\t</div>
@@ -81,7 +90,7 @@ class __TwigTemplate_b14b79ec6b5f671f3b46943e05e74859 extends Template
         // line 31
         yield from $this->unwrap()->yieldBlock('content', $context, $blocks);
         // line 32
-        yield "\t\t\t\t<!-- End Contant -->
+        yield "\t\t\t<!-- End Contant -->
 \t\t\t</div>
 \t\t\t<!--end::Container-->
 \t\t</div>
@@ -89,10 +98,9 @@ class __TwigTemplate_b14b79ec6b5f671f3b46943e05e74859 extends Template
 \t</main>
 \t<!--end::App Main-->
 
-
-";
-        // line 41
-        yield from $this->load("partials/footer.twig", 41)->unwrap()->yield($context);
+\t";
+        // line 40
+        yield from $this->load("partials/footer.twig", 40)->unwrap()->yield($context);
         yield from [];
     }
 
@@ -127,7 +135,7 @@ class __TwigTemplate_b14b79ec6b5f671f3b46943e05e74859 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  100 => 31,  95 => 41,  84 => 32,  82 => 31,  55 => 6,  53 => 5,  50 => 4,  48 => 3,  45 => 2,  43 => 1,);
+        return array (  108 => 31,  103 => 40,  93 => 32,  91 => 31,  76 => 19,  72 => 18,  66 => 15,  55 => 6,  53 => 5,  50 => 4,  48 => 3,  45 => 2,  43 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -146,11 +154,11 @@ class __TwigTemplate_b14b79ec6b5f671f3b46943e05e74859 extends Template
 \t\t<div class=\"container-fluid\">
 \t\t\t<!--begin::Row-->
 \t\t\t<div class=\"row\">
-\t\t\t\t<div class=\"col-sm-6\"><h3 class=\"mb-0\">Dashboard v3</h3></div>
+\t\t\t\t<div class=\"col-sm-6\"><h3 class=\"mb-0\">{{ TITLE }}</h3></div>
 \t\t\t\t<div class=\"col-sm-6\">
 \t\t\t\t\t<ol class=\"breadcrumb float-sm-end\">
-\t\t\t\t\t\t<li class=\"breadcrumb-item\"><a href=\"#\">Home</a></li>
-\t\t\t\t\t\t<li class=\"breadcrumb-item active\" aria-current=\"page\">Dashboard v3</li>
+\t\t\t\t\t\t<li class=\"breadcrumb-item\"><a href=\"{{ base_path }}\">Home</a></li>
+\t\t\t\t\t\t<li class=\"breadcrumb-item active\" aria-current=\"page\">{{ TITLE }}</li>
 \t\t\t\t\t</ol>
 \t\t\t\t</div>
 \t\t\t</div>
@@ -163,7 +171,7 @@ class __TwigTemplate_b14b79ec6b5f671f3b46943e05e74859 extends Template
 \t\t<div class=\"container-fluid\">
 \t\t\t<!-- Start Contant -->
 \t\t\t{% block content %}{% endblock %}
-\t\t\t\t<!-- End Contant -->
+\t\t\t<!-- End Contant -->
 \t\t\t</div>
 \t\t\t<!--end::Container-->
 \t\t</div>
@@ -171,7 +179,6 @@ class __TwigTemplate_b14b79ec6b5f671f3b46943e05e74859 extends Template
 \t</main>
 \t<!--end::App Main-->
 
-
-{% include 'partials/footer.twig' %}", "base.twig", "C:\\wamp64\\www\\dashboard\\templates\\pages\\base.twig");
+\t{% include 'partials/footer.twig' %}", "base.twig", "C:\\wamp64\\www\\dashboard\\templates\\pages\\base.twig");
     }
 }

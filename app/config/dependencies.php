@@ -8,6 +8,8 @@ use Slim\App;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Connection as DBALConn;
 
+use App\Views\TwigRedirect;
+
 use App\Core\Connection;
 use App\Services\QueryBuilderService;
 
@@ -37,10 +39,10 @@ return [
             'auto_reload' => $appConfig['debug']
         ]);
 
-
-        // Variáveis globais
+        // Global variables
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);
+        $twig->addExtension($c->get(TwigRedirect::class));
 
         if ($appConfig['env'] === 'development') {
             $twig->addExtension(new \Twig\Extension\DebugExtension());
@@ -48,6 +50,14 @@ return [
         }
 
         return $twig;
+    },
+
+    // Twig function to redirect to route name
+    TwigRedirect::class => function (ContainerInterface $c): TwigRedirect {
+        $routeParser = $c->get(App::class)
+            ->getRouteCollector()
+            ->getRouteParser();
+        return new TwigRedirect($routeParser);
     },
 
 
@@ -113,7 +123,7 @@ return [
 
     // UserController
     UserController::class => function (ContainerInterface $c) {
-        return new UserController(    
+        return new UserController(
             $c->get(Twig::class),
             $c->get(UserService::class)
         );

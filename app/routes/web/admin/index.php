@@ -1,10 +1,10 @@
 <?php
 
-use app\controllers\UserController;
+use App\Controllers\UserController;
 
 $app->group('/admin', function (Slim\Routing\RouteCollectorProxy $group) {
     $group->get('', [UserController::class, 'index']);
     
-    // Rotas de usuários
+    // Users routs
     require 'users.php';
 });

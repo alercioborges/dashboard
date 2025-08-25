@@ -4,25 +4,60 @@
  */
 class CompiledContainer extends DI\CompiledContainer{
     const METHOD_MAPPING = array (
-  'config' => 'get1',
-  'Slim\\Views\\Twig' => 'get2',
-  'Slim\\Views\\TwigMiddleware' => 'get3',
+  'appConfig' => 'get1',
+  'dbConfig' => 'get2',
+  'subEntry1' => 'get3',
+  'Slim\\Views\\Twig' => 'get4',
+  'App\\Views\\ExtensionTwig' => 'get5',
+  'Slim\\Views\\TwigMiddleware' => 'get6',
+  'PDO' => 'get7',
+  'Doctrine\\DBAL\\Connection' => 'get8',
+  'App\\Services\\QueryBuilderService' => 'get9',
+  'App\\Core\\Controller' => 'get10',
+  'App\\Interfaces\\UserRepositoryInterface' => 'get11',
+  'App\\Services\\UserService' => 'get12',
+  'App\\Controllers\\UserController' => 'get13',
 );
 
     protected function get1()
     {
         return [
-            'debug' => true,
+            'debug' => false,
             'env' => 'production',
             'baseDir' => '/dashboard',
             'url' => 'http://localhost/dashboard',
         ];
     }
 
+    protected function get3()
+    {
+        return [
+            3 => 2,
+            19 => 2,
+            20 => false,
+            17 => false,
+            1002 => 'SET NAMES utf8mb4',
+        ];
+    }
+
     protected function get2()
     {
+        return [
+            'driver' => 'mysql',
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'dashboard',
+            'username' => 'dashboard',
+            'password' => 'dashboardd',
+            'charset' => 'utf8mb4',
+            'options' => $this->get3(),
+        ];
+    }
+
+    protected function get4()
+    {
         return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \Slim\Views\Twig {
-        $appConfig = $c->get('config');
+        $appConfig = $c->get('appConfig');
 
         $twig = \Slim\Views\Twig::create('C:\\wamp64\\www\\dashboard\\app\\config' . "/../../templates/pages/", [
             'cache' => $appConfig['env'] === 'production'
@@ -32,9 +67,10 @@ class CompiledContainer extends DI\CompiledContainer{
             'auto_reload' => $appConfig['debug']
         ]);
 
-        // Variáveis globais
+        // Global variables
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);
+        $twig->addExtension($c->get(\App\Views\ExtensionTwig::class));
 
         if ($appConfig['env'] === 'development') {
             $twig->addExtension(new \Twig\Extension\DebugExtension());
@@ -45,14 +81,92 @@ class CompiledContainer extends DI\CompiledContainer{
     }, 'Slim\\Views\\Twig');
     }
 
-    protected function get3()
+    protected function get5()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Views\ExtensionTwig {
+        $routeParser = $c->get(\Slim\App::class)
+            ->getRouteCollector()
+            ->getRouteParser();
+        return new \App\Views\ExtensionTwig($routeParser);
+    }, 'App\\Views\\ExtensionTwig');
+    }
+
+    protected function get6()
     {
         return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c) {
-        return \Slim\Views\TwigMiddleware::createFromContainer(
-            $c->get(\Slim\App::class),
-            \Slim\Views\Twig::class
-        );
+        return \Slim\Views\TwigMiddleware::createFromContainer($c->get(\Slim\App::class), \Slim\Views\Twig::class);
     }, 'Slim\\Views\\TwigMiddleware');
+    }
+
+    protected function get7()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c) {
+        $dbConfig = $c->get('dbConfig');
+        return \App\Core\Connection::getInstance($dbConfig);
+    }, 'PDO');
+    }
+
+    protected function get8()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c) {
+        $dbConfig = $c->get('dbConfig');
+        $c->get(\PDO::class);
+
+        // Configuration parameters of Doctrine DBAL
+        $connectionParams = [
+            'driver' => 'pdo_mysql',
+            'host' => $dbConfig['host'],
+            'port' => $dbConfig['port'],
+            'dbname' => $dbConfig['database'],
+            'user' => $dbConfig['username'],
+            'password' => $dbConfig['password'],
+            'charset' => $dbConfig['charset']
+        ];
+
+        return \Doctrine\DBAL\DriverManager::getConnection($connectionParams);
+    }, 'Doctrine\\DBAL\\Connection');
+    }
+
+    protected function get9()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Services\QueryBuilderService {
+        return new \App\Services\QueryBuilderService(
+            $c->get(\Doctrine\DBAL\Connection::class)
+        );
+    }, 'App\\Services\\QueryBuilderService');
+    }
+
+    protected function get10()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Core\Controller {
+        return new \App\Core\Controller(
+            $c->get(\Slim\Views\Twig::class)
+        );
+    }, 'App\\Core\\Controller');
+    }
+
+    protected function get11()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Interfaces\UserRepositoryInterface {
+        return new \App\Models\User($c->get(\App\Services\QueryBuilderService::class));
+    }, 'App\\Interfaces\\UserRepositoryInterface');
+    }
+
+    protected function get12()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Services\UserService {
+        return new \App\Services\UserService($c->get(\App\Interfaces\UserRepositoryInterface::class));
+    }, 'App\\Services\\UserService');
+    }
+
+    protected function get13()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c) {
+        return new \App\Controllers\UserController(
+            $c->get(\Slim\Views\Twig::class),
+            $c->get(\App\Services\UserService::class)
+        );
+    }, 'App\\Controllers\\UserController');
     }
 
 }

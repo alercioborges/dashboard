@@ -8,7 +8,7 @@ use Slim\App;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Connection as DBALConn;
 
-use App\Views\TwigRedirect;
+use App\Views\ExtensionTwig;
 
 use App\Core\Connection;
 use App\Services\QueryBuilderService;
@@ -42,7 +42,7 @@ return [
         // Global variables
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);
-        $twig->addExtension($c->get(TwigRedirect::class));
+        $twig->addExtension($c->get(ExtensionTwig::class));
 
         if ($appConfig['env'] === 'development') {
             $twig->addExtension(new \Twig\Extension\DebugExtension());
@@ -53,11 +53,11 @@ return [
     },
 
     // Twig function to redirect to route name
-    TwigRedirect::class => function (ContainerInterface $c): TwigRedirect {
+    ExtensionTwig::class => function (ContainerInterface $c): ExtensionTwig {
         $routeParser = $c->get(App::class)
             ->getRouteCollector()
             ->getRouteParser();
-        return new TwigRedirect($routeParser);
+        return new ExtensionTwig($routeParser);
     },
 
 
@@ -77,7 +77,7 @@ return [
     // Setting Doctrine DBAL Connection
     DBALConn::class => function (ContainerInterface $c) {
         $dbConfig = $c->get('dbConfig');
-        PDO::class;
+        $c->get(PDO::class);
 
         // Configuration parameters of Doctrine DBAL
         $connectionParams = [

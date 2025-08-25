@@ -6,7 +6,7 @@ use Slim\Interfaces\RouteParserInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class TwigRedirect extends AbstractExtension
+class ExtensionTwig extends AbstractExtension
 {
     private RouteParserInterface $routeParser;
 

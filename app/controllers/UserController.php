@@ -12,7 +12,8 @@ use App\Services\UserService;
 class UserController extends Controller
 {
     private UserService $userService;
-
+    private User $user;
+    
     public function __construct(Twig $twig, UserService $userService)
     {
         parent::__construct($twig);

@@ -16,8 +16,13 @@ use App\Services\QueryBuilderService;
 use App\Interfaces\UserRepositoryInterface;
 use App\Services\UserService;
 use App\Controllers\UserController;
-use App\Core\Controller;
 use App\Models\User;
+
+use App\Core\Controller;
+use App\Core\Model;
+
+use Doctrine\DBAL\Query;
+use Doctrine\DBAL\Query\QueryBuilder;
 
 return [
 
@@ -101,23 +106,40 @@ return [
         );
     },
 
-
+    // Core Controller
     Controller::class => function (ContainerInterface $c): Controller {
         return new Controller(
             $c->get(Twig::class)
         );
     },
 
+    // Core Model
+    Model::class => function (ContainerInterface $c): Model {
+        return new Model(
+            $c->get(QueryBuilderService::class)
+        );
+    },
+
 
     // Repository User implements UserRepositoryInterface
     UserRepositoryInterface::class => function (ContainerInterface $c): UserRepositoryInterface {
-        return new User($c->get(QueryBuilderService::class));
+        return new User(
+            $c->get(QueryBuilderService::class)
+        );
     },
 
 
     // UserService
     UserService::class => function (ContainerInterface $c): UserService {
         return new UserService($c->get(UserRepositoryInterface::class));
+    },
+
+
+    //User
+    User::class => function (ContainerInterface $c): User {
+        return new User(
+            $c->get(QueryBuilderService::class)
+        );
     },
 
 

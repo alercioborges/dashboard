@@ -2,6 +2,9 @@
 
 require "../bootstrap.php";
 
+// Authentication route
+require 'auth/index.php';
+
 // Dashboard route
 require 'dashboard.php';
 

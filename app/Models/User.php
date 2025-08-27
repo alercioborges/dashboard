@@ -3,12 +3,18 @@
 namespace App\Models;
 
 use App\Core\Model;
+use App\Services\QueryBuilderService;
 use App\Interfaces\UserRepositoryInterface;
 
 class User extends Model implements UserRepositoryInterface
 {
 
     private $table = 'tbl_users';
+
+    public function __construct(QueryBuilderService $queryBuilder)
+    {
+        parent::__construct($queryBuilder);
+    }
 
     /**
      * Find user by ID

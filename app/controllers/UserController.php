@@ -13,22 +13,11 @@ class UserController extends Controller
 {
     private UserService $userService;
     private User $user;
-    
+
     public function __construct(Twig $twig, UserService $userService)
     {
         parent::__construct($twig);
         $this->userService = $userService;
-    }
-
-    public function index(Request $request, Response $response): Response
-    {
-        return $this->twig->render(
-            $response,
-            'admin.html',
-            [
-                'TITLE' => 'Administração do site'
-            ]
-        );
     }
 
     public function show(Request $request, Response $response): Response
@@ -37,10 +26,22 @@ class UserController extends Controller
 
         return $this->twig->render(
             $response,
-            'users.html',
+            'users.twig',
             [
                 'TITLE' => 'Lista de usuários',
                 'USERS' => $users
+            ]
+        );
+    }
+
+
+    public function create(Request $request, Response $response): Response
+    {
+        return $this->twig->render(
+            $response,
+            'users-create.twig',
+            [
+                'TITLE' => 'Cadastrar novo usuários'
             ]
         );
     }

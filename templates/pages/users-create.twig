@@ -1,0 +1,52 @@
+{% extends "base.twig" %}
+
+{% block content %}
+  <div class="card mb-4">
+      <!-- /.card-header -->
+      <div class="card-body responsive p-0">
+          <form id="cadastroForm" method="post" action="{{ route_redirect('user.store') }}">
+            <!-- firstname -->
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="nome" name="nome" required>
+            </div>
+
+            <!-- Sobrenome -->
+            <div class="mb-3">
+                <label for="sobrenome" class="form-label">Sobrenome <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="sobrenome" name="sobrenome" required>
+            </div>
+
+            <!-- E-mail -->
+            <div class="mb-3">
+                <label for="email" class="form-label">E-mail <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+
+            <!-- Perfil de usuário -->
+            <div class="mb-3">
+                <label for="perfil" class="form-label">Perfil de Usuário <span class="text-danger">*</span></label>
+                <select class="form-select" id="perfil" name="perfil" required>
+                    <option value="">Selecione um perfil</option>
+                    <option value="admin">Administrador</option>
+                    <option value="usuario">Usuário</option>
+                    <option value="moderador">Moderador</option>
+                    <option value="convidado">Convidado</option>
+                </select>
+            </div>
+
+            <!-- Senha -->
+            <div class="mb-3">
+                <label for="senha" class="form-label">Senha <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="senha" name="senha" required minlength="6">
+                <div class="form-text">A senha deve conter pelo menos 6 caracteres.</div>
+            </div>
+
+            <!-- Botão de submit -->
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Cadastrar</button>
+            </div>
+        </form>
+    </div><!-- /.card-body -->
+</div><!-- /.card -->
+{% endblock %}

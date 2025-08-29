@@ -38,8 +38,19 @@ class User extends Model implements UserRepositoryInterface
      */
     public function getAll(int $page = 1, int $perPage = 10): array
     {
-        $all = $this->queryBuilder->select($this->table);
-        return $all;
+        $users = $this->queryBuilder->selectWithJoin(
+            $this->table,
+            [
+                'tbl_roles r' => ['INNER', 'r.id = m.role_id']
+            ],
+            [
+                "CONCAT(m.firstname, ' ', m.lastname) AS name",
+                "m.email",
+                "r.name AS role"
+            ]
+        );
+
+        return $users;
     }
 
     /**
@@ -67,5 +78,4 @@ class User extends Model implements UserRepositoryInterface
     {
         return true;
     }
-
 }

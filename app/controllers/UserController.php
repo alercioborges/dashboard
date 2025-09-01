@@ -45,4 +45,9 @@ class UserController extends Controller
             ]
         );
     }
+
+    public function store()
+    {
+        dd($_POST);
+    }
 }

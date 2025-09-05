@@ -8,16 +8,18 @@ use Slim\Views\Twig;
 
 use App\Core\Controller;
 use App\Services\UserService;
+use App\Services\Validators\Validator;
 
 class UserController extends Controller
 {
     private UserService $userService;
-    private User $user;
+    private Validator $validator;
 
-    public function __construct(Twig $twig, UserService $userService)
+    public function __construct(Twig $twig, UserService $userService, Validator $validator)
     {
         parent::__construct($twig);
         $this->userService = $userService;
+        $this->validator = $validator;
     }
 
     public function show(Request $request, Response $response): Response
@@ -46,8 +48,25 @@ class UserController extends Controller
         );
     }
 
-    public function store()
+    public function store(Request $request, Response $response)
     {
-        dd($_POST);
+
+        $data = $this->validator->validate([
+            'firstname' => 'required:max@30:uppercase',
+            'lastname'  => 'required:max@30:uppercase',
+            'email'     => 'email:required:max@60:unique@User',
+            'role_id'   => 'required',
+            'password'  => 'required:max@30'
+        ]);
+
+        if ($this->validator->hasErrors($data)) {
+            return $response
+                ->withHeader('Location', '/dashboard/admin/users/create')
+                ->withStatus(301);
+        }
+
+        return $response
+            ->withHeader('Location', '/dashboard/admin/users')
+            ->withStatus(301);
     }
 }

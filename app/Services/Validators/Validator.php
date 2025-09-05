@@ -3,9 +3,15 @@
 namespace App\Services\Validators;
 
 use App\Services\Validators\Validation;
+use Psr\Container\ContainerInterface;
 
-class UserValidator extends Validation
+class Validator extends Validation
 {
+    public function __construct(ContainerInterface $container)
+    {
+        parent::__construct($container);
+    }
+
     public function validate($rules)
     {
         foreach ($rules as $field => $validation) {

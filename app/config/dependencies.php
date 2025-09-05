@@ -13,6 +13,8 @@ use App\Views\ExtensionTwig;
 use App\Core\Connection;
 use App\Services\QueryBuilderService;
 
+use App\Services\Validators\Validator;
+
 use App\Interfaces\UserRepositoryInterface;
 use App\Services\UserService;
 use App\Controllers\UserController;
@@ -121,6 +123,12 @@ return [
     },
 
 
+    // Validator
+    Validator::class => function (ContainerInterface $c): Validator {
+        return new Validator($c);
+    },
+
+
     // Repository User implements UserRepositoryInterface
     UserRepositoryInterface::class => function (ContainerInterface $c): UserRepositoryInterface {
         return new User(
@@ -147,7 +155,8 @@ return [
     UserController::class => function (ContainerInterface $c) {
         return new UserController(
             $c->get(Twig::class),
-            $c->get(UserService::class)
+            $c->get(UserService::class),
+            $c->get(Validator::class)
         );
     },
 

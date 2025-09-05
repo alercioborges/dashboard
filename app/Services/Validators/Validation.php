@@ -2,9 +2,17 @@
 
 namespace App\Services\Validators;
 
+use Psr\Container\ContainerInterface;
+
 abstract class Validation extends Sanitize
 {
     private $errors = [];
+    protected ContainerInterface $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     protected function required(string $field)
     {
@@ -42,9 +50,7 @@ abstract class Validation extends Sanitize
 
         try {
 
-            global $container;
-
-            if (!isset($container)) {
+            if (!isset($this->container)) {
                 throw new \Exception("Dependency container is not available");
             }
 
@@ -53,26 +59,16 @@ abstract class Validation extends Sanitize
 
             // Check if the class exists
             if (!class_exists($modelClass)) {
-                throw new \Exception("Modelo {$modelName} não encontrado");
+                throw new \Exception("Model {$modelName} not found");
             }
 
-            // Get the model through the container
-            $model = $container->get($modelClass);
-
-            // Determine which method to use based on the field
-            $searchMethod = $this->getSearchMethodForField($field);
-
-            // Check if the method exists in the model
-            if (!method_exists($model, $searchMethod)) {
-                throw new \Exception("Método {$searchMethod} não encontrado no modelo {$modelName}");
-            }
+            $model = $this->container->get($modelClass);
 
             // Database search
-            $result = $model->$searchMethod($_POST[$field]);
-            dd($result);
-            // Se encontrou um registro, significa que não é único
+            $result = $model->findByField($field, $_POST[$field]);
+
             if ($result !== null && !empty($result)) {
-                $this->errors[$field][] = flash($field, error("Este {$this->getFieldLabel($field)} já está sendo usado"));
+                $this->errors[$field][] = flash($field, error("Este {$field} já está"));
             }
         } catch (\Exception $e) {
             // Em caso de erro, registra o erro de validação
@@ -86,27 +82,7 @@ abstract class Validation extends Sanitize
         $_POST[$field] = mb_strtoupper($_POST[$field]);
     }
 
-    private function getSearchMethodForField(string $field): string
-    {
-        switch ($field) {
-            case 'email':
-                return 'findByEmail';
-            case 'id':
-                return 'findById';
-            case 'username':
-                return 'findByUsername';
-            case 'cpf':
-                return 'findByCpf';
-            case 'cnpj':
-                return 'findByCnpj';
-            default:
-                // Para outros campos, assume um método padrão findBy + CampoCapitalizado
-                return 'findBy' . ucfirst($field);
-        }
-    }
-
-
-    private function hasErrors(array $formData = [])
+    public function hasErrors(array $formData)
     {
         return !empty($this->errors);
     }

@@ -19,11 +19,17 @@ class ExtensionTwig extends AbstractExtension
     {
         return [
             new TwigFunction('route_redirect', [$this, 'routeRedirect']),
+            new TwigFunction('message', [$this, 'setMessage'])
         ];
     }
 
     public function routeRedirect(string $routeName): string
     {
         return $this->routeParser->urlFor($routeName);
+    }
+
+    public function setMessage($type)
+    {
+        return \App\Services\FlashMessageService::get($type);
     }
 }

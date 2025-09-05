@@ -2,7 +2,8 @@
 
 {% block content %}
 	<div class="col-md-8 mx-auto border border-dark p-3 rounded">
-		<form method="post" action="{{ route_redirect('users.store') }}">
+		<form
+			method="post" action="{{ route_redirect('users.store') }}">
 			<!-- firstname -->
 			<div class="mb-3">
 				<label for="nome" class="form-label">Nome
@@ -25,19 +26,21 @@
 					<span class="text-danger">*</span>
 				</label>
 				<input type="email" class="form-control border border-dark" id="email" name="email" required>
+				{{ message('email')|raw }}
 			</div>
 
-			<!-- Perfil de usuário -->
+
+			<!-- User profile -->
 			<div class="mb-3">
-				<label for="perfil" class="form-label">Perfil de Usuário
+				<label for="role_id" class="form-label">Perfil de Usuário
 					<span class="text-danger">*</span>
 				</label>
-				<select class="form-select border border-dark" id="perfil" name="perfil" required>
+				<select class="form-select border border-dark" id="role_id" name="role_id" required>
 					<option value="">Selecione um perfil</option>
-					<option value="admin">Administrador</option>
-					<option value="usuario">Usuário</option>
-					<option value="moderador">Moderador</option>
-					<option value="convidado">Convidado</option>
+					<option value="1">Administrador</option>
+					<option value="2">Usuário</option>
+					<option value="3">Moderador</option>
+					<option value="4">Convidado</option>
 				</select>
 			</div>
 
@@ -56,4 +59,5 @@
 			</div>
 		</form>
 	</div>
+	<pre>
 {% endblock %}

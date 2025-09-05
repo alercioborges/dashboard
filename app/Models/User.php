@@ -9,7 +9,7 @@ use App\Interfaces\UserRepositoryInterface;
 class User extends Model implements UserRepositoryInterface
 {
 
-    private $table = 'tbl_users';
+    protected string $table = 'tbl_users';
 
     public function __construct(QueryBuilderService $queryBuilder)
     {
@@ -29,7 +29,11 @@ class User extends Model implements UserRepositoryInterface
      */
     public function findByEmail(string $email): ?array
     {
-        return [];
+        return $this->queryBuilder->select(
+            $this->table,
+            ['email'],
+            ['email' => $email]
+        ) ?? [];
     }
 
 
@@ -38,7 +42,7 @@ class User extends Model implements UserRepositoryInterface
      */
     public function getAll(int $page = 1, int $perPage = 10): array
     {
-        $users = $this->queryBuilder->selectWithJoin(
+        return $this->queryBuilder->selectWithJoin(
             $this->table,
             [
                 'tbl_roles r' => ['INNER', 'r.id = m.role_id']
@@ -48,9 +52,7 @@ class User extends Model implements UserRepositoryInterface
                 "m.email",
                 "r.name AS role"
             ]
-        );
-
-        return $users;
+        ) ?? [];
     }
 
     /**

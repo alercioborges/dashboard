@@ -48,7 +48,7 @@ class UserController extends Controller
         );
     }
 
-    public function store(Request $request, Response $response)
+    public function store()
     {
 
         $data = $this->validator->validate([
@@ -60,13 +60,11 @@ class UserController extends Controller
         ]);
 
         if ($this->validator->hasErrors($data)) {
-            return $response
-                ->withHeader('Location', '/dashboard/admin/users/create')
-                ->withStatus(301);
+            back();
         }
 
-        return $response
-            ->withHeader('Location', '/dashboard/admin/users')
-            ->withStatus(301);
+        dd($this->userService->createUser($data));
+
+        return redirect('/admin/users');
     }
 }

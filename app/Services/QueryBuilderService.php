@@ -109,7 +109,7 @@ class QueryBuilderService
             $qb->executeStatement();
             return (int) $this->connection->lastInsertId();
         } catch (DBALException $e) {
-            throw new Exception("Erro no INSERT: " . $e->getMessage(), 0, $e);
+            throw new Exception("Error at INSERT: " . $e->getMessage(), 0, $e);
         }
     }
 

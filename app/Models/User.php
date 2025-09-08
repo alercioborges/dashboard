@@ -52,7 +52,7 @@ class User extends Model implements UserRepositoryInterface
                 "m.email",
                 "r.name AS role"
             ]
-        ) ?? [];
+        );
     }
 
     /**
@@ -60,7 +60,21 @@ class User extends Model implements UserRepositoryInterface
      */
     public function create(array $data): int
     {
-        return true;
+        return $this->queryBuilder->insert(
+            $this->table,
+            [
+                'id'          => NULL,
+                'firstname'   => $data['firstname'],
+                'lastname'    => $data['lastname'],
+                'email'       => $data['email'],
+                'password'    => $data['password'],
+                'role_id'     => $data['role_id'],
+                'is_active'   => 1,
+                'last_login'  => NULL,
+                'created_at'  => date('Y-m-d H:i:s'),
+                'updated_at'  => NULL
+            ]
+        );
     }
 
 

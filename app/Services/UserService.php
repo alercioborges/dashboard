@@ -26,4 +26,20 @@ class UserService
     {
         return $this->userRepository->getAll($page, $perPage);
     }
+
+    /**
+     * Create new user with validation
+     */
+    /**
+     * Create new user with validation
+     */
+    public function createUser(array $data): array
+    {
+        $userId = $this->userRepository->create($data);
+
+        return [
+            'success' => true,
+            'user_id' => $userId
+        ];
+    }
 }

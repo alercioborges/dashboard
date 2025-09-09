@@ -15,18 +15,16 @@ class Validator extends Validation
     public function validate($rules)
     {
         foreach ($rules as $field => $validation) {
-
+            // Primeiro, processa validações com parâmetros
             $validation = $this->validateWithParameter($field, $validation);
 
-            if ($this->hasOneValidation($validation)) {
-                $this->$validation($field);
-            }
+            // Separa as validações e garante que 'required' venha primeiro
+            $validations = $this->orderValidations($validation);
 
-            if ($this->hasTwoOrMoreValidation($validation)) {
-                $validations = explode(':', $validation);
-
-                foreach ($validations as $validation) {
-                    $this->$validation($field);
+            // Executa as validações na ordem correta
+            foreach ($validations as $validationRule) {
+                if (method_exists($this, $validationRule)) {
+                    $this->$validationRule($field);
                 }
             }
         }
@@ -34,6 +32,43 @@ class Validator extends Validation
         return $this->sanitize();
     }
 
+    /**
+     * Sort validations
+     * */
+    private function orderValidations($validation)
+    {
+        // Se há apenas uma validação
+        if ($this->hasOneValidation($validation)) {
+            return [$validation];
+        }
+
+        // Se há múltiplas validações
+        if ($this->hasTwoOrMoreValidation($validation)) {
+            $validations = explode(':', $validation);
+
+            // Remove strings vazias que podem aparecer após processamento de parâmetros
+            $validations = array_filter($validations, function ($val) {
+                return !empty(trim($val));
+            });
+
+            // Separa 'required' das outras validações
+            $requiredIndex = array_search('required', $validations);
+            $orderedValidations = [];
+
+            // Se 'required' existe, coloca primeiro
+            if ($requiredIndex !== false) {
+                $orderedValidations[] = 'required';
+                unset($validations[$requiredIndex]);
+            }
+
+            // Adiciona as outras validações na sequência
+            $orderedValidations = array_merge($orderedValidations, array_values($validations));
+
+            return $orderedValidations;
+        }
+
+        return [];
+    }
 
     private function validateWithParameter($field, $validation)
     {
@@ -58,12 +93,10 @@ class Validator extends Validation
         return $validation;
     }
 
-
     private function hasOneValidation($validate)
     {
         return substr_count($validate, ':') == 0;
     }
-
 
     private function hasTwoOrMoreValidation($validate)
     {

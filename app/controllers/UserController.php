@@ -50,21 +50,21 @@ class UserController extends Controller
 
     public function store()
     {
-
         $data = $this->validator->validate([
-            'firstname' => 'required:max@30:uppercase',
-            'lastname'  => 'required:max@30:uppercase',
-            'email'     => 'email:required:max@60:unique@User',
+            'firstname' => 'required:max@30:min@2:uppercase',
+            'lastname'  => 'required:max@30:min@2:uppercase',
+            'email'     => 'required:email@60:unique@User',
             'role_id'   => 'required',
-            'password'  => 'required:max@30'
+            'password'  => 'required:max@30:min@6'
         ]);
 
         if ($this->validator->hasErrors($data)) {
+            //unset($_SESSION['redirect']);
             back();
         }
 
         dd($this->userService->createUser($data));
 
-        return redirect('/admin/users');
+        return redirect('/admin/users/');
     }
 }

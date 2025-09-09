@@ -28,17 +28,17 @@ abstract class Validation extends Sanitize
         }
     }
 
-    protected function username(string $field)
-    {
-        if (preg_match('/[^A-Za-z0-9\.@_-]/', $_POST[$field])) {
-            $this->errors[$field][] = flash($field, error('O nome de usuário pode conter apenas caracteres minúsculos alfanuméricos (letras e números), sublinhado (_), hífen (-), ponto (.) ou símbolo arroba (@).'));
-        }
-    }
-
     protected function max(string $field, int $max)
     {
         if (strlen($_POST[$field]) > $max) {
             $this->errors[$field][] = flash($field, error("O número de caracteres para este campo não pode ser maior que {$max}"));
+        }
+    }
+
+    protected function min(string $field, int $min)
+    {
+        if (strlen($_POST[$field]) < $min) {
+            $this->errors[$field][] = flash($field, error("O número de caracteres para este campo deve ser maior ou igual a {$min}"));
         }
     }
 

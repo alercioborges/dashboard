@@ -59,7 +59,8 @@ class UserController extends Controller
         ]);
 
         if ($this->validator->hasErrors($data)) {
-            //unset($_SESSION['redirect']);
+            oldInput($data);
+            //session_destroy();
             back();
         }
 

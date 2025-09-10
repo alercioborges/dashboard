@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-class FlashMessageService extends Sanitize
+class FlashMessageService
 {
     public static function add(string $index, string $message)
     {
@@ -20,11 +20,17 @@ class FlashMessageService extends Sanitize
         return NULL;
     }
 
-    function old(string $field, $value): ?string
+    public static function addOldInput(array $formData):array
     {
-        if (!isset($_SESSION['old'][$field])) {
-            $_SESSION['old'][$field] = $value;
-            return htmlspecialchars($value, ENT_QUOTES);
+        return $_SESSION['old_input'] = $formData;
+    }
+
+    public static function getOldInput(): ?array
+    {
+        if (isset($_SESSION['old_input'])) {
+            $formData = $_SESSION['old_input'];           
+            unset($_SESSION['old_input']);
+            return $formData;
         }
 
         return NULL;

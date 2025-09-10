@@ -44,3 +44,8 @@ function back():void
     \App\Services\RedirectService::back();
     exit;
 }
+
+function oldInput(array $formData)
+{
+    return \App\Services\FlashMessageService::addOldInput($formData);
+}

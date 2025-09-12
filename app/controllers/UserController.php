@@ -43,7 +43,8 @@ class UserController extends Controller
             $response,
             'users-create.twig',
             [
-                'TITLE' => 'Cadastrar novo usuários'
+                'TITLE' => 'Cadastrar novo usuários',
+                'OLD_INPUT' => $this->getOldInput()
             ]
         );
     }
@@ -59,12 +60,11 @@ class UserController extends Controller
         ]);
 
         if ($this->validator->hasErrors($data)) {
-            oldInput($data);
-            //session_destroy();
+            $this->setOldInput($data);
             back();
         }
 
-        dd($this->userService->createUser($data));
+        $this->userService->createUser($data);
 
         return redirect('/admin/users/');
     }

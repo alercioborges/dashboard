@@ -19,20 +19,4 @@ class FlashMessageService
 
         return NULL;
     }
-
-    public static function addOldInput(array $formData):array
-    {
-        return $_SESSION['old_input'] = $formData;
-    }
-
-    public static function getOldInput(): ?array
-    {
-        if (isset($_SESSION['old_input'])) {
-            $formData = $_SESSION['old_input'];           
-            unset($_SESSION['old_input']);
-            return $formData;
-        }
-
-        return NULL;
-    }
 }

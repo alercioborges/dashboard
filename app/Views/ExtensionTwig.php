@@ -19,8 +19,7 @@ class ExtensionTwig extends AbstractExtension
     {
         return [
             new TwigFunction('route_redirect', [$this, 'routeRedirect']),
-            new TwigFunction('message', [$this, 'setMessage']),
-            new TwigFunction('oldInput', [$this, 'setOldInput'])
+            new TwigFunction('message', [$this, 'setMessage'])
         ];
     }
 
@@ -32,20 +31,5 @@ class ExtensionTwig extends AbstractExtension
     public function setMessage($field)
     {
         return \App\Services\FlashMessageService::get($field);
-    }
-
-    public function setOldInput(string $field)
-    {
-        $formData = \App\Services\FlashMessageService::getOldInput();
-
-        if ($formData === null) {
-            return null;
-        }
-
-        if ($field !== null && isset($formData[$field])) {
-            return $formData[$field];
-        }
-
-        return null;
     }
 }

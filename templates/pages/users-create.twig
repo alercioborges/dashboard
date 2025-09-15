@@ -18,7 +18,7 @@
 				<label for="lastname" class="form-label">Sobrenome
 					<span class="text-danger">*</span>
 				</label>
-				<input type="text" value="{{ OLD_INPUT['lastname'] }}" class="form-control border border-dark" id="lastname" name="lastname">
+				<input type="text" value="{{ OLD_INPUT['lastname'] }}" class="form-control border border-dark" id="lastname" name="lastname" data-bs-rules="required|min=2|max=30|onlyLetter" placeholder="Digite seu sobrenome" required>
 				{{ message('lastname')|raw }}
 			</div>
 
@@ -27,7 +27,7 @@
 				<label for="email" class="form-label">E-mail
 					<span class="text-danger">*</span>
 				</label>
-				<input type="text" value="{{ OLD_INPUT['email'] }}" class="form-control border border-dark" id="email" name="email" data-rules="required|email" autocomplete="email" onkeyup="this.value = this.value.toLowerCase()" aria-required="true" inputmode="email" required>
+				<input type="email" value="{{ OLD_INPUT['email'] }}" class="form-control border border-dark" id="email" name="email" data-rules="required|email" autocomplete="email" onkeyup="this.value = this.value.toLowerCase()" aria-required="true" inputmode="email" required>
 				{{ message('email')|raw }}
 			</div>
 
@@ -64,207 +64,409 @@
 		</form>
 	</div>
 
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 	<script>
-		class FormValidator {
+		/**
+         * Sistema de Validação Progressive Enhancement
+         * Funciona como complemento às validações do servidor
+         */
+class ProgressiveFormValidator {
 constructor(formSelector) {
 this.form = document.querySelector(formSelector);
-this.isSubmitting = false;
-this.isTogglingPassword = false;
-
 if (!this.form) {
-throw new Error('Formulário não encontrado');
+console.warn('Formulário não encontrado');
+return;
 }
+
+this.isSubmitting = false;
+this.validationRules = new Map();
+this.debounceTimers = new Map();
 
 this.init();
 }
 
-init() {
-this.form.setAttribute('novalidate', 'true');
+init() { // Marca que JS está habilitado
+document.documentElement.classList.add('js-enabled');
+
+// Configura validação do Bootstrap
+this.form.classList.add('needs-validation');
+
 this.setupEventListeners();
+this.setupPasswordFeatures();
+this.setupRealTimeValidation();
+
+console.log('Sistema de validação inicializado (Progressive Enhancement)');
 }
 
-setupEventListeners() {
+setupEventListeners() { // Submit do formulário
 this.form.addEventListener('submit', (e) => this.handleSubmit(e));
 
-this.form.querySelectorAll('input').forEach(input => { // Só valida no focusout se não estiver alternando a senha
-input.addEventListener('focusout', () => {
-if (!this.isTogglingPassword) {
-this.validateField(input);
-}
-});
+// Validação em tempo real
+this.form.querySelectorAll('[data-bs-rules]').forEach(field => { // Validação ao perder foco
+field.addEventListener('blur', () => {
+this.validateField(field);
 });
 
-// Configuração do botão de mostrar/ocultar senha
-const toggleButton = document.getElementById('togglePassword');
-const passwordInput = document.getElementById('password');
+// Validação em tempo real com debounce
+if (field.classList.contains('real-time-validation')) {
+field.addEventListener('input', () => {
+this.debounceValidation(field, 300);
+});
+}
+});
 
-if (toggleButton && passwordInput) {
-toggleButton.addEventListener('click', () => this.togglePassword(passwordInput, toggleButton));
+// Conversão automática para lowercase no email
+const emailField = this.form.querySelector('#email');
+if (emailField) {
+emailField.addEventListener('input', (e) => {
+e.target.value = e.target.value.toLowerCase();
+});
 }
 }
 
-validateOnType(input) {
-if (input.dataset.rules && input.value.length > 0) {
-this.validateField(input);
+setupPasswordFeatures() {
+const passwordField = document.getElementById('password');
+const toggleBtn = document.getElementById('togglePassword');
+const confirmField = document.getElementById('password_confirmation');
+
+// Toggle de visibilidade da senha
+if (passwordField && toggleBtn) {
+toggleBtn.addEventListener('click', () => {
+this.togglePasswordVisibility(passwordField, toggleBtn);
+});
+}
+
+// Medidor de força da senha
+if (passwordField) {
+passwordField.addEventListener('input', (e) => {
+this.updatePasswordStrength(e.target.value);
+});
+}
+
+// Validação automática da confirmação quando a senha principal muda
+if (passwordField && confirmField) {
+passwordField.addEventListener('input', () => {
+if (confirmField.value) {
+this.debounceValidation(confirmField, 300);
+}
+});
 }
 }
 
-togglePassword(input, button) {
-this.isTogglingPassword = true;
-const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-input.setAttribute('type', type);
-button.textContent = type === 'password' ? 'Mostrar senha' : 'Ocultar senha';
-button.setAttribute('aria-label', `${
-type === 'password' ? 'Mostrar' : 'Ocultar'
-} senha`);
+setupRealTimeValidation() { // Configurações específicas para campos especiais
+const firstNameField = document.getElementById('firstname');
+const lastNameField = document.getElementById('lastname');
 
-// Mantém o foco no input sem trigger de validação
-input.focus();
-
-// Restaura a validação após um pequeno delay
-setTimeout(() => {
-this.isTogglingPassword = false;
-}, 100);
+// Conversão automática para maiúsculas (compatível com backend)
+[firstNameField, lastNameField].forEach(field => {
+if (field) {
+field.addEventListener('input', (e) => { // Aplica transformação visual, mas mantém valor original
+const cursor = e.target.selectionStart;
+e.target.value = e.target.value.toUpperCase();
+e.target.setSelectionRange(cursor, cursor);
+});
+}
+});
 }
 
-validateField(input) { // Se estiver alternando a senha, não valida
-if (this.isTogglingPassword) 
-return true;
+debounceValidation(field, delay) {
+const fieldName = field.name || field.id;
 
+if (this.debounceTimers.has(fieldName)) {
+clearTimeout(this.debounceTimers.get(fieldName));
+}
 
+const timer = setTimeout(() => {
+this.validateField(field);
+this.debounceTimers.delete(fieldName);
+}, delay);
 
-const rules = input.dataset.rules;
-if (! rules) 
-return true;
+this.debounceTimers.set(fieldName, timer);
+}
 
+validateField(field) {
+if (!field.dataset.bsRules) {
+return this.validateWithNativeAPI(field);
+}
 
-
-const rulesArray = rules.split('|');
+const rules = field.dataset.bsRules.split('|');
 let isValid = true;
-let errorMessage = '';
+let customErrorMessage = '';
 
-for (const rule of rulesArray) {
+for (const rule of rules) {
 const [ruleName, ruleValue] = rule.split('=');
-const validationResult = this.validateRule(input, ruleName, ruleValue);
+const result = this.applyValidationRule(field, ruleName, ruleValue);
 
-if (validationResult !== true) {
+if (result !== true) {
 isValid = false;
-errorMessage = validationResult;
+customErrorMessage = result;
 break;
 }
 }
 
-this.updateFieldStatus(input, isValid, errorMessage);
+this.updateFieldValidationState(field, isValid, customErrorMessage);
 return isValid;
 }
 
-validateRule(input, ruleName, ruleValue) {
-const value = input.value.trim();
+validateWithNativeAPI(field) {
+const isValid = field.checkValidity();
+this.updateFieldValidationState(field, isValid);
+return isValid;
+}
+
+applyValidationRule(field, ruleName, ruleValue) {
+const value = field.value.trim();
 
 switch (ruleName) {
 case 'required':
+if (field.type === 'checkbox') {
+return field.checked || 'Este campo é obrigatório';
+}
 return value !== '' || 'Este campo é obrigatório';
 
 case 'min':
-return value.length >= parseInt(ruleValue) || `Este campo deve ter pelo menos ${ruleValue} caracteres`;
+const minLength = parseInt(ruleValue);
+return value.length >= minLength || `Mínimo de ${minLength} caracteres`;
 
 case 'max':
-return value.length<= parseInt(ruleValue) ||
-	`Este campo pode ter no máximo ${ruleValue} caracteres`;
+const maxLength = parseInt(ruleValue);
+return value.length<= maxLength || 
+	`Máximo de ${maxLength} caracteres`;
 
 case 'email':
-	const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2, }$/;
-	return !value || emailRegex.test(value) || 'Digite um e-mail válido';
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	return !value || emailRegex.test(value) || 'E-mail inválido';
 
 case 'onlyLetter':
-	const onlyLetterRegex = /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ ]+$/;
-	return !value || onlyLetterRegex.test(value) || 'Somente letras é permitido neste campo';
+	const letterRegex = /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ\s]+$/;
+	return !value || letterRegex.test(value) || 'Apenas letras são permitidas';
+
+case 'match':
+	const matchField = document.getElementById(ruleValue);
+	return !value || !matchField || value === matchField.value || 
+	'Os campos não coincidem';
 
 default:
-	console.warn(`Regra de validação desconhecida: ${ruleName}`);
 	return true;
 }
 }
 
-updateFieldStatus(input, isValid, errorMessage = '') {
-	const formGroup = input.closest('.form-group');
-	const existingError = formGroup.querySelector('.error');
-
-	if (existingError) {
-		existingError.remove();
+updateFieldValidationState(field, isValid, customMessage = '') {
+                // Remove classes anteriores
+	field.classList.remove('is-valid', 'is-invalid');
+	
+	if (field.value.trim() === '') {
+                    // Campo vazio - remove estados de validação
+		return;
 	}
 
-	input.setAttribute('aria-invalid', !isValid);
-	input.style.borderColor = isValid ? '' : 'var(--error-color)';
-
-	if (!isValid) {
-		const errorDiv = document.createElement('div');
-		errorDiv.className = 'error';
-		errorDiv.setAttribute('role', 'alert');
-		errorDiv.textContent = errorMessage;
-		formGroup.appendChild(errorDiv);
+	if (isValid) {
+		field.classList.add('is-valid');
+	} else {
+		field.classList.add('is-invalid');
+		
+                    // Atualiza mensagem de erro se fornecida
+		if (customMessage) {
+			const feedback = field.parentNode.querySelector('.invalid-feedback');
+			if (feedback) {
+				feedback.textContent = customMessage;
+			}
+		}
 	}
+}
+
+togglePasswordVisibility(passwordField, toggleBtn) {
+	const type = passwordField.type === 'password' ? 'text' : 'password';
+	const icon = toggleBtn.querySelector('i');
+	
+	passwordField.type = type;
+	icon.className = type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+	
+	toggleBtn.setAttribute('aria-label', type === 'password' ? 'Mostrar senha' : 'Ocultar senha'
+		);
+}
+
+updatePasswordStrength(password) {
+	const meter = document.getElementById('strengthMeter');
+	const text = document.getElementById('strengthText');
+	
+	if (!meter || !text) return;
+
+	const strength = this.calculatePasswordStrength(password);
+	
+	meter.style.width = strength.percentage + '%';
+	meter.className = `progress-bar ${strength.colorClass}`;
+	meter.setAttribute('aria-valuenow', strength.percentage);
+	
+	text.textContent = strength.text;
+}
+
+calculatePasswordStrength(password) {
+	if (!password) {
+		return { percentage: 0, colorClass: '', text: '' };
+	}
+
+	let score = 0;
+	
+                // Critérios de força
+	if (password.length> = 6
+)score += 20;
+if (password.length >= 8) 
+score += 20;
+
+
+if (/[a-z]/.test(password)) 
+score += 20;
+
+
+if (/[A-Z]/.test(password)) 
+score += 20;
+
+
+if (/[0-9]/.test(password)) 
+score += 10;
+
+
+if (/[^A-Za-z0-9]/.test(password)) 
+score += 10;
+
+
+
+let level,
+colorClass,
+text;
+
+if (score < 40) {
+level = 1;
+colorClass = 'bg-danger';
+text = 'Senha fraca';
+} else if (score < 60) {
+level = 2;
+colorClass = 'bg-warning';
+text = 'Senha regular';
+} else if (score < 80) {
+level = 3;
+colorClass = 'bg-info';
+text = 'Senha boa';
+} else {
+level = 4;
+colorClass = 'bg-success';
+text = 'Senha forte';
+}
+
+return {percentage: score, colorClass, text, level};
 }
 
 async handleSubmit(event) {
-	event.preventDefault();
+event.preventDefault();
 
-	if (this.isSubmitting) return;
-
-	let isFormValid = true;
-	const inputs = this.form.querySelectorAll('input');
-
-	inputs.forEach(input => {
-if (!this.validateField(input)) {
-isFormValid = false;
+if (this.isSubmitting) {
+return;
 }
-}
-);
 
-if (isFormValid) {
-const submitButton = this.form.querySelector('button[type="submit"]');
+// Valida todos os campos
+let formIsValid = true;
+const fields = this.form.querySelectorAll('input, select');
+
+fields.forEach(field => {
+if (!this.validateField(field)) {
+formIsValid = false;
+}
+});
+
+// Adiciona classe de validação do Bootstrap
+this.form.classList.add('was-validated');
+
+if (! formIsValid) { // Foca no primeiro campo inválido
+const firstInvalid = this.form.querySelector('.is-invalid');
+if (firstInvalid) {
+firstInvalid.focus();
+firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
+}
+return;
+}
+
+// Se chegou aqui, o formulário é válido
+await this.submitForm();
+}
+
+async submitForm() {
+const submitBtn = document.getElementById('submitBtn');
+const originalContent = submitBtn.innerHTML;
 
 try {
 this.isSubmitting = true;
-submitButton.classList.add('loading');
 
-// Simular delay de rede (remover em produção)
+// Estado de loading
+submitBtn.classList.add('btn-loading');
+submitBtn.disabled = true;
+
+// Em um cenário real, você removeria este delay e deixaria o form.submit() natural
+// Este delay é apenas para demonstrar o loading state
 await new Promise(resolve => setTimeout(resolve, 1000));
 
-// Aqui você pode adicionar sua lógica de envio
+// Submete o formulário naturalmente para o backend processar
 this.form.submit();
+
 } catch (error) {
-console.error('Erro ao enviar formulário:', error);
-// Adicione tratamento de erro apropriado aqui
+console.error('Erro no envio:', error);
+this.showAlert('Erro ao enviar formulário. Tente novamente.', 'danger');
+
 } finally {
 this.isSubmitting = false;
-submitButton.classList.remove('loading');
-}
-} else {
-const firstError = this.form.querySelector('[aria-invalid="true"]');
-if (firstError) {
-firstError.focus();
-}
+submitBtn.classList.remove('btn-loading');
+submitBtn.disabled = false;
+submitBtn.innerHTML = originalContent;
 }
 }
 
-clearErrors() {
-this.form.querySelectorAll('.error').forEach(error => error.remove());
-this.form.querySelectorAll('input').forEach(input => {
-input.style.borderColor = '';
-input.setAttribute('aria-invalid', 'false');
-});
+showAlert(message, type = 'info') {
+const alertDiv = document.createElement('div');
+alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+alertDiv.innerHTML = `
+                    <i class="bi bi-${
+type === 'danger' ? 'exclamation-triangle' : 'info-circle'
+}-fill me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+
+const container = document.querySelector('.container');
+container.insertBefore(alertDiv, container.firstChild);
+
+// Auto-remove após 5 segundos
+setTimeout(() => {
+if (alertDiv.parentNode) {
+const bsAlert = new bootstrap.Alert(alertDiv);
+bsAlert.close();
+}
+}, 5000);
 }
 }
 
-// Inicialização do validador
-document.addEventListener('DOMContentLoaded', () => {
+// Inicialização apenas quando DOM estiver pronto
+document.addEventListener('DOMContentLoaded', function () { // Verifica se o formulário existe antes de inicializar
+if (document.querySelector('#userForm')) {
 try {
-new FormValidator('.validator-form');
+window.formValidator = new ProgressiveFormValidator('#userForm');
 } catch (error) {
-console.error('Erro ao inicializar o validador:', error);
+console.error('Erro ao inicializar validação:', error);
+// Formulário continua funcionando sem validação JS
+}
+}
+});
+
+// Funcionalidade de fallback para quando há erros
+window.addEventListener('error', function (e) {
+console.warn('Erro JavaScript detectado. Formulário funcionará em modo básico.');
+// Remove validações JS e permite funcionamento nativo
+const form = document.querySelector('#userForm');
+if (form) {
+form.classList.remove('needs-validation');
+form.removeAttribute('novalidate');
 }
 });
 	</script>
+
 {% endblock %}

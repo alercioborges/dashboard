@@ -53,7 +53,7 @@ class UserController extends Controller
     {
         $data = $this->validator->validate([
             'firstname' => 'required:max@30:min@2:uppercase',
-            'lastname'  => 'required:max@30:min@2:uppercase',
+            'lastname'  => 'required:max@30:min@2:onlyLetter:uppercase',
             'email'     => 'required:email@60:unique@User',
             'role_id'   => 'required',
             'password'  => 'required:max@30:min@6'

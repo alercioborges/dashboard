@@ -52,7 +52,7 @@ class UserController extends Controller
     public function store()
     {
         $data = $this->validator->validate([
-            'firstname' => 'required:max@30:min@2:uppercase',
+            'firstname' => 'required:max@30:min@2:onlyLetter:uppercase',
             'lastname'  => 'required:max@30:min@2:onlyLetter:uppercase',
             'email'     => 'required:email@60:unique@User',
             'role_id'   => 'required',

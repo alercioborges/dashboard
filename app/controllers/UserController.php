@@ -68,4 +68,16 @@ class UserController extends Controller
 
         return redirect('/admin/users/');
     }
+
+    public function profile(Request $request, Response $response, array $arg): Response
+    {
+        dd($arg['id']);
+        return $this->twig->render(
+            $response,
+            'profile.twig',
+            [
+                'TITLE' => 'Perfil do usuário'
+            ]
+        );
+    }
 }

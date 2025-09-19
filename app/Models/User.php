@@ -48,6 +48,7 @@ class User extends Model implements UserRepositoryInterface
                 'tbl_roles r' => ['INNER', 'r.id = m.role_id']
             ],
             [
+                "m.id",
                 "CONCAT(m.firstname, ' ', m.lastname) AS name",
                 "m.email",
                 "r.name AS role"

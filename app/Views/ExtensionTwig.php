@@ -23,9 +23,9 @@ class ExtensionTwig extends AbstractExtension
         ];
     }
 
-    public function routeRedirect(string $routeName): string
+    public function routeRedirect(string $routeName, array $params = [], array $queryParams = []): string
     {
-        return $this->routeParser->urlFor($routeName);
+        return $this->routeParser->urlFor($routeName, $params, $queryParams);
     }
 
     public function setMessage($field)

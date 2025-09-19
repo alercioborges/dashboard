@@ -1,0 +1,199 @@
+class FormValidator {
+    constructor(formSelector) {
+        this.form = document.querySelector(formSelector);
+        this.isSubmitting = false;
+        this.isTogglingPassword = false;
+
+        if (!this.form) {
+            throw new Error('Formulário não encontrado');
+        }
+
+        this.init();
+    }
+
+    init() {
+        this.form.setAttribute('novalidate', 'true');
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+
+        this.form.querySelectorAll('input').forEach(input => { // Só valida no focusout se não estiver alternando a senha
+            input.addEventListener('focusout', () => {
+                if (!this.isTogglingPassword) {
+                    this.validateField(input);
+                }
+            });
+        });
+
+        // Configuração do botão de mostrar/ocultar senha
+        const toggleButton = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        if (toggleButton && passwordInput) {
+            toggleButton.addEventListener('click', () => this.togglePassword(passwordInput, toggleButton));
+        }
+    }
+
+    validateOnType(input) {
+        if (input.dataset.rules && input.value.length > 0) {
+            this.validateField(input);
+        }
+    }
+
+    togglePassword(input, button) {
+        this.isTogglingPassword = true;
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        button.textContent = type === 'password' ? 'Mostrar senha' : 'Ocultar senha';
+        button.setAttribute('aria-label', `${type === 'password' ? 'Mostrar' : 'Ocultar'
+            } senha`);
+
+        // Mantém o foco no input sem trigger de validação
+        input.focus();
+
+        // Restaura a validação após um pequeno delay
+        setTimeout(() => {
+            this.isTogglingPassword = false;
+        }, 100);
+    }
+
+    validateField(input) { // Se estiver alternando a senha, não valida
+        if (this.isTogglingPassword)
+            return true;
+
+
+
+        const rules = input.dataset.rules;
+        if (!rules)
+            return true;
+
+
+
+        const rulesArray = rules.split('|');
+        let isValid = true;
+        let errorMessage = '';
+
+        for (const rule of rulesArray) {
+            const [ruleName, ruleValue] = rule.split('=');
+            const validationResult = this.validateRule(input, ruleName, ruleValue);
+
+            if (validationResult !== true) {
+                isValid = false;
+                errorMessage = validationResult;
+                break;
+            }
+        }
+
+        this.updateFieldStatus(input, isValid, errorMessage);
+        return isValid;
+    }
+
+    validateRule(input, ruleName, ruleValue) {
+        const value = input.value.trim();
+
+        switch (ruleName) {
+            case 'required':
+                return value !== '' || 'Este campo é obrigatório';
+
+            case 'min':
+                return value.length >= parseInt(ruleValue) || `Este campo deve ter pelo menos ${ruleValue} caracteres`;
+
+            case 'max':
+                return value.length <= parseInt(ruleValue) ||
+                    `Este campo pode ter no máximo ${ruleValue} caracteres`;
+
+            case 'email':
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2, }$/;
+                return !value || emailRegex.test(value) || 'Digite um e-mail válido';
+
+            case 'onlyLetter':
+                const onlyLetterRegex = /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ ]+$/;
+                return !value || onlyLetterRegex.test(value) || 'Somente letras é permitido neste campo';
+
+            default:
+                console.warn(`Regra de validação desconhecida: ${ruleName}`);
+                return true;
+        }
+    }
+
+    updateFieldStatus(input, isValid, errorMessage = '') {
+        const formGroup = input.closest('.form-group');
+        const existingError = formGroup.querySelector('.error');
+
+        if (existingError) {
+            existingError.remove();
+        }
+
+        input.setAttribute('aria-invalid', !isValid);
+        input.style.borderColor = isValid ? '' : 'var(--error-color)';
+
+        if (!isValid) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.setAttribute('role', 'alert');
+            errorDiv.textContent = errorMessage;
+            formGroup.appendChild(errorDiv);
+        }
+    }
+
+    async handleSubmit(event) {
+        event.preventDefault();
+
+        if (this.isSubmitting) return;
+
+        let isFormValid = true;
+        const inputs = this.form.querySelectorAll('input');
+
+        inputs.forEach(input => {
+            if (!this.validateField(input)) {
+                isFormValid = false;
+            }
+        }
+        );
+
+        if (isFormValid) {
+            const submitButton = this.form.querySelector('button[type="submit"]');
+
+            try {
+                this.isSubmitting = true;
+                submitButton.classList.add('loading');
+
+                // Simular delay de rede (remover em produção)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Aqui você pode adicionar sua lógica de envio
+                this.form.submit();
+            } catch (error) {
+                console.error('Erro ao enviar formulário:', error);
+                // Adicione tratamento de erro apropriado aqui
+            } finally {
+                this.isSubmitting = false;
+                submitButton.classList.remove('loading');
+            }
+        } else {
+            const firstError = this.form.querySelector('[aria-invalid="true"]');
+            if (firstError) {
+                firstError.focus();
+            }
+        }
+    }
+
+    clearErrors() {
+        this.form.querySelectorAll('.error').forEach(error => error.remove());
+        this.form.querySelectorAll('input').forEach(input => {
+            input.style.borderColor = '';
+            input.setAttribute('aria-invalid', 'false');
+        });
+    }
+}
+
+// Inicialização do validador
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        new FormValidator('#userForm');
+    } catch (error) {
+        console.error('Erro ao inicializar o validador:', error);
+    }
+});

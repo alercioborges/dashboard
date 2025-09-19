@@ -1,0 +1,51 @@
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: black;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: gray;
+    box-shadow: var(--focus-ring);
+}
+
+.password-group {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.toggle-password:hover {
+    color: var(--primary-dark);
+}
+
+.toggle-password:focus {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.error {
+    font-size: 0.875rem;
+    color: red;
+    padding: 0.5rem;
+    background-color: rgba(231, 76, 60, 0.1);
+    animation: fadeIn 0.3s ease;
+}

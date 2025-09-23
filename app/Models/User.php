@@ -5,15 +5,17 @@ namespace App\Models;
 use App\Core\Model;
 use App\Services\QueryBuilderService;
 use App\Interfaces\UserRepositoryInterface;
+use App\Services\PasswordService;
 
 class User extends Model implements UserRepositoryInterface
 {
-
     protected string $table = 'tbl_users';
+    private PasswordService $passwordService;
 
-    public function __construct(QueryBuilderService $queryBuilder)
+    public function __construct(QueryBuilderService $queryBuilder, PasswordService $passwordService)
     {
         parent::__construct($queryBuilder);
+        $this->passwordService = $passwordService;
     }
 
     /**
@@ -21,7 +23,22 @@ class User extends Model implements UserRepositoryInterface
      */
     public function findById(int $id): ?array
     {
-        return [];
+        $userData = $this->queryBuilder->selectWithJoin(
+            $this->table,
+            [
+                'tbl_roles r' => ['INNER', 'r.id = m.role_id']
+            ],
+            [
+                "m.id",
+                "CONCAT(m.firstname, ' ', m.lastname) AS name",
+                "m.email",
+                "r.name AS role",
+                "m.created_at"
+            ],
+            ['m.id' => $id]
+        );
+
+        return $userData[0];
     }
 
     /**
@@ -68,7 +85,7 @@ class User extends Model implements UserRepositoryInterface
                 'firstname'   => $data['firstname'],
                 'lastname'    => $data['lastname'],
                 'email'       => $data['email'],
-                'password'    => $data['password'],
+                'password'    => $this->passwordService->make($data['password']),
                 'role_id'     => $data['role_id'],
                 'is_active'   => 1,
                 'last_login'  => NULL,

@@ -3,26 +3,30 @@
 {% block content %}
 	{% if USERS is not empty %}
 		{{ message('message') }}
-		<table class="table table-striped table-hover">
-			<thead>
-				<tr>
-					<th scope="col">#</th>
-					<th scope="col">Nome</th>
-					<th scope="col">E-mail</th>
-					<th scope="col">Perfil</th>
-				</tr>
-			</thead>
-			<tbody class="table-group-divider">
-				{% for data in USERS %}
-					<tr class="align-middle">
-						<td>{{ data.id }}</td>
-						<td><a href="{{ route_redirect('users.profile', {'id': data.id }) }}">{{ data.name }}</a></td>
-						<td>{{ data.email }}</td>
-						<td>{{ data.role }}</td>
+		<div class="card-body table-responsive p-0">
+			<table class="table table-striped table-hover">
+				<thead>
+					<tr>
+						<th scope="col">#</th>
+						<th scope="col">Nome</th>
+						<th scope="col">E-mail</th>
+						<th scope="col">Perfil</th>
 					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
+				</thead>
+				<tbody class="table-group-divider">
+					{% for data in USERS %}
+						<tr class="align-middle">
+							<td>{{ data.id }}</td>
+							<td>
+								<a href="{{ route_redirect('users.profile', {'id' : data.id}) }}">{{ data.name }}</a>
+							</td>
+							<td>{{ data.email }}</td>
+							<td>{{ data.role }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
 	{% else %}
 		<div class="alert alert-danger mt-1" role="alert">
 			<strong>Nenhum usuário encontrado</strong>

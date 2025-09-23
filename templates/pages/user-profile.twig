@@ -1,0 +1,85 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    <link href="{{ base_path }}/assets/css/user-profile.css" rel="stylesheet"/>
+    
+	<div class="card-body p-0">
+		<div
+			class="profile-card">
+			<!-- Perfile header -->
+			<div class="profile-header">
+				<div class="profile-avatar rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center">
+					<i class="bi bi-person-fill" style="font-size: 3rem;"></i>
+				</div>				
+			</div>
+
+			<!-- Profile body -->
+			<div
+				class="profile-body">
+				<!-- Name -->
+				<div class="info-item">
+					<div class="d-flex align-items-center">
+						<i class="bi bi-person-circle text-primary me-3" style="font-size: 1.5rem;"></i>
+						<div class="flex-grow-1">
+							<div class="info-label">
+								<i class="bi bi-tag-fill me-1"></i>Nome Completo
+							</div>
+							<p class="info-value">{{ USER_DATA['name'] }}</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- E-mail -->
+				<div class="info-item">
+					<div class="d-flex align-items-center">
+						<i class="bi bi-envelope-fill text-primary me-3" style="font-size: 1.5rem;"></i>
+						<div class="flex-grow-1">
+							<div class="info-label">
+								<i class="bi bi-at me-1"></i>E-mail
+							</div>
+							<p class="info-value">{{ USER_DATA['email'] }}</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Role -->
+				<div class="info-item">
+					<div class="d-flex align-items-center">
+						<i class="bi bi-shield-check text-primary me-3" style="font-size: 1.5rem;"></i>
+						<div class="flex-grow-1">
+							<div class="info-label">
+								<i class="bi bi-briefcase-fill me-1"></i>Papel no Sistema
+							</div>
+							<div>
+								<span class="role-badge">
+									<i class="bi bi-star-fill me-1"></i>{{ USER_DATA['role'] }}
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Action button -->
+				<div class="text-center mt-4">
+					<a href="{{ route_redirect('users.edit', {'id' : USER_DATA['id']}) }}" class="btn btn-edit me-2">
+						<i class="bi bi-pencil-square me-2"></i>Editar Perfil
+					</a>
+				</div>
+
+				<!-- Additional information -->
+				<div class="mt-4 pt-3 border-top">
+					<div class="row text-center">
+						<div class="col-6">
+							<small class="text-muted d-block">Último acesso</small>
+							<strong class="text-dark">Hoje às 14:30</strong>
+						</div>
+						<div class="col-6">
+							<small class="text-muted d-block">Cadastrado em</small>
+							<strong class="text-dark">{{ USER_DATA['created_at'] | date("d/m/Y H:i") }}</strong>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

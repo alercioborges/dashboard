@@ -71,13 +71,35 @@ class UserController extends Controller
 
     public function profile(Request $request, Response $response, array $arg): Response
     {
-        dd($arg['id']);
+        $userData = $this->userService->getUserById($arg['id']);
+
         return $this->twig->render(
             $response,
-            'profile.twig',
+            'user-profile.twig',
             [
-                'TITLE' => 'Perfil do usuário'
+                'TITLE' => 'Perfil do usuário',
+                'USER_DATA' => $userData
             ]
         );
+    }
+
+    public function edit(Request $request, Response $response, array $arg): Response
+    {
+        $userData = $this->userService->getUserById($arg['id']);
+
+        return $this->twig->render(
+            $response,
+            'user-edit.twig',
+            [
+                'TITLE' => 'Modificar perfil',
+                'USER_DATA' => $userData
+            ]
+        );
+    }
+
+    public function update(Request $request, Response $response, array $arg): Response
+    {
+        dd($arg);
+        return $response;
     }
 }

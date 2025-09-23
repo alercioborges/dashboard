@@ -86,7 +86,7 @@ abstract class Validation extends Sanitize
     {
         $letterRegex = '/^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ\s]+$/';
 
-        if (!preg_match($letterRegex, $_POST[$field])) {
+        if (!preg_match($letterRegex, $_POST[$field]) && !empty($_POST[$field])) {
             $this->errors[$field][] = flash($field, error('Apenas letras são permitidas neste campo.'));
         }
     }

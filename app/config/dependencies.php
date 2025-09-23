@@ -23,8 +23,8 @@ use App\Models\User;
 use App\Core\Controller;
 use App\Core\Model;
 
-use Doctrine\DBAL\Query;
-use Doctrine\DBAL\Query\QueryBuilder;
+use App\Services\PasswordService;
+use Dotenv\Store\File\Paths;
 
 return [
 
@@ -132,7 +132,8 @@ return [
     // Repository User implements UserRepositoryInterface
     UserRepositoryInterface::class => function (ContainerInterface $c): UserRepositoryInterface {
         return new User(
-            $c->get(QueryBuilderService::class)
+            $c->get(QueryBuilderService::class),
+            $c->get(PasswordService::class)
         );
     },
 
@@ -146,7 +147,8 @@ return [
     //User
     User::class => function (ContainerInterface $c): User {
         return new User(
-            $c->get(QueryBuilderService::class)
+            $c->get(QueryBuilderService::class),
+            $c->get(PasswordService::class)
         );
     },
 
@@ -158,6 +160,11 @@ return [
             $c->get(UserService::class),
             $c->get(Validator::class)
         );
+    },
+
+    // Pasword
+    PasswordService::class => function (ContainerInterface $c): PasswordService {
+        return new PasswordService(12);
     },
 
 ];

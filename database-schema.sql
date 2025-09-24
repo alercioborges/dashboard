@@ -5,7 +5,7 @@ CREATE TABLE `tbl_roles` (
   `name` varchar(50) NOT NULL,
   `description` text,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -36,4 +36,10 @@ CREATE TABLE `tbl_users` (
 ____________________________________________________________
 
 
-
+INSERT INTO `tbl_roles` VALUES(
+  NULL,
+  'Gerente',
+  '',
+  NOW(),
+  NULL
+)

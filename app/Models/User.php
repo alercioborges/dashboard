@@ -30,7 +30,8 @@ class User extends Model implements UserRepositoryInterface
             ],
             [
                 "m.id",
-                "CONCAT(m.firstname, ' ', m.lastname) AS name",
+                "m.firstname",
+                "m.lastname",
                 "m.email",
                 "r.name AS role",
                 "m.created_at"

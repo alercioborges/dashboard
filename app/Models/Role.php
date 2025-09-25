@@ -6,7 +6,7 @@ use App\Core\Model;
 use App\Services\QueryBuilderService;
 use App\Interfaces\RoleRepositoryInterface;
 
-class User extends Model implements RoleRepositoryInterface
+class Role extends Model implements RoleRepositoryInterface
 {
     protected string $table = 'tbl_role';
 

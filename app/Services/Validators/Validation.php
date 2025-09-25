@@ -18,6 +18,8 @@ abstract class Validation extends Sanitize
     {
         if (empty($_POST[$field])) {
             $this->errors[$field][] = flash($field, error('Compo obrigatório'));
+        } else if (trim($_POST[$field]) === '') {
+            $this->errors[$field][] = flash($field, error('O campo contém apenas espaços'));
         }
     }
 

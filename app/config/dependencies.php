@@ -24,7 +24,11 @@ use App\Core\Controller;
 use App\Core\Model;
 
 use App\Services\PasswordService;
-use Dotenv\Store\File\Paths;
+
+use App\Interfaces\RoleRepositoryInterface;
+use App\Services\RoleService;
+use App\Controllers\RoleController;
+use App\Models\Role;
 
 return [
 
@@ -154,7 +158,7 @@ return [
 
 
     // UserController
-    UserController::class => function (ContainerInterface $c) {
+    UserController::class => function (ContainerInterface $c): UserController {
         return new UserController(
             $c->get(Twig::class),
             $c->get(UserService::class),
@@ -165,6 +169,33 @@ return [
     // Pasword
     PasswordService::class => function (ContainerInterface $c): PasswordService {
         return new PasswordService(12);
+    },
+
+    // Repository User Role implements RoleRepositoryInterface
+    RoleRepositoryInterface::class => function (ContainerInterface $c): Role {
+        return new Role(
+            $c->get(QueryBuilderService::class)
+        );
+    },
+
+    // RoleService
+    RoleService::class => function (ContainerInterface $c): RoleService {
+        return new RoleService($c->get(RoleRepositoryInterface::class));
+    },
+
+    //Role
+    Role::class => function (ContainerInterface $c): Role {
+        return new Role(
+            $c->get(QueryBuilderService::class)
+        );
+    },
+
+    // RoleController
+    RoleController::class => function (ContainerInterface $c): RoleController {
+        return new RoleController(
+            $c->get(Twig::class),
+            $c->get(RoleService::class)
+        );
     },
 
 ];

@@ -194,7 +194,8 @@ return [
     RoleController::class => function (ContainerInterface $c): RoleController {
         return new RoleController(
             $c->get(Twig::class),
-            $c->get(RoleService::class)
+            $c->get(RoleService::class),
+            $c->get(Validator::class)
         );
     },
 

@@ -31,7 +31,8 @@ class UserController extends Controller
             'users.twig',
             [
                 'TITLE' => 'Lista de usuários',
-                'USERS' => $users
+                'USERS' => $users,
+                'CURRENT_ROUTE' => $request->getUri()->getPath()
             ]
         );
     }

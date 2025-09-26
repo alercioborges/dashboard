@@ -7,4 +7,7 @@ $app->group('/admin', function (Slim\Routing\RouteCollectorProxy $group) {
     
     // Users routs
     require 'users.php';
+
+    // Users routs
+    require 'roles-user.php';
 });

@@ -50,4 +50,19 @@ class UserService
     {
         return $this->userRepository->findById($id);
     }
+
+    /**
+     * Get user by email
+     */
+    public function getUserByEmail(string $email): ?array
+    {
+        return $this->userRepository->findByEmail($email);
+    }
+
+    public function updateUser(array $data) {}
+
+    public function emailExists(string $email, int $id): ?array
+    {
+        return $this->userRepository->findFieldExists('email', $email, 'id', $id);
+    }
 }

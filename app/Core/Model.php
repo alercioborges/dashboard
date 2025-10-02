@@ -18,7 +18,7 @@ abstract class Model
      * Método genérico para buscar por qualquer campo
      * Pode ser sobrescrito nas classes filhas se necessário
      */
-    public function findByField(string $field, $value): ?array
+    protected function findByField(string $field, $value): ?array
     {
         if (!isset($this->table)) {
             throw new \Exception("Propriedade 'table' não definida no modelo " . get_class($this));
@@ -31,5 +31,17 @@ abstract class Model
         );
 
         return !empty($result) ? $result[0] : null;
+    }
+
+    protected function fieldExists($field, $value, $key, $id)
+    {
+        return $this->queryBuilder->select(
+            $this->table,
+            [$field],
+            [
+                $field => $value,
+                $key   . ' <>' => $id
+            ]
+        );
     }
 }

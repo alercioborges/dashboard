@@ -19,7 +19,9 @@ class ExtensionTwig extends AbstractExtension
     {
         return [
             new TwigFunction('route_redirect', [$this, 'routeRedirect']),
-            new TwigFunction('message', [$this, 'setMessage'])
+            new TwigFunction('message', [$this, 'setMessage']),
+            new TwigFunction('is_active', [$this, 'isActive']),
+            new TwigFunction('is_enable', [$this, 'isEnable'])
         ];
     }
 
@@ -31,5 +33,15 @@ class ExtensionTwig extends AbstractExtension
     public function setMessage($field)
     {
         return \App\Services\FlashMessageService::get($field);
+    }
+
+    public function isActive(string $url, string $currentRoute): string
+    {
+        return ($currentRoute == $url) ? 'active' : '';
+    }
+
+    public function isEnable(array $routes, string $currentRoute): string
+    {
+        return (in_array($currentRoute, $routes)) ? 'menu-open' : '';
     }
 }

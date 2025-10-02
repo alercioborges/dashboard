@@ -33,12 +33,19 @@ class QueryBuilderService
             $qb->select(...$columns)->from($table);
 
             foreach ($conditions as $column => $value) {
-                if (is_array($value)) {
-                    $qb->andWhere($qb->expr()->in($column, ':' . $column))
-                        ->setParameter($column, $value, ArrayParameterType::STRING);
+                // Verifica se tem operador na chave (ex: "id <>", "email LIKE")
+                if (preg_match('/\s(=|<>|>|<|>=|<=|LIKE)$/i', $column)) {
+                    $param = preg_replace('/\W/', '_', $column); // transforma "id <>" em "id__"
+                    $qb->andWhere($column . ' :' . $param)
+                        ->setParameter($param, $value);
+                } elseif (is_array($value)) {
+                    $param = preg_replace('/\W/', '_', $column);
+                    $qb->andWhere($qb->expr()->in($column, ':' . $param))
+                        ->setParameter($param, $value, ArrayParameterType::STRING);
                 } else {
-                    $qb->andWhere($column . ' = :' . $column)
-                        ->setParameter($column, $value);
+                    $param = str_replace('.', '_', $column);
+                    $qb->andWhere($column . ' = :' . $param)
+                        ->setParameter($param, $value);
                 }
             }
 

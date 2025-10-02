@@ -51,7 +51,7 @@ class User extends Model implements UserRepositoryInterface
             $this->table,
             ['email'],
             ['email' => $email]
-        ) ?? [];
+        );
     }
 
 
@@ -96,15 +96,33 @@ class User extends Model implements UserRepositoryInterface
         );
     }
 
-
     /**
      * Update user
      */
     public function update(int $id, array $data): bool
     {
-        return true;
+        $result = $this->queryBuilder->update(
+            $this->table,
+            [
+                'firstname'   => $data['firstname'],
+                'lastname'    => $data['lastname'],
+                'email'       => $data['email'],
+                'role_id'     => $data['role_id'],
+                'updated_at'  => date('Y-m-d H:i:s')
+            ],
+            ['id' => $id]
+        );
+
+        return $result > 0;
     }
 
+    /**
+     * Get specific users data
+     */
+    public function findFieldExists($field, $value, $key, $id): ?array
+    {
+        return $this->fieldExists($field, $value, $key, $id);
+    }
 
     /**
      * Delete user

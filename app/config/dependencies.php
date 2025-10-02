@@ -53,6 +53,7 @@ return [
         // Global variables
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);
+        $twig->getEnvironment()->addGlobal('current_route', $appConfig['current_route']);
         $twig->addExtension($c->get(ExtensionTwig::class));
 
         if ($appConfig['env'] === 'development') {

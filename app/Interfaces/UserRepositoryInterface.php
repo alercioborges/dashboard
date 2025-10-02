@@ -36,6 +36,11 @@ interface UserRepositoryInterface
     public function update(int $id, array $data): bool;
 
     /**
+     * find user by field
+     */
+    public function findFieldExists($field, $value, $key, $id): ?array;
+
+    /**
      * Delete user
      */
     public function delete(int $id): bool;

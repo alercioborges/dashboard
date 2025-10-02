@@ -97,4 +97,9 @@ abstract class Validation extends Sanitize
     {
         return !empty($this->errors);
     }
+
+    public function setError(string $field, string $message): void
+    {
+        $this->errors[$field][] = flash($field, error($message));
+    }
 }

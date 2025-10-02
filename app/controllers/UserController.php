@@ -31,8 +31,7 @@ class UserController extends Controller
             'users.twig',
             [
                 'TITLE' => 'Lista de usuários',
-                'USERS' => $users,
-                'CURRENT_ROUTE' => $request->getUri()->getPath()
+                'USERS' => $users
             ]
         );
     }
@@ -55,10 +54,14 @@ class UserController extends Controller
         $data = $this->validator->validate([
             'firstname' => 'required:max@30:min@2:onlyLetter:uppercase',
             'lastname'  => 'required:max@30:min@2:onlyLetter:uppercase',
-            'email'     => 'required:email@60:unique@User',
+            'email'     => 'required:email:max@60',
             'role_id'   => 'required',
             'password'  => 'required:max@30:min@6'
         ]);
+
+        if ($this->userService->getUserByEmail($data['email'])) {
+            $this->validator->setError('email', 'Esse e-mail já existe');
+        }
 
         if ($this->validator->hasErrors($data)) {
             $this->setOldInput($data);
@@ -86,7 +89,7 @@ class UserController extends Controller
 
     public function edit(Request $request, Response $response, array $arg): Response
     {
-        $userData = $this->userService->getUserById($arg['id']);
+        $userData = $this->userService->getUserById((int) $arg['id']);
 
         return $this->twig->render(
             $response,
@@ -100,7 +103,25 @@ class UserController extends Controller
 
     public function update(Request $request, Response $response, array $arg): Response
     {
-        dd($arg);
-        return $response;
+        $data = $this->validator->validate([
+            'firstname' => 'required:max@30:min@2:onlyLetter:uppercase',
+            'lastname'  => 'required:max@30:min@2:onlyLetter:uppercase',
+            'email'     => 'required:email:max@60',
+            'role_id'   => 'required'
+        ]);
+
+
+        if ($this->userService->emailExists($data['email'], $arg['id'])) {
+            $this->validator->setError('email', 'Esse e-mail já existe');
+        }
+        
+        if ($this->validator->hasErrors($data)) {
+            $this->setOldInput($data);
+            back();
+        }
+
+        $userData = $this->userService->updateUser($data, $arg['id']);
+
+        return redirect('/admin/users/');
     }
 }

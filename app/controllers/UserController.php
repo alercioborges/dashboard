@@ -58,11 +58,11 @@ class UserController extends Controller
             'role_id'   => 'required',
             'password'  => 'required:max@30:min@6'
         ]);
-
+        
         if ($this->userService->getUserByEmail($data['email'])) {
-            $this->validator->setError('email', 'Esse e-mail já existe');
+            $this->validator->setError('email', 'Esse e-mail já existe');            
         }
-
+        
         if ($this->validator->hasErrors($data)) {
             $this->setOldInput($data);
             back();
@@ -96,7 +96,8 @@ class UserController extends Controller
             'user-edit.twig',
             [
                 'TITLE' => 'Modificar perfil',
-                'USER_DATA' => $userData
+                'USER_DATA' => $userData,
+                'OLD_INPUT' => $this->getOldInput()
             ]
         );
     }
@@ -110,11 +111,10 @@ class UserController extends Controller
             'role_id'   => 'required'
         ]);
 
-
         if ($this->userService->emailExists($data['email'], $arg['id'])) {
             $this->validator->setError('email', 'Esse e-mail já existe');
         }
-        
+
         if ($this->validator->hasErrors($data)) {
             $this->setOldInput($data);
             back();

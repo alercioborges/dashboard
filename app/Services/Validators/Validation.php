@@ -16,7 +16,7 @@ abstract class Validation extends Sanitize
 
     protected function required(string $field)
     {
-        if (empty($_POST[$field])) {
+        if (empty($_POST[$field]) || !isset($_POST[$field]) || $_POST[$field] === '') {
             $this->errors[$field][] = flash($field, error('Compo obrigatório'));
         } else if (trim($_POST[$field]) === '') {
             $this->errors[$field][] = flash($field, error('O campo contém apenas espaços'));
@@ -25,8 +25,10 @@ abstract class Validation extends Sanitize
 
     protected function email(string $field)
     {
-        if (!filter_var($_POST[$field], FILTER_VALIDATE_EMAIL)) {
-            $this->errors[$field][] = flash($field, error("O e-mail inserido é inválido"));
+        if (!empty($_POST[$field]) && isset($_POST[$field])) {
+            if (!filter_var($_POST[$field], FILTER_VALIDATE_EMAIL)) {
+                $this->errors[$field][] = flash($field, error("O e-mail inserido é inválido"));
+            }
         }
     }
 

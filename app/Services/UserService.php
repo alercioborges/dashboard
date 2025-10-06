@@ -59,7 +59,10 @@ class UserService
         return $this->userRepository->findByEmail($email);
     }
 
-    public function updateUser(array $data) {}
+    public function updateUser(int $id, array $data): bool
+    {
+        return $this->userRepository->update($id, $data);
+    }
 
     public function emailExists(string $email, int $id): ?array
     {

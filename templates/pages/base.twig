@@ -40,7 +40,17 @@
 			<div
 				class="card mb-4">
 				<!-- /.card-header -->
-				<div class="card-body responsive p-3"> {% block content %}{% endblock %}
+				<div class="card-body responsive p-3">
+				
+				{% if ERROR is defined %}
+            		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                		<i class="fas fa-exclamation-triangle"></i> {{ ERROR }}
+                		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            		</div>
+        		{% else %}
+					{% block content %}{% endblock %}
+				{% endif %}
+				
 					</div>
 					<!-- /.card-body -->
 				</div>

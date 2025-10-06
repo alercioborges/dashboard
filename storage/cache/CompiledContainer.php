@@ -14,9 +14,17 @@ class CompiledContainer extends DI\CompiledContainer{
   'Doctrine\\DBAL\\Connection' => 'get8',
   'App\\Services\\QueryBuilderService' => 'get9',
   'App\\Core\\Controller' => 'get10',
-  'App\\Interfaces\\UserRepositoryInterface' => 'get11',
-  'App\\Services\\UserService' => 'get12',
-  'App\\Controllers\\UserController' => 'get13',
+  'App\\Core\\Model' => 'get11',
+  'App\\Services\\Validators\\Validator' => 'get12',
+  'App\\Interfaces\\UserRepositoryInterface' => 'get13',
+  'App\\Services\\UserService' => 'get14',
+  'App\\Models\\User' => 'get15',
+  'App\\Controllers\\UserController' => 'get16',
+  'App\\Services\\PasswordService' => 'get17',
+  'App\\Interfaces\\RoleRepositoryInterface' => 'get18',
+  'App\\Services\\RoleService' => 'get19',
+  'App\\Models\\Role' => 'get20',
+  'App\\Controllers\\RoleController' => 'get21',
 );
 
     protected function get1()
@@ -26,6 +34,7 @@ class CompiledContainer extends DI\CompiledContainer{
             'env' => 'production',
             'baseDir' => '/dashboard',
             'url' => 'http://localhost/dashboard',
+            'current_route' => '/admin/users/19/edit',
         ];
     }
 
@@ -48,7 +57,7 @@ class CompiledContainer extends DI\CompiledContainer{
             'port' => '3306',
             'database' => 'dashboard',
             'username' => 'dashboard',
-            'password' => 'dashboardd',
+            'password' => 'dashboard',
             'charset' => 'utf8mb4',
             'options' => $this->get3(),
         ];
@@ -70,6 +79,7 @@ class CompiledContainer extends DI\CompiledContainer{
         // Global variables
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);
+        $twig->getEnvironment()->addGlobal('current_route', $appConfig['current_route']);
         $twig->addExtension($c->get(\App\Views\ExtensionTwig::class));
 
         if ($appConfig['env'] === 'development') {
@@ -147,26 +157,99 @@ class CompiledContainer extends DI\CompiledContainer{
 
     protected function get11()
     {
-        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Interfaces\UserRepositoryInterface {
-        return new \App\Models\User($c->get(\App\Services\QueryBuilderService::class));
-    }, 'App\\Interfaces\\UserRepositoryInterface');
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Core\Model {
+        return new \App\Core\Model(
+            $c->get(\App\Services\QueryBuilderService::class)
+        );
+    }, 'App\\Core\\Model');
     }
 
     protected function get12()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Services\Validators\Validator {
+        return new \App\Services\Validators\Validator($c);
+    }, 'App\\Services\\Validators\\Validator');
+    }
+
+    protected function get13()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Interfaces\UserRepositoryInterface {
+        return new \App\Models\User(
+            $c->get(\App\Services\QueryBuilderService::class),
+            $c->get(\App\Services\PasswordService::class)
+        );
+    }, 'App\\Interfaces\\UserRepositoryInterface');
+    }
+
+    protected function get14()
     {
         return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Services\UserService {
         return new \App\Services\UserService($c->get(\App\Interfaces\UserRepositoryInterface::class));
     }, 'App\\Services\\UserService');
     }
 
-    protected function get13()
+    protected function get15()
     {
-        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c) {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Models\User {
+        return new \App\Models\User(
+            $c->get(\App\Services\QueryBuilderService::class),
+            $c->get(\App\Services\PasswordService::class)
+        );
+    }, 'App\\Models\\User');
+    }
+
+    protected function get16()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Controllers\UserController {
         return new \App\Controllers\UserController(
             $c->get(\Slim\Views\Twig::class),
-            $c->get(\App\Services\UserService::class)
+            $c->get(\App\Services\UserService::class),
+            $c->get(\App\Services\Validators\Validator::class)
         );
     }, 'App\\Controllers\\UserController');
+    }
+
+    protected function get17()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Services\PasswordService {
+        return new \App\Services\PasswordService(12);
+    }, 'App\\Services\\PasswordService');
+    }
+
+    protected function get18()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Models\Role {
+        return new \App\Models\Role(
+            $c->get(\App\Services\QueryBuilderService::class)
+        );
+    }, 'App\\Interfaces\\RoleRepositoryInterface');
+    }
+
+    protected function get19()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Services\RoleService {
+        return new \App\Services\RoleService($c->get(\App\Interfaces\RoleRepositoryInterface::class));
+    }, 'App\\Services\\RoleService');
+    }
+
+    protected function get20()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Models\Role {
+        return new \App\Models\Role(
+            $c->get(\App\Services\QueryBuilderService::class)
+        );
+    }, 'App\\Models\\Role');
+    }
+
+    protected function get21()
+    {
+        return $this->resolveFactory(static function (\Psr\Container\ContainerInterface $c): \App\Controllers\RoleController {
+        return new \App\Controllers\RoleController(
+            $c->get(\Slim\Views\Twig::class),
+            $c->get(\App\Services\RoleService::class),
+            $c->get(\App\Services\Validators\Validator::class)
+        );
+    }, 'App\\Controllers\\RoleController');
     }
 
 }

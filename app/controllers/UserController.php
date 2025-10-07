@@ -20,7 +20,7 @@ class UserController extends Controller
     {
         parent::__construct($twig);
         $this->userService = $userService;
-        $this->validator = $validator;
+        $this->validator   = $validator;
     }
 
     public function show(Request $request, Response $response): Response
@@ -57,7 +57,7 @@ class UserController extends Controller
                 $response,
                 'users-create.twig',
                 [
-                    'TITLE' => 'Cadastrar novo usuário',
+                    'TITLE'     => 'Cadastrar novo usuário',
                     'OLD_INPUT' => $this->getOldInput()
                 ]
             );
@@ -74,7 +74,7 @@ class UserController extends Controller
         }
     }
 
-    public function store()
+    public function store(Request $request, Response $response): Response
     {
         try {
             $data = $this->validator->validate([
@@ -97,29 +97,44 @@ class UserController extends Controller
             $this->userService->createUser($data);
 
             flash('message', Success('Usuário criado com sucesso'));
-        } catch (\Exception $e) {
-            flash('message', error('Ocorreu um erro ao tentar cadastrar novo usuário'));
-        }
 
-        return redirect('/admin/users/');
+            return redirect('/admin/users');
+        } catch (\Exception $e) {
+
+            return $this->twig->render(
+                $response,
+                'users-create.twig',
+                [
+                    'TITLE' => 'Cadastrar novo usuário',
+                    'ERROR' => 'Ocorreu um erro ao tentar cadastrar novo usuário'
+                ]
+            );
+        }
     }
 
     public function profile(Request $request, Response $response, array $arg): Response
     {
         try {
-            $userData = $this->userService->getUserById($arg['id']);
+            $userData = $this->userService->getUserById((int) $arg['id']);
 
             return $this->twig->render(
                 $response,
                 'user-profile.twig',
                 [
-                    'TITLE' => 'Perfil do usuário',
+                    'TITLE'     => 'Perfil do usuário',
                     'USER_DATA' => $userData
                 ]
             );
         } catch (\Exception $e) {
-            flash('message', error($e->getMessage()));
-            return $response;
+
+            return $this->twig->render(
+                $response,
+                'user-profile.twig',
+                [
+                    'TITLE' => 'Cadastrar novo usuário',
+                    'ERROR' => 'Ocorreu um erro ao tentar visualizar perfil de usuário'
+                ]
+            );
         }
     }
 
@@ -138,8 +153,15 @@ class UserController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-            flash('message', error($e->getMessage()));
-            return $response;
+
+            return $this->twig->render(
+                $response,
+                'users.twig',
+                [
+                    'TITLE' => 'Lista de usuários',
+                    'ERROR' => 'Não é possível atualizar o usuários'
+                ]
+            );
         }
     }
 
@@ -153,7 +175,7 @@ class UserController extends Controller
                 'role_id'   => 'required'
             ]);
 
-            if ($this->userService->emailExists($data['email'], $arg['id'])) {
+            if ($this->userService->emailExists($data['email'], (int) $arg['id'])) {
                 $this->validator->setError('email', 'Esse e-mail já existe');
             }
 
@@ -162,13 +184,21 @@ class UserController extends Controller
                 back();
             }
 
-            $this->userService->updateUser($arg['id'], $data);
+            $this->userService->updateUser((int) $arg['id'], $data);
 
             flash('message', Success('Usuário atualizado com sucesso'));
-        } catch (\Exception $e) {
-            flash('message', error($e->getMessage()));
-        }
 
-        return redirect('/admin/users/');
+            return redirect('/admin/users');
+        } catch (\Exception $e) {
+
+            return $this->twig->render(
+                $response,
+                'user-edit.twig',
+                [
+                    'TITLE' => 'Cadastrar novo usuário',
+                    'ERROR' => 'Ocorreu um erro ao tentar atualizar cadastro de  usuário'
+                ]
+            );
+        }
     }
 }

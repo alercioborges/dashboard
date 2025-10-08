@@ -1,0 +1,29 @@
+{% set pageRequest = get.search is defined ? '?search=' ~ get.search ~ '&page=' : '?page=' %}
+{% set currentPage = currentPage ?? 1 %}
+
+{% if numPages > 1 %}
+<nav class="mt-4" aria-label="Navegação da página">
+    <ul class="pagination justify-content-center">
+        {# Anterior #}
+        {% if currentPage > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ route_redirect(routeName, {}, {'page': currentPage - 1}) }}">«</a>
+            </li>
+        {% endif %}
+
+        {# Páginas #}
+        {% for i in 1..numPages %}
+            <li class="page-item {{ currentPage == i ? 'active' }}">
+                <a class="page-link" href="{{ route_redirect(routeName, {}, {'page': i}) }}">{{ i }}</a>
+            </li>
+        {% endfor %}
+
+        {# Próxima #}
+        {% if currentPage < numPages %}
+            <li class="page-item">
+                <a class="page-link" href="{{ route_redirect(routeName, {}, {'page': currentPage + 1}) }}">»</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}

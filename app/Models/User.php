@@ -56,10 +56,12 @@ class User extends Model implements UserRepositoryInterface
 
 
     /**
-     * Get all users with pagination
+     * Get all active users with pagination
      */
     public function getAll(int $page = 1, int $perPage = 10): array
     {
+        $offset = ($page - 1) * $perPage;
+
         return $this->queryBuilder->selectWithJoin(
             $this->table,
             [
@@ -70,7 +72,10 @@ class User extends Model implements UserRepositoryInterface
                 "CONCAT(m.firstname, ' ', m.lastname) AS name",
                 "m.email",
                 "r.name AS role"
-            ]
+            ],
+            ['m.is_active' => 1],
+            $perPage,
+            $offset
         );
     }
 
@@ -130,5 +135,11 @@ class User extends Model implements UserRepositoryInterface
     public function delete(int $id): bool
     {
         return true;
+    }
+
+    public function countAll(): ?int
+    {
+        $result = $this->queryBuilder->query("SELECT COUNT(*) AS total FROM {$this->table} WHERE is_active = 1");
+        return (int) $result[0]['total'];
     }
 }

@@ -68,4 +68,24 @@ class UserService
     {
         return $this->userRepository->findFieldExists('email', $email, 'id', $id);
     }
+
+    public function countUsers(): ?int
+    {
+        return $this->userRepository->countAll();
+    }
+
+    public function getPaginatedUsers(int $page, int $limit): array
+    {
+        $total = $this->countUsers();
+        $numPages = (int) ceil($total / $limit);
+
+        $data = $this->userRepository->getAll($page, $limit);
+
+        return [
+            'data' => $data,
+            'numPages' => $numPages,
+            'currentPage' => $page,
+            'total' => $total
+        ];
+    }
 }

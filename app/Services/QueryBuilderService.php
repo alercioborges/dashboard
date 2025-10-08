@@ -67,13 +67,15 @@ class QueryBuilderService
     }
 
     /**
-     * SELECT com JOIN
+     * SELECT with JOIN
      */
     public function selectWithJoin(
         string $mainTable,
         array $joins = [],
         array $columns = ['*'],
-        array $conditions = []
+        array $conditions = [],
+        ?int $limit = null,
+        ?int $offset = null
     ): array {
         try {
             $qb = $this->connection->createQueryBuilder();
@@ -81,17 +83,22 @@ class QueryBuilderService
 
             foreach ($joins as $alias => [$type, $condition]) {
                 [$table, $joinAlias] = explode(' ', $alias);
-                if (strtoupper($type) === 'INNER') {
-                    $qb->innerJoin('m', $table, $joinAlias, $condition);
-                } else {
-                    $qb->leftJoin('m', $table, $joinAlias, $condition);
-                }
+                $type = strtoupper($type);
+                $method = $type === 'INNER' ? 'innerJoin' : 'leftJoin';
+                $qb->$method('m', $table, $joinAlias, $condition);
             }
 
             foreach ($conditions as $column => $value) {
                 $param = str_replace('.', '_', $column);
                 $qb->andWhere($column . ' = :' . $param)
                     ->setParameter($param, $value);
+            }
+
+            if ($limit !== null) {
+                $qb->setMaxResults($limit);
+            }
+            if ($offset !== null) {
+                $qb->setFirstResult($offset);
             }
 
             return $qb->executeQuery()->fetchAllAssociative();

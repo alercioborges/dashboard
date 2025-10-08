@@ -21,7 +21,8 @@ class ExtensionTwig extends AbstractExtension
             new TwigFunction('route_redirect', [$this, 'routeRedirect']),
             new TwigFunction('message', [$this, 'setMessage']),
             new TwigFunction('is_active', [$this, 'isActive']),
-            new TwigFunction('is_enable', [$this, 'isEnable'])
+            new TwigFunction('is_enable', [$this, 'isEnable']),
+            new TwigFunction('pagination', [$this, 'pagination'])
         ];
     }
 
@@ -43,5 +44,23 @@ class ExtensionTwig extends AbstractExtension
     public function isEnable(array $routes, string $currentRoute): string
     {
         return (in_array($currentRoute, $routes)) ? 'menu-open' : '';
+    }
+
+    public function pagination(int $numPages, int $currentPage = 1, string $routeName = '', array $params = []): string
+    {
+        // Cria um Twig isolado para o componente
+        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../../templates/components');
+        $twig = new \Twig\Environment($loader);
+
+        // Adiciona suporte a funções Twig já existentes
+        $twig->addFunction(new TwigFunction('route_redirect', [$this, 'routeRedirect']));
+
+        // Renderiza o componente
+        return $twig->render('pagination.twig', [
+            'numPages' => $numPages,
+            'currentPage' => $currentPage,
+            'routeName' => $routeName,
+            'params' => $params,
+        ]);
     }
 }

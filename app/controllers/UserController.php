@@ -25,19 +25,24 @@ class UserController extends Controller
 
     public function show(Request $request, Response $response): Response
     {
+        $page = (int) ($request->getQueryParams()['page'] ?? 1);
+        $perPage = 10;
+
         try {
-            $users = $this->userService->getAllUsers();
+            $pagination = $this->userService->getPaginatedUsers($page, $perPage);
 
             return $this->twig->render(
                 $response,
                 'users.twig',
                 [
                     'TITLE' => 'Lista de usuários',
-                    'USERS' => $users
+                    'USERS' => $pagination['data'],
+                    'NUM_PAGES'    => $pagination['numPages'],
+                    'CURRENT_PAGE' => $pagination['currentPage']
                 ]
             );
         } catch (\Exception $e) {
-
+            dd($e);
             return $this->twig->render(
                 $response,
                 'users.twig',

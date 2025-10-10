@@ -58,10 +58,8 @@ class User extends Model implements UserRepositoryInterface
     /**
      * Get all active users with pagination
      */
-    public function getAll(int $page = 1, int $perPage = 10): array
+    public function getAll(int $page = 1, int $perPage = 10, int $offset): array
     {
-        $offset = ($page - 1) * $perPage;
-
         return $this->queryBuilder->selectWithJoin(
             $this->table,
             [
@@ -137,9 +135,19 @@ class User extends Model implements UserRepositoryInterface
         return true;
     }
 
-    public function countAll(): ?int
+    /**
+     * Get number of active users
+     */
+    public function countAll(): int
     {
-        $result = $this->queryBuilder->query("SELECT COUNT(*) AS total FROM {$this->table} WHERE is_active = 1");
+        $result = $this->queryBuilder->select(
+            $this->table,
+            [
+                'COUNT(*) AS total'
+            ],
+            ['is_active' => 1]
+        );
+
         return (int) $result[0]['total'];
     }
 }

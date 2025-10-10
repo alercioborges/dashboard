@@ -41,6 +41,6 @@ function redirect(string $target): Slim\Psr7\Response
 
 function back(): void
 {
-    \App\Services\RedirectService::back();
+    \App\Services\RedirectService::back();    
     exit;
 }

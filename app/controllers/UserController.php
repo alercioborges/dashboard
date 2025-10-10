@@ -42,7 +42,7 @@ class UserController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-            dd($e);
+            
             return $this->twig->render(
                 $response,
                 'users.twig',
@@ -101,7 +101,7 @@ class UserController extends Controller
 
             $this->userService->createUser($data);
 
-            flash('message', Success('Usuário criado com sucesso'));
+            flash('message', success('Usuário criado com sucesso'));
 
             return redirect('/admin/users');
         } catch (\Exception $e) {
@@ -191,7 +191,7 @@ class UserController extends Controller
 
             $this->userService->updateUser((int) $arg['id'], $data);
 
-            flash('message', Success('Usuário atualizado com sucesso'));
+            flash('message', success('Usuário atualizado com sucesso'));
 
             return redirect('/admin/users');
         } catch (\Exception $e) {

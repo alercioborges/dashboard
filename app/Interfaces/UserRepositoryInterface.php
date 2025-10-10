@@ -23,7 +23,7 @@ interface UserRepositoryInterface
     /**
      * Get all active users with pagination
      */
-    public function getAll(int $page = 1, int $perPage = 10): array;
+    public function getAll(int $page = 1, int $perPage = 10, int $offset): array;
 
     /**
      * Create new user
@@ -45,5 +45,8 @@ interface UserRepositoryInterface
      */
     public function delete(int $id): bool;
 
-    public function countAll(): ?int;
+    /**
+     * Get number of active users
+     */
+    public function countAll(): int;
 }

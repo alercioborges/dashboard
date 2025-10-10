@@ -5,6 +5,7 @@ namespace App\Views;
 use Slim\Interfaces\RouteParserInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use Slim\Views\Twig;
 
 class ExtensionTwig extends AbstractExtension
 {
@@ -22,7 +23,7 @@ class ExtensionTwig extends AbstractExtension
             new TwigFunction('message', [$this, 'setMessage']),
             new TwigFunction('is_active', [$this, 'isActive']),
             new TwigFunction('is_enable', [$this, 'isEnable']),
-            new TwigFunction('pagination', [$this, 'pagination'])
+            new TwigFunction('pagination', [$this, 'pagination'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -46,21 +47,14 @@ class ExtensionTwig extends AbstractExtension
         return (in_array($currentRoute, $routes)) ? 'menu-open' : '';
     }
 
-    public function pagination(int $numPages, int $currentPage = 1, string $routeName = '', array $params = []): string
+    public function pagination(int $numPages, int $currentPage): string
     {
-        // Cria um Twig isolado para o componente
-        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../../templates/components');
+        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../../templates/layout/components/');
         $twig = new \Twig\Environment($loader);
-
-        // Adiciona suporte a funções Twig já existentes
-        $twig->addFunction(new TwigFunction('route_redirect', [$this, 'routeRedirect']));
-
-        // Renderiza o componente
+        
         return $twig->render('pagination.twig', [
             'numPages' => $numPages,
-            'currentPage' => $currentPage,
-            'routeName' => $routeName,
-            'params' => $params,
+            'currentPage' => $currentPage
         ]);
     }
 }

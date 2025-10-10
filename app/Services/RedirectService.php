@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Psr\Http\Message\ResponseInterface as Response;
+
 class RedirectService
 {
     public static function redirect(string $target): \Slim\Psr7\Response

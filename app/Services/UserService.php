@@ -20,14 +20,6 @@ class UserService
     }
 
     /**
-     * Get all users with pagination
-     */
-    public function getAllUsers(int $page = 1, int $perPage = 10): array
-    {
-        return $this->userRepository->getAll($page, $perPage);
-    }
-
-    /**
      * Create new user with validation
      */
     /**
@@ -78,8 +70,9 @@ class UserService
     {
         $total = $this->countUsers();
         $numPages = (int) ceil($total / $limit);
+        $offset = ($page - 1) * $limit;
 
-        $data = $this->userRepository->getAll($page, $limit);
+        $data = $this->userRepository->getAll($page, $limit, $offset);
 
         return [
             'data' => $data,

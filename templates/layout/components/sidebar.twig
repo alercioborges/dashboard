@@ -1,0 +1,36 @@
+{# Macro recursiva para renderizar itens do menu #}
+
+{% macro render_menu_item(item, level = 0) %}
+
+	{% set has_children = item.children is defined and item.children|length > 0 %}
+	{% set is_active = item.route is defined and is_active_route(item.route) %}
+	{% set has_active_child = has_children and has_active_child(item.children) %}
+	{% set is_open = is_active or has_active_child %}
+
+	<li class="nav-item {{ is_open ? 'menu-open' : '' }}">
+		{% if has_children %}
+			{# Item com submenu #}
+			<a href="#" class="nav-link {{ is_open ? 'active' : '' }}">
+				<i class="{{ item.icon }}"></i>
+				<p>
+					{{ item.label }}
+					<i class="nav-arrow bi bi-chevron-right"></i>
+				</p>
+			</a>
+			<ul class="nav nav-treeview">
+				{% for child in item.children %}
+					{{ _self.render_menu_item(child, level + 1) }}
+				{% endfor %}
+			</ul>
+		{% else %}
+			{# Item simples (sem submenu) #}
+			<a href="{{ route_redirect(item.route) }}" class="nav-link {{ is_active ? 'active' : '' }}">
+				<i class="{{ item.icon }}"></i>
+				<p>{{ item.label }}</p>
+			</a>
+		{% endif %}
+	</li>
+
+{% endmacro %}
+
+{{ _self.render_menu_item(menu_items) }}

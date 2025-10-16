@@ -58,7 +58,7 @@ class User extends Model implements UserRepositoryInterface
     /**
      * Get all active users with pagination
      */
-    public function getAll(int $page = 1, int $perPage = 10, int $offset): array
+    public function getAll(int $limit = 10, int $offset = 0): array
     {
         return $this->queryBuilder->selectWithJoin(
             $this->table,
@@ -72,7 +72,8 @@ class User extends Model implements UserRepositoryInterface
                 "r.name AS role"
             ],
             ['m.is_active' => 1],
-            $perPage,
+            ['m.id' => 'ASC'],
+            $limit,
             $offset
         );
     }

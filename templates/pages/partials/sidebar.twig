@@ -22,42 +22,7 @@
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="false" id="navigation">
 
                 <!-- Administration -->
-                <li class="nav-item {{ is_enable(['/admin', '/admin/users', '/admin/users/create'], current_route) }}">
-                    <a href="#" class="nav-link {{ is_enable(['/admin/users', '/admin/users/create'], current_route) ? 'active' : '' }}">
-                        <i class="nav-icon bi bi-speedometer"></i>
-                        <p>
-                            Administração
-                            <i class="nav-arrow bi bi-chevron-right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <!-- Usuário -->
-                        <li class="nav-item {{ is_enable(['/admin/users', '/admin/users/create'], current_route) }}">
-                            <a href="#" class="nav-link {{ is_enable(['/admin/users', '/admin/users/create'], current_route) ? 'active' : '' }}">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>
-                                    Usuário
-                                    <i class="nav-arrow bi bi-chevron-right"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ base_path }}/admin/users" class="nav-link {{ is_active('/admin/users', current_route) }}">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Lista de usuários</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ base_path }}/admin/users/create" class="nav-link {{ is_active('/admin/users/create', current_route) }}">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Cadastrar novo usuário</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <!-- end Usuário -->
-                    </ul>
-                </li>
+                {{ render_menu_item() }}
                 <!-- end Administration -->
                 
             </ul>

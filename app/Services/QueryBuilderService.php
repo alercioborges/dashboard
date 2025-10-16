@@ -18,7 +18,7 @@ class QueryBuilderService
     }
 
     /**
-     * SELECT básico
+     * Basic SELECT
      */
     public function select(
         string $table,
@@ -32,10 +32,11 @@ class QueryBuilderService
             $qb = $this->connection->createQueryBuilder();
             $qb->select(...$columns)->from($table);
 
+            // Montagem de condições (WHERE)
             foreach ($conditions as $column => $value) {
-                // Verifica se tem operador na chave (ex: "id <>", "email LIKE")
+                // Verifica se há operador na chave (ex: "email LIKE", "id >")
                 if (preg_match('/\s(=|<>|>|<|>=|<=|LIKE)$/i', $column)) {
-                    $param = preg_replace('/\W/', '_', $column); // transforma "id <>" em "id__"
+                    $param = preg_replace('/\W/', '_', $column);
                     $qb->andWhere($column . ' :' . $param)
                         ->setParameter($param, $value);
                 } elseif (is_array($value)) {
@@ -49,13 +50,16 @@ class QueryBuilderService
                 }
             }
 
+            // Ordenação (ORDER BY)
             foreach ($orderBy as $column => $direction) {
                 $qb->addOrderBy($column, $direction);
             }
 
+            // Paginação (LIMIT / OFFSET)
             if ($limit !== null) {
                 $qb->setMaxResults($limit);
             }
+
             if ($offset !== null) {
                 $qb->setFirstResult($offset);
             }
@@ -74,6 +78,7 @@ class QueryBuilderService
         array $joins = [],
         array $columns = ['*'],
         array $conditions = [],
+        array $orderBy = [],          // 🔹 Novo parâmetro opcional
         ?int $limit = null,
         ?int $offset = null
     ): array {
@@ -81,6 +86,7 @@ class QueryBuilderService
             $qb = $this->connection->createQueryBuilder();
             $qb->select(...$columns)->from($mainTable, 'm');
 
+            // 🔸 Monta os JOINs
             foreach ($joins as $alias => [$type, $condition]) {
                 [$table, $joinAlias] = explode(' ', $alias);
                 $type = strtoupper($type);
@@ -88,12 +94,30 @@ class QueryBuilderService
                 $qb->$method('m', $table, $joinAlias, $condition);
             }
 
+            // 🔸 Monta as condições (WHERE)
             foreach ($conditions as $column => $value) {
-                $param = str_replace('.', '_', $column);
-                $qb->andWhere($column . ' = :' . $param)
-                    ->setParameter($param, $value);
+                // Suporte a operadores (LIKE, >=, <=, etc.)
+                if (preg_match('/\s(=|<>|>|<|>=|<=|LIKE)$/i', $column)) {
+                    $param = preg_replace('/\W/', '_', $column);
+                    $qb->andWhere($column . ' :' . $param)
+                        ->setParameter($param, $value);
+                } elseif (is_array($value)) {
+                    $param = preg_replace('/\W/', '_', $column);
+                    $qb->andWhere($qb->expr()->in($column, ':' . $param))
+                        ->setParameter($param, $value, ArrayParameterType::STRING);
+                } else {
+                    $param = str_replace('.', '_', $column);
+                    $qb->andWhere($column . ' = :' . $param)
+                        ->setParameter($param, $value);
+                }
             }
 
+            // 🔹 Adiciona a cláusula ORDER BY (caso exista)
+            foreach ($orderBy as $column => $direction) {
+                $qb->addOrderBy($column, strtoupper($direction));
+            }
+
+            // 🔹 Paginação (LIMIT / OFFSET)
             if ($limit !== null) {
                 $qb->setMaxResults($limit);
             }

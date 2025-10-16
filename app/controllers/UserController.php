@@ -9,18 +9,21 @@ use Slim\Views\Twig;
 use App\Core\Controller;
 use App\Services\UserService;
 use App\Services\Validators\Validator;
-use GrahamCampbell\ResultType\Success;
+
+use App\Models\Role;
 
 class UserController extends Controller
 {
     private UserService $userService;
     private Validator $validator;
+    private Role $role;
 
-    public function __construct(Twig $twig, UserService $userService, Validator $validator)
+    public function __construct(Twig $twig, UserService $userService, Validator $validator, Role $role)
     {
         parent::__construct($twig);
         $this->userService = $userService;
         $this->validator   = $validator;
+        $this->role        = $role;
     }
 
     public function show(Request $request, Response $response): Response
@@ -29,20 +32,21 @@ class UserController extends Controller
         $perPage = 10;
 
         try {
+
             $pagination = $this->userService->getPaginatedUsers($page, $perPage);
 
             return $this->twig->render(
                 $response,
                 'users.twig',
                 [
-                    'TITLE' => 'Lista de usuários',
-                    'USERS' => $pagination['data'],
+                    'TITLE'        => 'Lista de usuários',
+                    'USERS'        => $pagination['data'],
                     'NUM_PAGES'    => $pagination['numPages'],
                     'CURRENT_PAGE' => $pagination['currentPage']
                 ]
             );
         } catch (\Exception $e) {
-            
+
             return $this->twig->render(
                 $response,
                 'users.twig',
@@ -58,12 +62,16 @@ class UserController extends Controller
     public function create(Request $request, Response $response): Response
     {
         try {
+
+            $userRoles = $this->role->getAll($this->role->countAll(), 0);
+
             return $this->twig->render(
                 $response,
                 'users-create.twig',
                 [
                     'TITLE'     => 'Cadastrar novo usuário',
-                    'OLD_INPUT' => $this->getOldInput()
+                    'OLD_INPUT' => $this->getOldInput(),
+                    'ROLES'     => $userRoles
                 ]
             );
         } catch (\Exception $e) {
@@ -82,6 +90,7 @@ class UserController extends Controller
     public function store(Request $request, Response $response): Response
     {
         try {
+
             $data = $this->validator->validate([
                 'firstname' => 'required:max@30:min@2:onlyLetter:uppercase',
                 'lastname'  => 'required:max@30:min@2:onlyLetter:uppercase',
@@ -120,6 +129,7 @@ class UserController extends Controller
     public function profile(Request $request, Response $response, array $arg): Response
     {
         try {
+
             $userData = $this->userService->getUserById((int) $arg['id']);
 
             return $this->twig->render(
@@ -146,7 +156,9 @@ class UserController extends Controller
     public function edit(Request $request, Response $response, array $arg): Response
     {
         try {
+
             $userData = $this->userService->getUserById((int) $arg['id']);
+            $userRoles = $this->role->getAll($this->role->countAll(), 0);
 
             return $this->twig->render(
                 $response,
@@ -154,6 +166,7 @@ class UserController extends Controller
                 [
                     'TITLE' => 'Modificar perfil',
                     'USER_DATA' => $userData,
+                    'ROLES' => $userRoles,
                     'OLD_INPUT' => $this->getOldInput()
                 ]
             );
@@ -173,6 +186,7 @@ class UserController extends Controller
     public function update(Request $request, Response $response, array $arg): Response
     {
         try {
+
             $data = $this->validator->validate([
                 'firstname' => 'required:max@30:min@2:onlyLetter:uppercase',
                 'lastname'  => 'required:max@30:min@2:onlyLetter:uppercase',

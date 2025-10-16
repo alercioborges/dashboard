@@ -68,17 +68,17 @@ class UserService
 
     public function getPaginatedUsers(int $page, int $limit): array
     {
-        $total = $this->countUsers();
+        $total    = $this->countUsers();
         $numPages = (int) ceil($total / $limit);
-        $offset = ($page - 1) * $limit;
-
-        $data = $this->userRepository->getAll($page, $limit, $offset);
-
+        $offset   = ($page - 1) * $limit;
+        
+        $data =  $this->userRepository->getAll($limit, $offset);
+        
         return [
-            'data' => $data,
-            'numPages' => $numPages,
+            'data'        => $data,
+            'numPages'    => $numPages,
             'currentPage' => $page,
-            'total' => $total
+            'total'       => $total
         ];
     }
 }

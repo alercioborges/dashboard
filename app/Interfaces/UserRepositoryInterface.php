@@ -23,7 +23,7 @@ interface UserRepositoryInterface
     /**
      * Get all active users with pagination
      */
-    public function getAll(int $page = 1, int $perPage = 10, int $offset): array;
+    public function getAll(int $limit = 10, int $offset = 0): array;
 
     /**
      * Create new user

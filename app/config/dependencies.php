@@ -163,7 +163,8 @@ return [
         return new UserController(
             $c->get(Twig::class),
             $c->get(UserService::class),
-            $c->get(Validator::class)
+            $c->get(Validator::class),
+            $c->get(Role::class)
         );
     },
 
@@ -172,24 +173,27 @@ return [
         return new PasswordService(12);
     },
 
-    // Repository User Role implements RoleRepositoryInterface
-    RoleRepositoryInterface::class => function (ContainerInterface $c): Role {
+    // Repository User role implements UserRepositoryInterface
+    RoleRepositoryInterface::class => function (ContainerInterface $c): RoleRepositoryInterface {
         return new Role(
             $c->get(QueryBuilderService::class)
         );
     },
+
 
     // RoleService
     RoleService::class => function (ContainerInterface $c): RoleService {
         return new RoleService($c->get(RoleRepositoryInterface::class));
     },
 
-    //Role
+
+    // Role
     Role::class => function (ContainerInterface $c): Role {
         return new Role(
             $c->get(QueryBuilderService::class)
         );
     },
+
 
     // RoleController
     RoleController::class => function (ContainerInterface $c): RoleController {

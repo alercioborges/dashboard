@@ -15,24 +15,43 @@ class RoleController extends Controller
     private RoleService $roleService;
     private Validator $validator;
 
-    public function __construct(Twig $twig, RoleService $roleService, Validator $validator;)
+    public function __construct(Twig $twig, RoleService $roleService, Validator $validator)
     {
         parent::__construct($twig);
         $this->roleService = $roleService;
         $this->validator = $validator;
     }
-
+    
+    
     public function show(Request $request, Response $response): Response
     {
-        $roles = $this->rolerService->getAllUserRoles();
+        $page = (int) ($request->getQueryParams()['page'] ?? 1);
+        $perPage = 10;
 
-        return $this->twig->render(
-            $response,
-            'roles-user.twig',
-            [
-                'TITLE' => 'Lista de perfis de usuários',
-                'ROLES' => $roles
-            ]
-        );
+        try {
+
+            $pagination = $this->roleService->getPaginatedRole($page, $perPage);
+
+            return $this->twig->render(
+                $response,
+                'roles-user.twig',
+                [
+                    'TITLE' => 'Lista de perfis de usuários',
+                    'ROLES' => $pagination['data'],
+                    'NUM_PAGES'    => $pagination['numPages'],
+                    'CURRENT_PAGE' => $pagination['currentPage']
+                ]
+            );
+        } catch (\Exception $e) {
+
+            return $this->twig->render(
+                $response,
+                'roles-user.twig',
+                [
+                    'TITLE' => 'Lista de perfis de usuários',
+                    'ERROR' => 'Não foi possível carregar lista usuários'
+                ]
+            );
+        }
     }
 }

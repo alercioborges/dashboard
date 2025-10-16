@@ -47,13 +47,18 @@ class ExtensionTwig extends AbstractExtension
         return (in_array($currentRoute, $routes)) ? 'menu-open' : '';
     }
 
-    public function pagination(int $numPages, int $currentPage): string
+    private function loadTwig()
     {
         $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../../templates/layout/components/');
         $twig = new \Twig\Environment($loader);
-        
-        return $twig->render('pagination.twig', [
-            'numPages' => $numPages,
+
+        return $twig;
+    }
+
+    public function pagination(int $numPages, int $currentPage): string
+    {
+        return $this->loadTwig()->render('pagination.twig', [
+            'numPages'    => $numPages,
             'currentPage' => $currentPage
         ]);
     }

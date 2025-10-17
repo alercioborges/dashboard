@@ -1,49 +1,71 @@
+<?php
+
 return [
     [
         'label' => 'Dashboard',
-        'icon' => 'nav-icon fas fa-tachometer-alt',
+        'icon'  => 'nav-icon bi bi-speedometer2',
         'route' => 'dashboard',
     ],
     [
         'label' => 'Administração',
-        'icon' => 'nav-icon fas fa-database',
+        'icon'  => 'nav-icon bi bi-database',
         'children' => [
             [
-                'label' => 'Usuários',
-                'icon' => 'far fa-circle nav-icon',
-                'children' => [
-                    'label' => 'Contas',
-                    'icon' => 'nav-icon fas fa-tachometer-alt',
-                    'children' => [
-                        'label' => 'Lista de usuários',
-                        'icon' => 'nav-icon fas fa-tachometer-alt',
-                        'route' => 'users.ahow'
-                    ],
-                    [
-                        'label' => 'Lista de usuários',
-                        'icon' => 'nav-icon fas fa-tachometer-alt',
-                        'route' => 'users.create'
-                    ],                
-                ].
-            ],
-            [
-                'label' => 'Clientes',
-                'icon' => 'far fa-circle nav-icon',
-                'route' => 'clients.index',
-            ],
-            [
-                'label' => 'Produtos',
-                'icon' => 'far fa-circle nav-icon',
+                'label' => 'Contas',
+                'icon'  => 'nav-icon bi bi-people',
                 'children' => [
                     [
-                        'label' => 'Listar Produtos',
-                        'icon' => 'far fa-dot-circle nav-icon',
-                        'route' => 'products.index',
+                        'label' => 'Usuários',
+                        'icon'  => 'nav-icon bi bi-person',
+                        'children' => [
+                            [
+                                'label' => 'Listar Usuários',
+                                'icon'  => 'nav-icon bi bi-circle',
+                                'route' => 'users.show',
+                            ],
+                            [
+                                'label' => 'Adicionar Usuário',
+                                'icon'  => 'nav-icon bi bi-plus-circle',
+                                'route' => 'users.create',
+                            ],
+                            [
+                                'label' => 'Perfil',
+                                'icon'  => 'nav-icon bi bi-person-badge',
+                                'route' => 'users.profile',
+                            ],
+                        ],
                     ],
                     [
-                        'label' => 'Categorias',
-                        'icon' => 'far fa-dot-circle nav-icon',
-                        'route' => 'categories.index',
+                        'label' => 'Permissões',
+                        'icon'  => 'nav-icon bi bi-shield-lock',
+                        'children' => [
+                            [
+                                'label' => 'Funções',
+                                'icon'  => 'nav-icon bi bi-circle',
+                                'route' => 'roles.show',
+                            ],
+                            [
+                                'label' => 'Adicionar Função',
+                                'icon'  => 'nav-icon bi bi-plus-circle',
+                                'route' => 'roles.create',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'label' => 'Configurações',
+                'icon'  => 'nav-icon bi bi-gear',
+                'children' => [
+                    [
+                        'label' => 'Geral',
+                        'icon'  => 'nav-icon bi bi-circle',
+                        'route' => 'settings.general',
+                    ],
+                    [
+                        'label' => 'Sistema',
+                        'icon'  => 'nav-icon bi bi-circle',
+                        'route' => 'settings.system',
                     ],
                 ],
             ],
@@ -51,23 +73,18 @@ return [
     ],
     [
         'label' => 'Relatórios',
-        'icon' => 'nav-icon fas fa-chart-bar',
+        'icon'  => 'nav-icon bi bi-file-earmark-text',
         'children' => [
             [
                 'label' => 'Vendas',
-                'icon' => 'far fa-circle nav-icon',
+                'icon'  => 'nav-icon bi bi-circle',
                 'route' => 'reports.sales',
             ],
             [
                 'label' => 'Financeiro',
-                'icon' => 'far fa-circle nav-icon',
+                'icon'  => 'nav-icon bi bi-circle',
                 'route' => 'reports.financial',
             ],
         ],
-    ],
-    [
-        'label' => 'Configurações',
-        'icon' => 'nav-icon fas fa-cog',
-        'route' => 'settings',
     ],
 ];

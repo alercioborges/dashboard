@@ -50,6 +50,19 @@ return [
             'auto_reload' => $appConfig['debug']
         ]);
 
+
+
+        // Carrega os itens do menu
+        $menuItems = require __DIR__ . '/../templates/layout/components/config/menu-itens.php';
+
+        // Global variables
+        $twig->getEnvironment()->addGlobal('menu_items', $menuItems);
+
+
+
+
+
+
         // Global variables
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);
@@ -66,10 +79,11 @@ return [
 
     // Twig function to redirect to route name
     ExtensionTwig::class => function (ContainerInterface $c): ExtensionTwig {
+        $appConfig = $c->get('appConfig');
         $routeParser = $c->get(App::class)
             ->getRouteCollector()
             ->getRouteParser();
-        return new ExtensionTwig($routeParser);
+        return new ExtensionTwig($routeParser, $appConfig['current_route']);
     },
 
 

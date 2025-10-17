@@ -10,10 +10,12 @@ use Slim\Views\Twig;
 class ExtensionTwig extends AbstractExtension
 {
     private RouteParserInterface $routeParser;
+    private string $currentRoute;
 
-    public function __construct(RouteParserInterface $routeParser)
+    public function __construct(RouteParserInterface $routeParser, string $currentRoute = '')
     {
         $this->routeParser = $routeParser;
+        $this->currentRoute = $currentRoute;
     }
 
     public function getFunctions(): array
@@ -21,9 +23,9 @@ class ExtensionTwig extends AbstractExtension
         return [
             new TwigFunction('route_redirect', [$this, 'routeRedirect']),
             new TwigFunction('message', [$this, 'setMessage']),
-            new TwigFunction('is_active', [$this, 'isActive']),
-            new TwigFunction('is_enable', [$this, 'isEnable']),
             new TwigFunction('pagination', [$this, 'pagination'], ['is_safe' => ['html']]),
+            new TwigFunction('is_active_route', [$this, 'isActiveRoute']),
+            new TwigFunction('has_active_child', [$this, 'hasActiveChild']),
         ];
     }
 
@@ -37,29 +39,22 @@ class ExtensionTwig extends AbstractExtension
         return \App\Services\FlashMessageService::get($field);
     }
 
-    public function isActive(string $url, string $currentRoute): string
+    /**
+     * Verifica se a rota atual corresponde à rota do menu
+     */
+    public function isActiveRoute(string $routeName): bool
     {
-        return ($currentRoute == $url) ? 'active' : '';
-    }
+        try {
+            $routeUrl = $this->routeParser->urlFor($routeName);
 
-    public function isEnable(array $routes, string $currentRoute): string
-    {
-        return (in_array($currentRoute, $routes)) ? 'menu-open' : '';
-    }
+            // Normaliza as URLs removendo trailing slashes
+            $currentPath = rtrim($this->currentRoute, '/');
+            $routePath = rtrim(parse_url($routeUrl, PHP_URL_PATH), '/');
 
-    private function loadTwig()
-    {
-        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../../templates/layout/components/');
-        $twig = new \Twig\Environment($loader);
-
-        return $twig;
-    }
-
-    public function pagination(int $numPages, int $currentPage): string
-    {
-        return $this->loadTwig()->render('pagination.twig', [
-            'numPages'    => $numPages,
-            'currentPage' => $currentPage
-        ]);
+            // Compara as rotas
+            return $currentPath === $routePath || $currentPath === $routePath . '/';
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

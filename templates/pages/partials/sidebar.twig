@@ -1,34 +1,82 @@
-<style>
-  .active {
-    background-color: white  !important;
-    color: black !important;
-  }  }
-</style>
-<!--begin::Sidebar-->
-<aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-    <!--begin::Sidebar Brand-->
-    <div class="sidebar-brand">
-        <a href="{{ base_path }}/" class="brand-link">
-            <img src="{{ base_path }}/assets/images/dashboard-icon.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow"/>
-            <span class="brand-text fw-light"> Dashboard</span>
-        </a>
-    </div>
-    <!--end::Sidebar Brand-->
-    
-    <!--begin::Sidebar Wrapper-->
-    <div class="sidebar-wrapper">
-        <nav class="mt-2">
-            <!--begin::Sidebar Menu-->
-            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="false" id="navigation">
+{% macro render_menu_item(item) %}
+	{% import _self as macros %}
+	{% set has_children = item.children is defined and item.children|length > 0 %}
+	{% set is_active = item.route is defined and is_active_route(item.route) %}
+	{% set has_active_child = has_children and has_active_child(item.children) %}
+	{% set is_open = is_active or has_active_child %}
 
-                <!-- Administration -->
-                {{ menu_items }}
-                <!-- end Administration -->
-                
-            </ul>
-            <!--end::Sidebar Menu-->
-        </nav>
-    </div>
-    <!--end::Sidebar Wrapper-->
+	<li class="nav-item {{ is_open ? 'menu-open' : '' }}">
+		{% if has_children %}
+			<a href="#" class="nav-link {{ is_open ? 'active' : '' }}">
+				<i class="{{ item.icon }}"></i>
+				<p>
+					{{ item.label }}
+					<i class="nav-arrow bi bi-chevron-right"></i>
+				</p>
+			</a>
+			<ul class="nav nav-treeview">
+				{% for child in item.children %}
+					{{ macros.render_menu_item(child) }}
+				{% endfor %}
+			</ul>
+		{% else %}
+			<a href="{{ route_redirect(item.route) }}" class="nav-link {{ is_active ? 'active' : '' }}">
+				<i class="{{ item.icon }}"></i>
+				<p>{{ item.label }}</p>
+			</a>
+		{% endif %}
+	</li>
+{% endmacro %}
+
+<style>
+	.nav-link.active {
+		background-color: rgba(255, 255, 255, 0.1) !important;
+		color: #ffffff !important;
+	}
+
+	.app-sidebar[data-bs-theme="dark"] .nav-link.active {
+		background-color: rgba(255, 255, 255, 0.1) !important;
+		color: #ffffff !important;
+	}
+
+	.nav-item.menu-open > .nav-link {
+		background-color: rgba(255, 255, 255, 0.05) !important;
+	}
+
+	.nav-treeview .nav-link.active {
+		background-color: rgba(255, 255, 255, 0.15) !important;
+	}
+</style>
+
+<!--begin::Sidebar-->
+<aside
+	class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+	<!--begin::Sidebar Brand-->
+	<div class="sidebar-brand">
+		<a href="{{ base_path }}/" class="brand-link">
+			<img src="{{ base_path }}/assets/images/dashboard-icon.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow"/>
+			<span class="brand-text fw-light">Dashboard</span>
+		</a>
+	</div>
+	<!--end::Sidebar Brand-->
+
+	<!--begin::Sidebar Wrapper-->
+	<div class="sidebar-wrapper">
+		<nav
+			class="mt-2">
+			<!--begin::Sidebar Menu-->
+			{% import _self as macros %}
+			<ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="false">
+
+
+				{% for item in menu_items %}
+					{{ macros.render_menu_item(item) }}
+				{% endfor %}
+
+			</ul>
+			<!--end::Sidebar Menu-->
+		</nav>
+	</div>
+	<!--end::Sidebar Wrapper-->
 </aside>
 <!--end::Sidebar-->

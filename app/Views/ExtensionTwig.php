@@ -46,15 +46,49 @@ class ExtensionTwig extends AbstractExtension
     {
         try {
             $routeUrl = $this->routeParser->urlFor($routeName);
-
-            // Normaliza as URLs removendo trailing slashes
-            $currentPath = rtrim($this->currentRoute, '/');
-            $routePath = rtrim(parse_url($routeUrl, PHP_URL_PATH), '/');
-
-            // Compara as rotas
-            return $currentPath === $routePath || $currentPath === $routePath . '/';
+            return $this->currentRoute === $routeUrl;
         } catch (\Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Verifica recursivamente se algum filho está ativo
+     */
+    public function hasActiveChild(array $children): bool
+    {
+        foreach ($children as $child) {
+            // Verifica se o item atual tem uma rota e está ativa
+            if (isset($child['route']) && $this->isActiveRoute($child['route'])) {
+                return true;
+            }
+
+            // Verifica recursivamente os filhos
+            if (isset($child['children']) && is_array($child['children'])) {
+                if ($this->hasActiveChild($child['children'])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+
+    private function loadTwig()
+    {
+        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../../templates/layout/components/');
+        $twig = new \Twig\Environment($loader);
+
+        return $twig;
+    }
+
+    public function pagination(int $numPages, int $currentPage): string
+    {
+        return $this->loadTwig()->render('pagination.twig', [
+            'numPages'    => $numPages,
+            'currentPage' => $currentPage
+        ]);
     }
 }

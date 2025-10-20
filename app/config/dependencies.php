@@ -50,23 +50,16 @@ return [
             'auto_reload' => $appConfig['debug']
         ]);
 
-
-
-        // Carrega os itens do menu
-        $menuItems = require __DIR__ . '/../templates/layout/components/config/menu-itens.php';
-
-        // Global variables
-        $twig->getEnvironment()->addGlobal('menu_items', $menuItems);
-
-
-
-
-
-
+        // Load menu itens
+        $menu_items = require __DIR__ . '/../../templates/layout/components/config/menu-itens.php';
+        
         // Global variables
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);
         $twig->getEnvironment()->addGlobal('current_route', $appConfig['current_route']);
+        $twig->getEnvironment()->addGlobal('menu_items', $menu_items);
+
+        // Load external Twig functions
         $twig->addExtension($c->get(ExtensionTwig::class));
 
         if ($appConfig['env'] === 'development') {

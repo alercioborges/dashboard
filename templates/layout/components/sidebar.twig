@@ -11,7 +11,7 @@
                 <i class="{{ item.icon }}"></i>
                 <p>
                     {{ item.label }}
-                    <i class="right fas fa-angle-left"></i>
+                    <i class="nav-arrow bi bi-chevron-right"></i>
                 </p>
             </a>
             <ul class="nav nav-treeview">
@@ -28,9 +28,65 @@
     </li>
 {% endmacro %}
 
-<ul class="nav nav-pills nav-sidebar flex-column" data-accordion="false">
-    {% import _self as macros %}
-    {% for item in menu_items %}
-        {{ macros.render_menu_item(item) }}
-    {% endfor %}
-</ul>
+<style>
+    .nav-link {
+        transition: background-color 0.2s ease, color 0.2s ease !important;
+    }
+
+    .nav-link.active {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important !important;
+        font-weight: 500 !important;
+    }
+
+    .app-sidebar[data-bs-theme="dark"] .nav-link.active {
+        background-color: rgba(255, 255, 255, 0.1) !important !important;
+        color: #ffffff !important;
+    }
+
+    .nav-item.menu-open > .nav-link {
+        background-color: rgba(255, 255, 255, 0.05) !important !important;
+    }
+
+    .nav-treeview .nav-link.active {
+        background-color: rgba(255, 255, 255, 0.15) !important !important;
+        padding-left: 2rem !important;
+    }
+
+    .nav-item.menu-open > .nav-treeview {
+        display: block !important;
+    }
+</style>
+
+<!--begin::Sidebar-->
+<aside
+	class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+	<!--begin::Sidebar Brand-->
+	<div class="sidebar-brand">
+		<a href="{{ base_path }}/" class="brand-link">
+			<img src="{{ base_path }}/assets/images/dashboard-icon.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow"/>
+			<span class="brand-text fw-light">Dashboard</span>
+		</a>
+	</div>
+	<!--end::Sidebar Brand-->
+
+	<!--begin::Sidebar Wrapper-->
+	<div class="sidebar-wrapper">
+		<nav
+			class="mt-2">
+			<!--begin::Sidebar Menu-->
+			{% import _self as macros %}
+			<ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="false">
+
+
+				{% for item in menu_itens %}
+					{{ macros.render_menu_item(item) }}
+				{% endfor %}
+
+			</ul>
+			<!--end::Sidebar Menu-->
+		</nav>
+	</div>
+	<!--end::Sidebar Wrapper-->
+</aside>
+<!--end::Sidebar-->

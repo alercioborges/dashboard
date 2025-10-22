@@ -9,6 +9,7 @@ return [
     [
         'label' => 'Administração',
         'icon'  => 'nav-icon bi bi-database',
+        'route' => 'admin.index',
         'children' => [
             [
                 'label' => 'Usuários',

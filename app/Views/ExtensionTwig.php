@@ -39,17 +39,27 @@ class ExtensionTwig extends AbstractExtension
         return \App\Services\FlashMessageService::get($field);
     }
 
-    /**
-     * Verifica se a rota atual corresponde à rota do menu
-     */
     public function isActiveRoute(string $routeName): bool
     {
         try {
             $routeUrl = $this->routeParser->urlFor($routeName);
-            return $this->currentRoute === $routeUrl;
-        } catch (\Exception $e) {
+            $routePath = parse_url($routeUrl, PHP_URL_PATH);
+            $routePath = preg_replace('#^' . preg_quote($this->getBaseDir(), '#') . '#', '', $routePath);
+            $routePath = rtrim($routePath, '/');
+
+            $current = rtrim($this->currentRoute, '/');
+
+            return $current === $routePath;
+        } catch (\Throwable $e) {
             return false;
         }
+    }
+
+    private function getBaseDir(): string
+    {
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+        $baseDir = str_replace('/public/index.php', '', $scriptName);
+        return rtrim($baseDir, '/');
     }
 
     /**
@@ -58,12 +68,10 @@ class ExtensionTwig extends AbstractExtension
     public function hasActiveChild(array $children): bool
     {
         foreach ($children as $child) {
-            // Verifica se o item atual tem uma rota e está ativa
             if (isset($child['route']) && $this->isActiveRoute($child['route'])) {
                 return true;
             }
 
-            // Verifica recursivamente os filhos
             if (isset($child['children']) && is_array($child['children'])) {
                 if ($this->hasActiveChild($child['children'])) {
                     return true;

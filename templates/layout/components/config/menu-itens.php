@@ -31,7 +31,19 @@ return [
                             ],
                         ],
                     ],
+                    [
+                        'label' => 'Permissões',
+                        'icon'  => 'nav-icon bi bi-circle',
+                        'children' => [
+                            [
+                                'label' => 'Papeis de usuário',
+                                'icon'  => 'nav-icon bi bi-plus-circle',
+                                'route' => 'roles-user.show'
+                            ],
+                        ],
+                    ],
                 ],
+
             ],
         ],
     ],

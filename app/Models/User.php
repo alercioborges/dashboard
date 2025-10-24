@@ -133,7 +133,18 @@ class User extends Model implements UserRepositoryInterface
      */
     public function delete(int $id): bool
     {
-        return true;
+        $email = $this->findById($id)['email'];
+
+        $result = $this->queryBuilder->update(
+            $this->table,
+            [
+                'email' => $email . '-(deleted)',
+                'is_active' => 0
+            ],
+            ['id' => $id]
+        );
+
+        return $result > 0;
     }
 
     /**

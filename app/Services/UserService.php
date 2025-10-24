@@ -51,6 +51,11 @@ class UserService
         return $this->userRepository->findByEmail($email);
     }
 
+    public function deleteUser(int $id): bool
+    {
+        return $this->userRepository->delete($id);
+    }
+
     public function updateUser(int $id, array $data): bool
     {
         return $this->userRepository->update($id, $data);

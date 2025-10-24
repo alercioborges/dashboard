@@ -220,4 +220,12 @@ class UserController extends Controller
             );
         }
     }
+
+    public function delete(Request $request, Response $response, array $arg): Response
+    {
+        dd($this->userService->deleteUser((int) $arg['id']));
+
+
+        return $response;
+    }
 }

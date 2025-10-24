@@ -9,4 +9,6 @@ $group->group('/users', function (Slim\Routing\RouteCollectorProxy $group) {
     $group->get('/{id:[0-9]+}/profile', [UserController::class, 'profile'])->setName('users.profile');    
     $group->get('/{id:[0-9]+}/edit', [UserController::class, 'edit'])->setName('users.edit');
     $group->post('/{id:[0-9]+}/edit', [UserController::class, 'update'])->setName('users.update');
+    
+    $group->get('/{id:[0-9]+}/delete', [UserController::class, 'delete']);
 });

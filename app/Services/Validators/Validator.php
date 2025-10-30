@@ -15,14 +15,23 @@ class Validator extends Validation
     public function validate($rules)
     {
         foreach ($rules as $field => $validation) {
+
             // Primeiro, processa validações com parâmetros
             $validation = $this->validateWithParameter($field, $validation);
 
             // Separa as validações e garante que 'required' venha primeiro
             $validations = $this->orderValidations($validation);
 
-            // Executa as validações na ordem correta
+
+
             foreach ($validations as $validationRule) {
+
+                // Remone spaces in string
+                if ($validationRule === 'onlyLetter') {
+                    $_POST[$field] = $this->removeSpaces($_POST[$field]);
+                }
+
+                // Execute the validations in correct order
                 if (method_exists($this, $validationRule)) {
                     $this->$validationRule($field);
                 }
@@ -91,6 +100,15 @@ class Validator extends Validation
         }
 
         return $validation;
+    }
+
+    private function removeSpaces(string $value)
+    {
+        $value = trim($value);
+        $value = rtrim($value);
+        $value = preg_replace('/\s+/', ' ', $value);
+
+        return $value;
     }
 
     private function hasOneValidation($validate)

@@ -138,7 +138,7 @@ class User extends Model implements UserRepositoryInterface
         $result = $this->queryBuilder->update(
             $this->table,
             [
-                'email' => $email . '-(deleted)',
+                'email'     => $email . '-(del)',
                 'is_active' => 0
             ],
             ['id' => $id]

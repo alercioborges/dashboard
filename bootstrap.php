@@ -43,8 +43,15 @@ if (!empty($appConfig['baseDir'])) {
     $app->setBasePath($appConfig['baseDir']);
 }
 
+// Body Parsing to ready POST data
+$app->addBodyParsingMiddleware();
+
+// Method Override to convertei _METHOD to HTTP method)
+$app->add(new Slim\Middleware\MethodOverrideMiddleware());
+
 // Add Middlewares routs
-$app->addRoutingMiddleware();
+$methodOverrideMiddleware = new Slim\Middleware\MethodOverrideMiddleware();
+$app->add($methodOverrideMiddleware);
 
 // Setting middlewares
 $middleware = require __DIR__ . '/app/config/middlewares.php';

@@ -1,83 +1,76 @@
 {% extends "base.twig" %}
 
 {% block content %}
-	{{ message('message')|raw }}
-	{% if USERS is not empty %}
-		<div class="card-body table-responsive p-0">
-			<table class="table table-striped table-hover">
-				<thead>
-					<tr>
-						<th scope="col">#</th>
-						<th scope="col">Nome</th>
-						<th scope="col">E-mail</th>
-						<th scope="col">Perfil</th>
-					</tr>
-				</thead>
-				<tbody class="table-group-divider">
-					{% for data in USERS %}
-						<tr class="align-middle">
-							<td>{{ data.id }}</td>
-							<td>
-								<a href="{{ route_redirect('users.profile', {'id' : data.id}) }}">{{ data.name }}</a>
-							</td>
-							<td>{{ data.email }}</td>
-							<td>{{ data.role }}</td>
-							<td>
-								<a href="{{ base_path }}/admin/users/{{data.id}}/edit" class="btn btn-primary btn-xs m-1">
-									<i class="fa fa-edit"></i>
+{{ message('message')|raw }}
+{% if USERS is not empty %}
+	<div class="card-body table-responsive p-0">
+		<table class="table table-striped table-hover">
+			<thead>
+				<tr>
+					<th scope="col">#</th>
+					<th scope="col">Nome</th>
+					<th scope="col">E-mail</th>
+					<th scope="col">Perfil</th>
+				</tr>
+			</thead>
+			<tbody class="table-group-divider">
+				{% for data in USERS %}
+					<tr class="align-middle">
+						<td>{{ data.id }}</td>
+						<td>
+							<a href="{{ route_redirect('users.profile', {'id' : data.id}) }}">{{ data.name }}</a>
+						</td>
+						<td>{{ data.email }}</td>
+						<td>{{ data.role }}</td>
+						<td>
+							<a href="{{ base_path }}/admin/users/{{data.id}}/edit" class="btn btn-primary btn-xs m-1">
+								<i class="fa fa-edit"></i>
 								Editar</a>
 
-								<!-- Start Modal delete user -->
-								<!-- Start link delete user Modal -->
-								<a href="#" data-bs-toggle="modal" data-bs-target="#confirm-delete-{{data.id}}" class="btn btn-danger btn-xs m-1">
-									<i class="fa fa-trash"></i>Excluir
-								</a>
+							<!-- Start Modal delete user -->
+							<!-- Start link delete user Modal -->
+							<a href="#" data-bs-toggle="modal" data-bs-target="#confirm-delete-{{data.id}}" class="btn btn-danger btn-xs m-1">
+								<i class="fa fa-trash"></i>Excluir
+							</a>
 
-								<!-- End link delete Modal -->
-								<!-- Start window Modal -->
-								<div class="modal fade" id="confirm-delete-{{data.id}}" tabindex="-1" aria-labelledby="modalLabel-{{data.id}}" aria-hidden="true">
-									<div class="modal-dialog modal-dialog-centered modal-lg">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h3>
-													<b>Exclusão de usuário</b>
-												</h3>
-												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-											</div>
-											<div class="modal-body">
-												<h6>
-													Deseja realmente excluir o usuário de nome
-													{{data.firstname}}
-													{{data.lastname}}
-													<br>
-													e de e-mail
-													{{data.email}}?
-												</h6>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-success" data-bs-dismiss="modal">Cancelar</button>
-												<a href="{{ base_path }}/admin/users/{{data.id}}/delete" class="btn btn-danger btn-ok">Deletar</a>
-											</div>
+							<!-- End link delete Modal -->
+							<!-- Start window Modal -->
+							<div class="modal fade" id="confirm-delete-{{data.id}}" tabindex="-1" aria-labelledby="modalLabel-{{data.id}}" aria-hidden="true">
+								<div class="modal-dialog modal-dialog-centered modal-lg">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h3>
+												<b>Exclusão de usuário</b>
+											</h3>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+										</div>
+										<div class="modal-body">
+											<h6>
+												Deseja realmente excluir o usuário de nome
+												{{data.name}}
+												<br>
+												e de e-mail
+												{{data.email}}?
+											</h6>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+											<form method="POST" action="{{ route_redirect('users.destroy', {'id': data.id}) }}" enctype="application/x-www-form-urlencoded">
+												<input type="hidden" name="_METHOD" value="DELETE">
+												<button type="submit" class="btn btn-danger">Excluir</button>
+											</form>
+
 										</div>
 									</div>
 								</div>
-							</td>
-						</tr>
-						<!-- End window Modal -->
-						<!-- End modal delete user -->
-					</tbody>
+							</div>
+						</td>
+					</tr>
+					<!-- End window Modal -->
+					<!-- End modal delete user -->
 				</tbody>
-			</td>
-		</tr>
+			</tbody>
+		</td>
 	</tr>
-{% endfor %}
-</tbody>
-</table>
-{{ pagination(NUM_PAGES, CURRENT_PAGE) }}
-</div>
-{% else %}
-	<div class="alert alert-danger mt-1" role="alert">
-		<strong>Nenhum usuário encontrado</strong>
-	</div>
-{% endif %}
-{% endblock %}
+</tr>{% endfor %}</tbody></table>{{ pagination(NUM_PAGES, CURRENT_PAGE) }}</div>{% else %}<div class="alert alert-danger mt-1" role="alert"><strong>Nenhum usuário encontrado</strong></div>{% endif %}{% endblock %}

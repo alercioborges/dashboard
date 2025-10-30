@@ -223,9 +223,52 @@ class UserController extends Controller
 
     public function delete(Request $request, Response $response, array $arg): Response
     {
-        dd($this->userService->deleteUser((int) $arg['id']));
+        try {
 
+            $userData = $this->userService->getUserById((int) $arg['id']);
 
-        return $response;
+            return $this->twig->render(
+                $response,
+                'user-delete.twig',
+                [
+                    'TITLE'     => 'Excluir cadastro de usuário',
+                    'USER_DATA' => $userData
+                ]
+            );
+
+        } catch (\Exception $e) {
+
+            return $this->twig->render(
+                $response,
+                'users-delete.twig',
+                [
+                    'TITLE' => 'Excluir cadastro de usuário',
+                    'ERROR' => 'Ocorreu um erro ao tentar excluir cadastro de usuário'
+                ]
+            );
+        }
+    }
+
+    public function destroy(Request $request, Response $response, array $arg): Response
+    {
+        try {
+
+            $this->userService->deleteUser((int) $arg['id']);
+
+            flash('message', success('Usuário excluído com sucesso'));
+
+            return redirect('/admin/users');
+
+        } catch (\Exception $e) {
+
+            return $this->twig->render(
+                $response,
+                'user-delete.twig',
+                [
+                    'TITLE' => 'Lista de usuários',
+                    'ERROR' => 'Ocorreu um erro ao tentar excluir cadastro de  usuário'
+                ]
+            );
+        }
     }
 }

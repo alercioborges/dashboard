@@ -8,7 +8,7 @@ $group->group('/users', function (Slim\Routing\RouteCollectorProxy $group) {
     $group->post('/create', [UserController::class, 'store'])->setName('users.store');
     $group->get('/{id:[0-9]+}/profile', [UserController::class, 'profile'])->setName('users.profile');    
     $group->get('/{id:[0-9]+}/edit', [UserController::class, 'edit'])->setName('users.edit');
-    $group->post('/{id:[0-9]+}/edit', [UserController::class, 'update'])->setName('users.update');
-    
-    $group->get('/{id:[0-9]+}/delete', [UserController::class, 'delete']);
+    $group->put('/{id:[0-9]+}', [UserController::class, 'update'])->setName('users.update');    
+    $group->get('/{id:[0-9]+}/delete', [UserController::class, 'delete'])->setName('users.delete');
+    $group->delete('/{id:[0-9]+}', [UserController::class, 'destroy'])->setName('users.destroy');
 });

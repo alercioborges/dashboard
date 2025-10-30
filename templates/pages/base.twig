@@ -41,25 +41,31 @@
 				class="card mb-4">
 				<!-- /.card-header -->
 				<div class="card-body responsive p-3">
-				
-				{% if ERROR is defined %}
-            		<div class="alert alert-danger alert-dismissible fade show" role="alert">
-                		<i class="fas fa-exclamation-triangle"></i> {{ ERROR }}
-                		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            		</div>
-        		{% else %}
-					{% block content %}{% endblock %}
-				{% endif %}
-				
-					</div>
-					<!-- /.card-body -->
+
+					{% if ERROR is defined %}
+						<div class="alert alert-danger alert-dismissible fade show" role="alert">
+							<i class="fas fa-exclamation-triangle"></i>
+							{{ ERROR }}
+							<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+						</div>
+						<div class="text-center mt-3">
+							<a href="{{ base_path }}">
+								<button class="btn btn-primary">Continuar</button>
+							</a>
+						</div>
+					{% else %}
+						{% block content %}{% endblock %}
+					{% endif %}
+
 				</div>
-				<!-- /.card -->
-				<!-- End Contant -->
+				<!-- /.card-body -->
 			</div>
-			<!--end::Container-->
+			<!-- /.card -->
+			<!-- End Contant -->
 		</div>
-		<!--end::App Content-->
-	</main>
-	<!--end::App Main-->
-	{% include 'partials/footer.twig' %}
+		<!--end::Container-->
+	</div>
+	<!--end::App Content-->
+</main>
+<!--end::App Main-->
+{% include 'partials/footer.twig' %}

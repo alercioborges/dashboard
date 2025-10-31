@@ -52,7 +52,7 @@ return [
 
         // Load menu itens
         $menu_items = require __DIR__ . '/../../templates/layout/components/config/menu-itens.php';
-        
+
         // Global variables
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);
@@ -76,7 +76,11 @@ return [
         $routeParser = $c->get(App::class)
             ->getRouteCollector()
             ->getRouteParser();
-        return new ExtensionTwig($routeParser, $appConfig['current_route']);
+        return new ExtensionTwig(
+            $routeParser,
+            $appConfig['current_route'],
+            $appConfig['baseDir']
+        );
     },
 
 

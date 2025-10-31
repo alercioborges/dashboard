@@ -1,0 +1,2635 @@
+# Sistema de Gerenciamento de Usuários - PHP MVC com Slim Framework 4
+
+Este é um sistema completo de gerenciamento de usuários desenvolvido com PHP 8.3, Slim Framework 4 e arquitetura MVC, seguindo princípios SOLID e boas práticas de desenvolvimento.
+
+## Estrutura do Projeto
+
+```
+project-root/
+├── config/
+│   ├── app.php
+│   ├── database.php
+│   └── container.php
+├── public/
+│   ├── index.php
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+├── src/
+│   ├── Controllers/
+│   │   ├── HomeController.php
+│   │   ├── AuthController.php
+│   │   └── UserController.php
+│   ├── Models/
+│   │   ├── User.php
+│   │   ├── Role.php
+│   │   └── Permission.php
+│   ├── Middleware/
+│   │   ├── AuthMiddleware.php
+│   │   └── PermissionMiddleware.php
+│   ├── Services/
+│   │   ├── AuthService.php
+│   │   └── UserService.php
+│   └── Interfaces/
+│       ├── UserRepositoryInterface.php
+│       └── AuthServiceInterface.php
+├── templates/
+│   ├── base.twig
+│   ├── home.twig
+│   ├── login.twig
+│   ├── users/
+│   │   ├── index.twig
+│   │   ├── create.twig
+│   │   └── edit.twig
+│   └── errors/
+│       └── 404.twig
+├── logs/
+├── bootstrap.php
+├── .env.example
+├── .env
+├── composer.json
+├── database.sql
+└── README.md
+```
+
+## Dependências (composer.json)
+
+```json
+{
+    "name": "company/user-management-system",
+    "description": "User management system with role-based permissions using Slim Framework 4",
+    "type": "project",
+    "require": {
+        "php": "^8.3",
+        "slim/slim": "^4.12",
+        "slim/psr7": "^1.6",
+        "slim/twig-view": "^3.3",
+        "twig/twig": "^3.7",
+        "php-di/php-di": "^7.0",
+        "vlucas/phpdotenv": "^5.5",
+        "zeuxisoo/slim-whoops": "^0.7",
+        "monolog/monolog": "^3.4",
+        "cradlephp/hydrahon": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "scripts": {
+        "start": "php -S localhost:8080 -t public",
+        "test": "phpunit"
+    }
+}
+```
+
+## Arquivos de Configuração
+
+### .env.example
+```env
+# Application Settings
+APP_NAME="User Management System"
+APP_DOMAIN="localhost"
+APP_ENV="development"
+APP_DEBUG=true
+APP_URL="http://localhost:8080"
+
+# Database Configuration
+DB_HOST="localhost"
+DB_PORT="3306"
+DB_NAME="user_management"
+DB_USER="root"
+DB_PASS=""
+DB_CHARSET="utf8mb4"
+
+# Security
+SESSION_NAME="app_session"
+SESSION_LIFETIME=3600
+```
+
+### config/app.php
+```php
+<?php
+
+return [
+    'name' => $_ENV['APP_NAME'] ?? 'User Management System',
+    'domain' => $_ENV['APP_DOMAIN'] ?? 'localhost',
+    'environment' => $_ENV['APP_ENV'] ?? 'development',
+    'debug' => filter_var($_ENV['APP_DEBUG'] ?? false, FILTER_VALIDATE_BOOLEAN),
+    'url' => $_ENV['APP_URL'] ?? 'http://localhost:8080',
+    'timezone' => 'America/Sao_Paulo',
+    
+    'paths' => [
+        'root' => dirname(__DIR__),
+        'public' => dirname(__DIR__) . '/public',
+        'templates' => dirname(__DIR__) . '/templates',
+        'logs' => dirname(__DIR__) . '/logs',
+        'cache' => dirname(__DIR__) . '/cache',
+    ],
+    
+    'session' => [
+        'name' => $_ENV['SESSION_NAME'] ?? 'app_session',
+        'lifetime' => (int) ($_ENV['SESSION_LIFETIME'] ?? 3600),
+        'path' => '/',
+        'domain' => $_ENV['APP_DOMAIN'] ?? 'localhost',
+        'secure' => $_ENV['APP_ENV'] === 'production',
+        'httponly' => true,
+        'samesite' => 'Strict'
+    ],
+];
+```
+
+### config/database.php
+```php
+<?php
+
+return [
+    'driver' => 'mysql',
+    'host' => $_ENV['DB_HOST'] ?? 'localhost',
+    'port' => (int) ($_ENV['DB_PORT'] ?? 3306),
+    'database' => $_ENV['DB_NAME'] ?? 'user_management',
+    'username' => $_ENV['DB_USER'] ?? 'root',
+    'password' => $_ENV['DB_PASS'] ?? '',
+    'charset' => $_ENV['DB_CHARSET'] ?? 'utf8mb4',
+    'collation' => 'utf8mb4_unicode_ci',
+    'options' => [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+        PDO::ATTR_PERSISTENT => false,
+    ],
+];
+```
+
+### config/container.php
+```php
+<?php
+
+use DI\ContainerBuilder;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+use Slim\Views\Twig;
+use Slim\Views\TwigMiddleware;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\RotatingFileHandler;
+use CradlePHP\Hydrahon\Hydrahon;
+use App\Services\AuthService;
+use App\Services\UserService;
+use App\Interfaces\AuthServiceInterface;
+use App\Interfaces\UserRepositoryInterface;
+use App\Models\User;
+
+return function (ContainerBuilder $containerBuilder): void {
+    $containerBuilder->addDefinitions([
+        
+        // Configuration
+        'config' => function (): array {
+            return require __DIR__ . '/app.php';
+        },
+        
+        'db_config' => function (): array {
+            return require __DIR__ . '/database.php';
+        },
+
+        // Database Connection
+        PDO::class => function (ContainerInterface $c): PDO {
+            $config = $c->get('db_config');
+            
+            $dsn = sprintf(
+                '%s:host=%s;port=%d;dbname=%s;charset=%s',
+                $config['driver'],
+                $config['host'],
+                $config['port'],
+                $config['database'],
+                $config['charset']
+            );
+            
+            $pdo = new PDO($dsn, $config['username'], $config['password'], $config['options']);
+            
+            return $pdo;
+        },
+
+        // Query Builder
+        Hydrahon::class => function (ContainerInterface $c): Hydrahon {
+            $pdo = $c->get(PDO::class);
+            return new Hydrahon($pdo);
+        },
+
+        // Logger
+        LoggerInterface::class => function (ContainerInterface $c): LoggerInterface {
+            $config = $c->get('config');
+            $logger = new Logger('app');
+            
+            if ($config['environment'] === 'production') {
+                $logger->pushHandler(new RotatingFileHandler(
+                    $config['paths']['logs'] . '/app.log',
+                    0,
+                    Logger::INFO
+                ));
+            } else {
+                $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
+                $logger->pushHandler(new StreamHandler(
+                    $config['paths']['logs'] . '/app.log',
+                    Logger::DEBUG
+                ));
+            }
+            
+            return $logger;
+        },
+
+        // Twig Template Engine using slim/twig-view
+        Twig::class => function (ContainerInterface $c): Twig {
+            $config = $c->get('config');
+            
+            $twig = Twig::create($config['paths']['templates'], [
+                'cache' => $config['debug'] ? false : $config['paths']['cache'] . '/twig',
+                'debug' => $config['debug'],
+                'auto_reload' => $config['debug'],
+            ]);
+            
+            // Add global variables
+            $twig->getEnvironment()->addGlobal('app', [
+                'name' => $config['name'],
+                'url' => $config['url'],
+                'environment' => $config['environment'],
+            ]);
+            
+            return $twig;
+        },
+
+        // Services
+        AuthServiceInterface::class => DI\autowire(AuthService::class),
+        UserService::class => DI\autowire(UserService::class),
+        
+        // Repository
+        UserRepositoryInterface::class => DI\autowire(User::class),
+
+        // Controllers (auto-wired)
+        App\Controllers\HomeController::class => DI\autowire(),
+        App\Controllers\AuthController::class => DI\autowire(),
+        App\Controllers\UserController::class => DI\autowire(),
+        
+        // Middleware (auto-wired)
+        App\Middleware\AuthMiddleware::class => DI\autowire(),
+        App\Middleware\PermissionMiddleware::class => DI\autowire(),
+    ]);
+};
+```
+
+## Bootstrap (bootstrap.php)
+
+```php
+<?php
+
+use DI\ContainerBuilder;
+use Dotenv\Dotenv;
+use Slim\Factory\AppFactory;
+use Slim\Views\Twig;
+use Slim\Views\TwigMiddleware;
+use Zeuxisoo\Whoops\Slim\WhoopsMiddleware;
+
+// Autoload dependencies
+require_once __DIR__ . '/vendor/autoload.php';
+
+// Load environment variables
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+// Set timezone
+date_default_timezone_set($_ENV['APP_TIMEZONE'] ?? 'America/Sao_Paulo');
+
+// Configure session
+if (session_status() === PHP_SESSION_NONE) {
+    $sessionConfig = [
+        'name' => $_ENV['SESSION_NAME'] ?? 'app_session',
+        'lifetime' => (int) ($_ENV['SESSION_LIFETIME'] ?? 3600),
+        'path' => '/',
+        'domain' => $_ENV['APP_DOMAIN'] ?? 'localhost',
+        'secure' => $_ENV['APP_ENV'] === 'production',
+        'httponly' => true,
+        'samesite' => 'Strict'
+    ];
+    
+    session_name($sessionConfig['name']);
+    session_set_cookie_params(
+        $sessionConfig['lifetime'],
+        $sessionConfig['path'],
+        $sessionConfig['domain'],
+        $sessionConfig['secure'],
+        $sessionConfig['httponly']
+    );
+    
+    session_start();
+}
+
+// Build DI Container
+$containerBuilder = new ContainerBuilder();
+
+// Add container definitions
+$containerDefinitions = require __DIR__ . '/config/container.php';
+$containerDefinitions($containerBuilder);
+
+// Build container
+$container = $containerBuilder->build();
+
+// Create Slim App
+AppFactory::setContainer($container);
+$app = AppFactory::create();
+
+// Configure routing
+$app->setBasePath('');
+
+// Add middleware
+$app->addRoutingMiddleware();
+
+// Add Twig-View Middleware
+$twig = $container->get(Twig::class);
+$app->add(TwigMiddleware::create($app, $twig));
+
+// Add Whoops middleware for development
+if ($_ENV['APP_ENV'] === 'development') {
+    $app->add(new WhoopsMiddleware());
+}
+
+// Trailing slash middleware
+$app->add(new Slim\Middleware\TrailingSlashMiddleware(false));
+
+// Error middleware
+$errorMiddleware = $app->addErrorMiddleware(
+    $container->get('config')['debug'],
+    true,
+    true
+);
+
+return $app;
+```
+
+## Arquivo Principal (public/index.php)
+
+```php
+<?php
+
+use App\Controllers\HomeController;
+use App\Controllers\AuthController;
+use App\Controllers\UserController;
+use App\Middleware\AuthMiddleware;
+use App\Middleware\PermissionMiddleware;
+use Slim\Routing\RouteCollectorProxy;
+
+// Bootstrap the application
+$app = require __DIR__ . '/../bootstrap.php';
+
+// Routes
+$app->get('/', [HomeController::class, 'index'])->setName('home');
+
+// Authentication routes
+$app->group('/auth', function (RouteCollectorProxy $group) {
+    $group->get('/login', [AuthController::class, 'showLogin'])->setName('login');
+    $group->post('/login', [AuthController::class, 'login']);
+    $group->post('/logout', [AuthController::class, 'logout'])->setName('logout');
+});
+
+// Protected routes
+$app->group('/users', function (RouteCollectorProxy $group) {
+    $group->get('', [UserController::class, 'index'])->setName('users.index');
+    $group->get('/create', [UserController::class, 'create'])->setName('users.create');
+    $group->post('/create', [UserController::class, 'store']);
+    $group->get('/{id:[0-9]+}', [UserController::class, 'show'])->setName('users.show');
+    $group->get('/{id:[0-9]+}/edit', [UserController::class, 'edit'])->setName('users.edit');
+    $group->put('/{id:[0-9]+}', [UserController::class, 'update']);
+    $group->delete('/{id:[0-9]+}', [UserController::class, 'delete']);
+})->add(PermissionMiddleware::class . ':users')
+  ->add(AuthMiddleware::class);
+
+// Admin routes
+$app->group('/admin', function (RouteCollectorProxy $group) {
+    $group->get('/dashboard', [HomeController::class, 'adminDashboard'])->setName('admin.dashboard');
+})->add(PermissionMiddleware::class . ':admin')
+  ->add(AuthMiddleware::class);
+
+// Run app
+$app->run();
+```
+
+## Modelos (Models)
+
+### src/Models/User.php
+```php
+<?php
+
+namespace App\Models;
+
+use CradlePHP\Hydrahon\Hydrahon;
+use App\Interfaces\UserRepositoryInterface;
+use PDO;
+use Exception;
+
+/**
+ * User Model - Handles user data operations
+ * 
+ * Implements Repository pattern for user management
+ * Follows SOLID principles with single responsibility
+ */
+class User implements UserRepositoryInterface
+{
+    private Hydrahon $db;
+
+    public function __construct(Hydrahon $db)
+    {
+        $this->db = $db;
+    }
+
+    /**
+     * Find user by ID
+     */
+    public function findById(int $id): ?array
+    {
+        $result = $this->db
+            ->select()
+            ->from('users')
+            ->leftJoin('roles', 'users.role_id = roles.id')
+            ->where('users.id', $id)
+            ->addSelect([
+                'users.*',
+                'roles.name as role_name',
+                'roles.permissions'
+            ])
+            ->getRow();
+
+        return $result ?: null;
+    }
+
+    /**
+     * Find user by email
+     */
+    public function findByEmail(string $email): ?array
+    {
+        $result = $this->db
+            ->select()
+            ->from('users')
+            ->leftJoin('roles', 'users.role_id = roles.id')
+            ->where('users.email', $email)
+            ->addSelect([
+                'users.*',
+                'roles.name as role_name',
+                'roles.permissions'
+            ])
+            ->getRow();
+
+        return $result ?: null;
+    }
+
+    /**
+     * Get all users with pagination
+     */
+    public function getAll(int $page = 1, int $perPage = 10): array
+    {
+        $offset = ($page - 1) * $perPage;
+        
+        $users = $this->db
+            ->select()
+            ->from('users')
+            ->leftJoin('roles', 'users.role_id = roles.id')
+            ->addSelect([
+                'users.*',
+                'roles.name as role_name'
+            ])
+            ->limit($perPage)
+            ->offset($offset)
+            ->orderBy('users.created_at', 'DESC')
+            ->getAll();
+
+        $total = $this->db
+            ->select()
+            ->from('users')
+            ->count();
+
+        return [
+            'data' => $users,
+            'total' => $total,
+            'page' => $page,
+            'per_page' => $perPage,
+            'total_pages' => ceil($total / $perPage)
+        ];
+    }
+
+    /**
+     * Create new user
+     */
+    public function create(array $data): int
+    {
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        $data['created_at'] = date('Y-m-d H:i:s');
+        $data['updated_at'] = date('Y-m-d H:i:s');
+
+        return $this->db
+            ->insert()
+            ->into('users')
+            ->values($data)
+            ->execute();
+    }
+
+    /**
+     * Update user
+     */
+    public function update(int $id, array $data): bool
+    {
+        if (isset($data['password'])) {
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
+        
+        $data['updated_at'] = date('Y-m-d H:i:s');
+
+        $affected = $this->db
+            ->update()
+            ->table('users')
+            ->set($data)
+            ->where('id', $id)
+            ->execute();
+
+        return $affected > 0;
+    }
+
+    /**
+     * Delete user
+     */
+    public function delete(int $id): bool
+    {
+        $affected = $this->db
+            ->delete()
+            ->from('users')
+            ->where('id', $id)
+            ->execute();
+
+        return $affected > 0;
+    }
+
+    /**
+     * Check if user has permission
+     */
+    public function hasPermission(int $userId, string $permission): bool
+    {
+        $user = $this->findById($userId);
+        
+        if (!$user || !$user['permissions']) {
+            return false;
+        }
+
+        $permissions = json_decode($user['permissions'], true);
+        
+        return in_array($permission, $permissions) || in_array('*', $permissions);
+    }
+
+    /**
+     * Get user permissions
+     */
+    public function getUserPermissions(int $userId): array
+    {
+        $user = $this->findById($userId);
+        
+        if (!$user || !$user['permissions']) {
+            return [];
+        }
+
+        return json_decode($user['permissions'], true);
+    }
+}
+```
+
+### src/Models/Role.php
+```php
+<?php
+
+namespace App\Models;
+
+use CradlePHP\Hydrahon\Hydrahon;
+
+/**
+ * Role Model - Handles role management
+ */
+class Role
+{
+    private Hydrahon $db;
+
+    public function __construct(Hydrahon $db)
+    {
+        $this->db = $db;
+    }
+
+    public function getAll(): array
+    {
+        return $this->db
+            ->select()
+            ->from('roles')
+            ->orderBy('name')
+            ->getAll();
+    }
+
+    public function findById(int $id): ?array
+    {
+        $result = $this->db
+            ->select()
+            ->from('roles')
+            ->where('id', $id)
+            ->getRow();
+
+        return $result ?: null;
+    }
+}
+```
+
+## Controllers
+
+### src/Controllers/HomeController.php
+```php
+<?php
+
+namespace App\Controllers;
+
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Views\Twig;
+use Psr\Log\LoggerInterface;
+
+/**
+ * Home Controller
+ * 
+ * Handles main application pages and dashboard
+ */
+class HomeController
+{
+    private Twig $twig;
+    private LoggerInterface $logger;
+
+    public function __construct(Twig $twig, LoggerInterface $logger)
+    {
+        $this->twig = $twig;
+        $this->logger = $logger;
+    }
+
+    /**
+     * Display home page
+     */
+    public function index(Request $request, Response $response): Response
+    {
+        $this->logger->info('Home page accessed', [
+            'ip' => $request->getServerParams()['REMOTE_ADDR'] ?? 'unknown',
+            'user_agent' => $request->getHeaderLine('User-Agent')
+        ]);
+
+        $data = [
+            'page_title' => 'Home',
+            'user' => $_SESSION['user'] ?? null,
+        ];
+
+        return $this->twig->render($response, 'home.twig', $data);
+    }
+
+    /**
+     * Admin dashboard
+     */
+    public function adminDashboard(Request $request, Response $response): Response
+    {
+        $data = [
+            'page_title' => 'Admin Dashboard',
+            'user' => $_SESSION['user'],
+        ];
+
+        return $this->twig->render($response, 'admin/dashboard.twig', $data);
+    }
+}
+```
+
+### src/Controllers/AuthController.php
+```php
+<?php
+
+namespace App\Controllers;
+
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Views\Twig;
+use App\Interfaces\AuthServiceInterface;
+use Psr\Log\LoggerInterface;
+
+/**
+ * Authentication Controller
+ * 
+ * Handles user authentication (login/logout)
+ */
+class AuthController
+{
+    private Twig $twig;
+    private AuthServiceInterface $authService;
+    private LoggerInterface $logger;
+
+    public function __construct(
+        Twig $twig, 
+        AuthServiceInterface $authService,
+        LoggerInterface $logger
+    ) {
+        $this->twig = $twig;
+        $this->authService = $authService;
+        $this->logger = $logger;
+    }
+
+    /**
+     * Show login form
+     */
+    public function showLogin(Request $request, Response $response): Response
+    {
+        // Redirect if already authenticated
+        if (isset($_SESSION['user'])) {
+            return $response
+                ->withHeader('Location', '/')
+                ->withStatus(302);
+        }
+
+        $data = [
+            'page_title' => 'Login',
+            'errors' => $_SESSION['errors'] ?? [],
+        ];
+
+        unset($_SESSION['errors']);
+
+        return $this->twig->render($response, 'auth/login.twig', $data);
+    }
+
+    /**
+     * Process login
+     */
+    public function login(Request $request, Response $response): Response
+    {
+        $data = $request->getParsedBody();
+        $email = $data['email'] ?? '';
+        $password = $data['password'] ?? '';
+
+        $result = $this->authService->authenticate($email, $password);
+
+        if ($result['success']) {
+            $_SESSION['user'] = $result['user'];
+            
+            $this->logger->info('User logged in successfully', [
+                'user_id' => $result['user']['id'],
+                'email' => $result['user']['email']
+            ]);
+
+            return $response
+                ->withHeader('Location', '/')
+                ->withStatus(302);
+        }
+
+        $_SESSION['errors'] = $result['errors'];
+        
+        $this->logger->warning('Failed login attempt', [
+            'email' => $email,
+            'ip' => $request->getServerParams()['REMOTE_ADDR'] ?? 'unknown'
+        ]);
+
+        return $response
+            ->withHeader('Location', '/auth/login')
+            ->withStatus(302);
+    }
+
+    /**
+     * Process logout
+     */
+    public function logout(Request $request, Response $response): Response
+    {
+        $userId = $_SESSION['user']['id'] ?? null;
+        
+        session_destroy();
+        
+        if ($userId) {
+            $this->logger->info('User logged out', ['user_id' => $userId]);
+        }
+
+        return $response
+            ->withHeader('Location', '/')
+            ->withStatus(302);
+    }
+}
+```
+
+### src/Controllers/UserController.php
+```php
+<?php
+
+namespace App\Controllers;
+
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Views\Twig;
+use App\Services\UserService;
+use App\Models\Role;
+use Psr\Log\LoggerInterface;
+
+/**
+ * User Controller
+ * 
+ * Handles CRUD operations for users
+ */
+class UserController
+{
+    private Twig $twig;
+    private UserService $userService;
+    private Role $roleModel;
+    private LoggerInterface $logger;
+
+    public function __construct(
+        Twig $twig,
+        UserService $userService,
+        Role $roleModel,
+        LoggerInterface $logger
+    ) {
+        $this->twig = $twig;
+        $this->userService = $userService;
+        $this->roleModel = $roleModel;
+        $this->logger = $logger;
+    }
+
+    /**
+     * List all users
+     */
+    public function index(Request $request, Response $response): Response
+    {
+        $params = $request->getQueryParams();
+        $page = (int) ($params['page'] ?? 1);
+        
+        $users = $this->userService->getAllUsers($page);
+
+        $data = [
+            'page_title' => 'Users Management',
+            'users' => $users,
+            'current_user' => $_SESSION['user'],
+        ];
+
+        return $this->twig->render($response, 'users/index.twig', $data);
+    }
+
+    /**
+     * Show create user form
+     */
+    public function create(Request $request, Response $response): Response
+    {
+        $data = [
+            'page_title' => 'Create User',
+            'roles' => $this->roleModel->getAll(),
+            'errors' => $_SESSION['errors'] ?? [],
+            'old_input' => $_SESSION['old_input'] ?? [],
+        ];
+
+        unset($_SESSION['errors'], $_SESSION['old_input']);
+
+        return $this->twig->render($response, 'users/create.twig', $data);
+    }
+
+    /**
+     * Store new user
+     */
+    public function store(Request $request, Response $response): Response
+    {
+        $data = $request->getParsedBody();
+        
+        $result = $this->userService->createUser($data);
+
+        if ($result['success']) {
+            $this->logger->info('User created successfully', [
+                'user_id' => $result['user_id'],
+                'created_by' => $_SESSION['user']['id']
+            ]);
+
+            return $response
+                ->withHeader('Location', '/users')
+                ->withStatus(302);
+        }
+
+        $_SESSION['errors'] = $result['errors'];
+        $_SESSION['old_input'] = $data;
+
+        return $response
+            ->withHeader('Location', '/users/create')
+            ->withStatus(302);
+    }
+
+    /**
+     * Show edit user form
+     */
+    public function edit(Request $request, Response $response, array $args): Response
+    {
+        $id = (int) $args['id'];
+        $user = $this->userService->getUserById($id);
+
+        if (!$user) {
+            return $response
+                ->withHeader('Location', '/users')
+                ->withStatus(404);
+        }
+
+        $data = [
+            'page_title' => 'Edit User',
+            'user' => $user,
+            'roles' => $this->roleModel->getAll(),
+            'errors' => $_SESSION['errors'] ?? [],
+            'old_input' => $_SESSION['old_input'] ?? [],
+        ];
+
+        unset($_SESSION['errors'], $_SESSION['old_input']);
+
+        return $this->twig->render($response, 'users/edit.twig', $data);
+    }
+
+    /**
+     * Update user
+     */
+    public function update(Request $request, Response $response, array $args): Response
+    {
+        $id = (int) $args['id'];
+        $data = $request->getParsedBody();
+        
+        $result = $this->userService->updateUser($id, $data);
+
+        if ($result['success']) {
+            $this->logger->info('User updated successfully', [
+                'user_id' => $id,
+                'updated_by' => $_SESSION['user']['id']
+            ]);
+
+            return $response
+                ->withHeader('Location', '/users')
+                ->withStatus(302);
+        }
+
+        $_SESSION['errors'] = $result['errors'];
+        $_SESSION['old_input'] = $data;
+
+        return $response
+            ->withHeader('Location', "/users/{$id}/edit")
+            ->withStatus(302);
+    }
+
+    /**
+     * Delete user
+     */
+    public function delete(Request $request, Response $response, array $args): Response
+    {
+        $id = (int) $args['id'];
+        
+        // Prevent self-deletion
+        if ($id === $_SESSION['user']['id']) {
+            return $response
+                ->withHeader('Location', '/users')
+                ->withStatus(403);
+        }
+        
+        $result = $this->userService->deleteUser($id);
+
+        if ($result) {
+            $this->logger->info('User deleted successfully', [
+                'user_id' => $id,
+                'deleted_by' => $_SESSION['user']['id']
+            ]);
+        }
+
+        return $response
+            ->withHeader('Location', '/users')
+            ->withStatus(302);
+    }
+}
+```
+
+## Services
+
+### src/Services/AuthService.php
+```php
+<?php
+
+namespace App\Services;
+
+use App\Interfaces\AuthServiceInterface;
+use App\Interfaces\UserRepositoryInterface;
+
+/**
+ * Authentication Service
+ * 
+ * Handles user authentication logic
+ * Implements business rules for login/logout
+ */
+class AuthService implements AuthServiceInterface
+{
+    private UserRepositoryInterface $userRepository;
+
+    public function __construct(UserRepositoryInterface $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
+    /**
+     * Authenticate user with email and password
+     */
+    public function authenticate(string $email, string $password): array
+    {
+        $errors = [];
+
+        // Validate input
+        if (empty($email)) {
+            $errors[] = 'Email is required';
+        }
+
+        if (empty($passworrd)) {
+            $errors[] = 'Password is required';
+        }
+
+        if (!empty($errors)) {
+            return ['success' => false, 'errors' => $errors];
+        }
+
+        // Find user by email
+        $user = $this->userRepository->findByEmail($email);
+
+        if (!$user) {
+            return ['success' => false, 'errors' => ['Invalid credentials']];
+        }
+
+        // Check if user is active
+        if (!$user['is_active']) {
+            return ['success' => false, 'errors' => ['Account is inactive']];
+        }
+
+        // Verify password
+        if (!password_verify($password, $user['password'])) {
+            return ['success' => false, 'errors' => ['Invalid credentials']];
+        }
+
+        // Remove sensitive data
+        unset($user['password']);
+
+        return [
+            'success' => true,
+            'user' => $user
+        ];
+    }
+
+    /**
+     * Check if user is authenticated
+     */
+    public function isAuthenticated(): bool
+    {
+        return isset($_SESSION['user']) && !empty($_SESSION['user']);
+    }
+
+    /**
+     * Get current authenticated user
+     */
+    public function getCurrentUser(): ?array
+    {
+        return $_SESSION['user'] ?? null;
+    }
+
+    /**
+     * Check if current user has permission
+     */
+    public function hasPermission(string $permission): bool
+    {
+        $user = $this->getCurrentUser();
+        
+        if (!$user) {
+            return false;
+        }
+
+        return $this->userRepository->hasPermission($user['id'], $permission);
+    }
+}
+src/Services/UserService.php
+php<?php
+
+namespace App\Services;
+
+use App\Interfaces\UserRepositoryInterface;
+
+/**
+ * User Service
+ * 
+ * Business logic for user management
+ * Handles validation and data processing
+ */
+class UserService
+{
+    private UserRepositoryInterface $userRepository;
+
+    public function __construct(UserRepositoryInterface $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
+    /**
+     * Get all users with pagination
+     */
+    public function getAllUsers(int $page = 1, int $perPage = 10): array
+    {
+        return $this->userRepository->getAll($page, $perPage);
+    }
+
+    /**
+     * Get user by ID
+     */
+    public function getUserById(int $id): ?array
+    {
+        return $this->userRepository->findById($id);
+    }
+
+    /**
+     * Create new user with validation
+     */
+    public function createUser(array $data): array
+    {
+        $errors = $this->validateUserData($data);
+
+        if (!empty($errors)) {
+            return ['success' => false, 'errors' => $errors];
+        }
+
+        // Check if email already exists
+        if ($this->userRepository->findByEmail($data['email'])) {
+            return ['success' => false, 'errors' => ['Email already exists']];
+        }
+
+        $userId = $this->userRepository->create($data);
+
+        return ['success' => true, 'user_id' => $userId];
+    }
+
+    /**
+     * Update user with validation
+     */
+    public function updateUser(int $id, array $data): array
+    {
+        $existingUser = $this->userRepository->findById($id);
+        
+        if (!$existingUser) {
+            return ['success' => false, 'errors' => ['User not found']];
+        }
+
+        $errors = $this->validateUserData($data, $id);
+
+        if (!empty($errors)) {
+            return ['success' => false, 'errors' => $errors];
+        }
+
+        // Check if email already exists (excluding current user)
+        $emailUser = $this->userRepository->findByEmail($data['email']);
+        if ($emailUser && $emailUser['id'] !== $id) {
+            return ['success' => false, 'errors' => ['Email already exists']];
+        }
+
+        $updated = $this->userRepository->update($id, $data);
+
+        return ['success' => $updated];
+    }
+
+    /**
+     * Delete user
+     */
+    public function deleteUser(int $id): bool
+    {
+        return $this->userRepository->delete($id);
+    }
+
+    /**
+     * Validate user data
+     */
+    private function validateUserData(array $data, ?int $userId = null): array
+    {
+        $errors = [];
+
+        // Name validation
+        if (empty($data['name']) || strlen(trim($data['name'])) < 2) {
+            $errors[] = 'Name must be at least 2 characters long';
+        }
+
+        // Email validation
+        if (empty($data['email'])) {
+            $errors[] = 'Email is required';
+        } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Please enter a valid email address';
+        }
+
+        // Password validation (only for new users or when password is provided)
+        if ($userId === null || !empty($data['password'])) {
+            if (empty($data['password'])) {
+                $errors[] = 'Password is required';
+            } elseif (strlen($data['password']) < 8) {
+                $errors[] = 'Password must be at least 8 characters long';
+            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/', $data['password'])) {
+                $errors[] = 'Password must contain at least one lowercase letter, one uppercase letter, and one number';
+            }
+        }
+
+        // Role validation
+        if (empty($data['role_id'])) {
+            $errors[] = 'Role is required';
+        }
+
+        return $errors;
+    }
+}
+Interfaces
+src/Interfaces/AuthServiceInterface.php
+php<?php
+
+namespace App\Interfaces;
+
+/**
+ * Authentication Service Interface
+ * 
+ * Defines contract for authentication services
+ * Follows Interface Segregation Principle
+ */
+interface AuthServiceInterface
+{
+    /**
+     * Authenticate user with email and password
+     */
+    public function authenticate(string $email, string $password): array;
+
+    /**
+     * Check if user is authenticated
+     */
+    public function isAuthenticated(): bool;
+
+    /**
+     * Get current authenticated user
+     */
+    public function getCurrentUser(): ?array;
+
+    /**
+     * Check if current user has permission
+     */
+    public function hasPermission(string $permission): bool;
+}
+src/Interfaces/UserRepositoryInterface.php
+php<?php
+
+namespace App\Interfaces;
+
+/**
+ * User Repository Interface
+ * 
+ * Defines contract for user data access
+ * Follows Repository pattern
+ */
+interface UserRepositoryInterface
+{
+    /**
+     * Find user by ID
+     */
+    public function findById(int $id): ?array;
+
+    /**
+     * Find user by email
+     */
+    public function findByEmail(string $email): ?array;
+
+    /**
+     * Get all users with pagination
+     */
+    public function getAll(int $page = 1, int $perPage = 10): array;
+
+    /**
+     * Create new user
+     */
+    public function create(array $data): int;
+
+    /**
+     * Update user
+     */
+    public function update(int $id, array $data): bool;
+
+    /**
+     * Delete user
+     */
+    public function delete(int $id): bool;
+
+    /**
+     * Check if user has permission
+     */
+    public function hasPermission(int $userId, string $permission): bool;
+
+    /**
+     * Get user permissions
+     */
+    public function getUserPermissions(int $userId): array;
+}
+Middleware
+src/Middleware/AuthMiddleware.php
+php<?php
+
+namespace App\Middleware;
+
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Slim\Psr7\Response;
+use App\Interfaces\AuthServiceInterface;
+
+/**
+ * Authentication Middleware
+ * 
+ * Ensures user is authenticated before accessing protected routes
+ */
+class AuthMiddleware implements MiddlewareInterface
+{
+    private AuthServiceInterface $authService;
+
+    public function __construct(AuthServiceInterface $authService)
+    {
+        $this->authService = $authService;
+    }
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        if (!$this->authService->isAuthenticated()) {
+            $response = new Response();
+            return $response
+                ->withHeader('Location', '/auth/login')
+                ->withStatus(302);
+        }
+
+        return $handler->handle($request);
+    }
+}
+src/Middleware/PermissionMiddleware.php
+php<?php
+
+namespace App\Middleware;
+
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Slim\Psr7\Response;
+use App\Interfaces\AuthServiceInterface;
+use Slim\Views\Twig;
+
+/**
+ * Permission Middleware
+ * 
+ * Checks if user has required permissions for specific routes
+ */
+class PermissionMiddleware implements MiddlewareInterface
+{
+    private AuthServiceInterface $authService;
+    private Twig $twig;
+    private string $requiredPermission;
+
+    public function __construct(AuthServiceInterface $authService, Twig $twig)
+    {
+        $this->authService = $authService;
+        $this->twig = $twig;
+    }
+
+    public function __invoke(ServerRequestInterface $request, RequestHandlerInterface $handler, string $permission): ResponseInterface
+    {
+        $this->requiredPermission = $permission;
+        return $this->process($request, $handler);
+    }
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        if (!$this->authService->hasPermission($this->requiredPermission)) {
+            $response = new Response();
+            
+            // Return 403 Forbidden with error page
+            return $this->twig->render($response->withStatus(403), 'errors/403.twig', [
+                'page_title' => 'Access Denied',
+                'message' => 'You do not have permission to access this resource.'
+            ]);
+        }
+
+        return $handler->handle($request);
+    }
+}
+Templates (Views)
+templates/base.twig
+twig<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }} - {{ app.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ app.url }}">{{ app.name }}</a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    {% if user %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/users">Users</a>
+                        </li>
+                        {% if user.role_name == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/dashboard">Admin</a>
+                        </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if user %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> {{ user.name }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><span class="dropdown-item-text">{{ user.role_name|title }}</span></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="/auth/logout" class="d-inline">
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="bi bi-box-arrow-right"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/login">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container my-4">
+        {% if errors %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <ul class="mb-0">
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light text-center py-3 mt-5">
+        <div class="container">
+            <p>&copy; 2024 {{ app.name }}. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+templates/home.twig
+twig{% extends "base.twig" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="jumbotron bg-light p-5 rounded">
+            <h1 class="display-4">Welcome to {{ app.name }}</h1>
+            <p class="lead">A modern user management system built with PHP 8.3, Slim Framework 4, and MVC architecture.</p>
+            
+            {% if user %}
+                <hr class="my-4">
+                <p>Hello, <strong>{{ user.name }}</strong>! You are logged in as <span class="badge bg-primary">{{ user.role_name|title }}</span>.</p>
+                <p>
+                    <a class="btn btn-primary btn-lg" href="/users" role="button">
+                        <i class="bi bi-people"></i> Manage Users
+                    </a>
+                    {% if user.role_name == 'admin' %}
+                    <a class="btn btn-success btn-lg ms-2" href="/admin/dashboard" role="button">
+                        <i class="bi bi-speedometer2"></i> Admin Dashboard
+                    </a>
+                    {% endif %}
+                </p>
+            {% else %}
+                <hr class="my-4">
+                <p>Please login to access the user management system.</p>
+                <p>
+                    <a class="btn btn-primary btn-lg" href="/auth/login" role="button">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Features -->
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-shield-check text-primary" style="font-size: 3rem;"></i>
+                        <h5 class="card-title">Secure Authentication</h5>
+                        <p class="card-text">Role-based access control with secure password hashing and session management.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-people text-success" style="font-size: 3rem;"></i>
+                        <h5 class="card-title">User Management</h5>
+                        <p class="card-text">Complete CRUD operations for user management with validation and error handling.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-gear text-warning" style="font-size: 3rem;"></i>
+                        <h5 class="card-title">Modern Architecture</h5>
+                        <p class="card-text">Built with PHP 8.3, Slim 4, and follows SOLID principles with dependency injection.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+templates/auth/login.twig
+twig{% extends "base.twig" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4><i class="bi bi-box-arrow-in-right"></i> Login</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/auth/login">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Demo credentials -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="card-title">Demo Credentials</h6>
+                <p class="card-text small">
+                    <strong>Admin:</strong> admin@example.com / admin123<br>
+                    <strong>Manager:</strong> manager@example.com / manager123<br>
+                    <strong>User:</strong> user@example.com / user123
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+templates/users/index.twig
+twig{% extends "base.twig" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-people"></i> Users Management</h2>
+    <a href="/users/create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add User
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if users.data %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users.data %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <span class="badge bg-secondary">{{ user.role_name|title }}</span>
+                            </td>
+                            <td>
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.created_at|date('Y-m-d') }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/users/{{ user.id }}/edit" class="btn btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% if user.id != current_user.id %}
+                                    <form method="POST" action="/users/{{ user.id }}" class="d-inline" 
+                                          onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                        <input type="hidden" name="_METHOD" value="DELETE">
+                                        <button type="submit" class="btn btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if users.total_pages > 1 %}
+            <nav>
+                <ul class="pagination justify-content-center">
+                    {% for page in 1..users.total_pages %}
+                        {% if page == users.page %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-4">
+                <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
+                <h4 class="text-muted">No users found</h4>
+                <p class="text-muted">Start by creating your first user.</p>
+                <a href="/users/create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Add User
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+templates/users/create.twig
+twig{% extends "base.twig" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-plus-circle"></i> Create New User</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/users/create">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{{ old_input.name ?? '' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ old_input.email ?? '' }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password *</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="form-text">Minimum 8 characters with uppercase, lowercase, and number</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="role_id" class="form-label">Role *</label>
+                                <select class="form-select" id="role_id" name="role_id" required>
+                                    <option value="">Select Role</option>
+                                    {% for role in roles %}
+                                    <option value="{{ role.id }}" {% if old_input.role_id == role.id %}selected{% endif %}>
+                                        {{ role.name|title }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" 
+                                   {% if old_input.is_active is not defined or old_input.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                Active User
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="/users" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Users
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Create User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+templates/users/edit.twig
+twig{% extends "base.twig" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-pencil"></i> Edit User: {{ user.name }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/users/{{ user.id }}">
+                    <input type="hidden" name="_METHOD" value="PUT">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{{ old_input.name ?? user.name }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ old_input.email ?? user.email }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="password" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="password" name="password">
+                                <div class="form-text">Leave blank to keep current password</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="role_id" class="form-label">Role *</label>
+                                <select class="form-select" id="role_id" name="role_id" required>
+                                    <option value="">Select Role</option>
+                                    {% for role in roles %}
+                                    <option value="{{ role.id }}" 
+                                        {% if (old_input.role_id ?? user.role_id) == role.id %}selected{% endif %}>
+                                        {{ role.name|title }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" 
+                                   {% if (old_input.is_active ?? user.is_active) %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                Active User
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="/users" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Users
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Update User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+templates/admin/dashboard.twig
+twig{% extends "base.twig" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="bi bi-speedometer2"></i> Admin Dashboard</h2>
+        <p class="text-muted">Welcome to the administrative panel, {{ user.name }}.</p>
+    </div>
+</div># Sistema de Gerenciamento de Usuários - PHP MVC com Slim Framework 4
+
+templates/users/create.twig
+twig{% extends "base.twig" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-plus-circle"></i> Create New User</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/users/create">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{{ old_input.name ?? '' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ old_input.email ?? '' }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password *</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="form-text">Minimum 8 characters with uppercase, lowercase, and number</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="role_id" class="form-label">Role *</label>
+                                <select class="form-select" id="role_id" name="role_id" required>
+                                    <option value="">Select Role</option>
+                                    {% for role in roles %}
+                                    <option value="{{ role.id }}" {% if old_input.role_id == role.id %}selected{% endif %}>
+                                        {{ role.name|title }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" 
+                                   {% if old_input.is_active is not defined or old_input.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                Active User
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="/users" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Users
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Create User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+templates/users/edit.twig
+twig{% extends "base.twig" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-pencil"></i> Edit User: {{ user.name }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/users/{{ user.id }}">
+                    <input type="hidden" name="_METHOD" value="PUT">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{{ old_input.name ?? user.name }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ old_input.email ?? user.email }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="password" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="password" name="password">
+                                <div class="form-text">Leave blank to keep current password</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="role_id" class="form-label">Role *</label>
+                                <select class="form-select" id="role_id" name="role_id" required>
+                                    <option value="">Select Role</option>
+                                    {% for role in roles %}
+                                    <option value="{{ role.id }}" 
+                                        {% if (old_input.role_id ?? user.role_id) == role.id %}selected{% endif %}>
+                                        {{ role.name|title }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" 
+                                   {% if (old_input.is_active ?? user.is_active) %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                Active User
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="/users" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Users
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Update User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+templates/admin/dashboard.twig
+twig{% extends "base.twig" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>Users</h4>
+                        <p class="card-text">Total active users in the system</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-people" style="font-size: 2.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/users" class="text-white text-decoration-none">
+                    <small>View Details <i class="bi bi-arrow-right"></i></small>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>Roles</h4>
+                        <p class="card-text">User roles and permissions</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-shield-check" style="font-size: 2.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="#" class="text-white text-decoration-none">
+                    <small>Manage Roles <i class="bi bi-arrow-right"></i></small>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>Activity</h4>
+                        <p class="card-text">Recent system activity</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-activity" style="font-size: 2.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="#" class="text-white text-decoration-none">
+                    <small>View Logs <i class="bi bi-arrow-right"></i></small>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>Settings</h4>
+                        <p class="card-text">System configuration</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-gear" style="font-size: 2.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="#" class="text-white text-decoration-none">
+                    <small>Configure <i class="bi bi-arrow-right"></i></small>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-graph-up"></i> System Overview</h5>
+            </div>
+            <div class="card-body">
+                <p>Here you can add charts, graphs, and other analytics data about your system usage.</p>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> This is a demo dashboard. In a real application, you would connect to your analytics service or database to display meaningful data.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-clock-history"></i> Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item border-0 px-0">
+                        <small class="text-muted">2 minutes ago</small>
+                        <p class="mb-0">New user registered</p>
+                    </div>
+                    <div class="list-group-item border-0 px-0">
+                        <small class="text-muted">15 minutes ago</small>
+                        <p class="mb-0">User role updated</p>
+                    </div>
+                    <div class="list-group-item border-0 px-0">
+                        <small class="text-muted">1 hour ago</small>
+                        <p class="mb-0">System backup completed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+templates/errors/403.twig
+twig{% extends "base.twig" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <div class="card">
+            <div class="card-body py-5">
+                <i class="bi bi-shield-exclamation text-danger" style="font-size: 5rem;"></i>
+                <h1 class="display-4 text-danger">403</h1>
+                <h2>Access Denied</h2>
+                <p class="lead">{{ message ?? 'You do not have permission to access this resource.' }}</p>
+                <hr>
+                <p>If you believe this is an error, please contact your administrator.</p>
+                <a href="/" class="btn btn-primary">
+                    <i class="bi bi-house"></i> Go Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+templates/errors/404.twig
+twig{% extends "base.twig" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <div class="card">
+            <div class="card-body py-5">
+                <i class="bi bi-question-circle text-warning" style="font-size: 5rem;"></i>
+                <h1 class="display-4 text-warning">404</h1>
+                <h2>Page Not Found</h2>
+                <p class="lead">The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+                <hr>
+                <a href="/" class="btn btn-primary">
+                    <i class="bi bi-house"></i> Go Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+CSS Styling
+public/css/style.css
+css/* Custom styles for User Management System */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.jumbotron {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn {
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.badge {
+    font-size: 0.75em;
+    font-weight: 500;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+footer {
+    margin-top: auto;
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Custom button variants */
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-danger:hover {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .jumbotron {
+        padding: 2rem 1rem;
+    }
+    
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+/* Animation for page transitions */
+main {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+Estrutura SQL do Banco de Dados
+database.sql
+sql-- User Management System Database Schema
+-- Created for PHP 8.3 with Slim Framework 4
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+-- Database: user_management
+CREATE DATABASE IF NOT EXISTS `user_management` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `user_management`;
+
+-- --------------------------------------------------------
+
+-- Table structure for table `roles`
+CREATE TABLE `roles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `description` text,
+  `permissions` json DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+-- Table structure for table `users`
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `last_login` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  KEY `idx_role_id` (`role_id`),
+  KEY `idx_is_active` (`is_active`),
+  KEY `idx_created_at` (`created_at`),
+  CONSTRAINT `fk_users_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+-- Table structure for table `permissions` (for future expansion)
+CREATE TABLE `permissions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `description` text,
+  `module` varchar(50) NOT NULL,
+  `action` varchar(50) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_permission` (`module`, `action`),
+  KEY `idx_module` (`module`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+-- Table structure for table `user_sessions` (for session management)
+CREATE TABLE `user_sessions` (
+  `id` varchar(128) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text,
+  `data` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `expires_at` timestamp NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_expires_at` (`expires_at`),
+  CONSTRAINT `fk_sessions_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+-- Table structure for table `activity_logs` (for audit trail)
+CREATE TABLE `activity_logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `action` varchar(100) NOT NULL,
+  `entity` varchar(50) DEFAULT NULL,
+  `entity_id` int(11) DEFAULT NULL,
+  `old_values` json DEFAULT NULL,
+  `new_values` json DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_action` (`action`),
+  KEY `idx_entity` (`entity`, `entity_id`),
+  KEY `idx_created_at` (`created_at`),
+  CONSTRAINT `fk_logs_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+-- Insert default roles
+INSERT INTO `roles` (`name`, `description`, `permissions`) VALUES
+('admin', 'Administrator with full system access', JSON_ARRAY('*')),
+('manager', 'Manager with user management permissions', JSON_ARRAY('users', 'reports')),
+('user', 'Regular user with limited access', JSON_ARRAY('profile'));
+
+-- Insert default permissions
+INSERT INTO `permissions` (`name`, `description`, `module`, `action`) VALUES
+('users.view', 'View users list', 'users', 'view'),
+('users.create', 'Create new users', 'users', 'create'),
+('users.edit', 'Edit existing users', 'users', 'edit'),
+('users.delete', 'Delete users', 'users', 'delete'),
+('admin.dashboard', 'Access admin dashboard', 'admin', 'dashboard'),
+('reports.view', 'View reports', 'reports', 'view'),
+('profile.edit', 'Edit own profile', 'profile', 'edit');
+
+-- Insert demo users (passwords are hashed versions of: admin123, manager123, user123)
+INSERT INTO `users` (`name`, `email`, `password`, `role_id`, `is_active`) VALUES
+('System Administrator', 'admin@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 1),
+('Department Manager', 'manager@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2, 1),
+('Regular User', 'user@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3, 1);
+
+COMMIT;
+
+-- Additional indexes for performance
+CREATE INDEX idx_users_email_active ON users(email, is_active);
+CREATE INDEX idx_users_role_active ON users(role_id, is_active);
+
+-- Views for common queries
+CREATE VIEW v_active_users AS
+SELECT 
+    u.id,
+    u.name,
+    u.email,
+    u.role_id,
+    r.name as role_name,
+    u.last_login,
+    u.created_at
+FROM users u
+JOIN roles r ON u.role_id = r.id
+WHERE u.is_active = 1;
+
+-- Stored procedure for user statistics
+DELIMITER //
+CREATE PROCEDURE GetUserStats()
+BEGIN
+    SELECT 
+        COUNT(*) as total_users,
+        COUNT(CASE WHEN is_active = 1 THEN 1 END) as active_users,
+        COUNT(CASE WHEN is_active = 0 THEN 1 END) as inactive_users,
+        COUNT(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 END) as new_users_30_days
+    FROM users;
+END//
+DELIMITER ;
+Instruções de Instalação e Execução
+Requisitos do Sistema
+
+PHP 8.3 ou superior
+MySQL 8.0 ou MariaDB 10.4+
+Composer 2.0+
+Servidor web (Apache/Nginx) ou PHP Built-in Server
+
+Passos de Instalação
+
+Clone ou baixe o projeto:
+
+bashgit clone <repository-url> user-management-system
+cd user-management-system
+
+Instale as dependências do Composer:
+
+bashcomposer install
+
+Configure o banco de dados:
+
+bash# Crie o banco de dados MySQL
+mysql -u root -p -e "CREATE DATABASE user_management CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# Importe a estrutura do banco
+mysql -u root -p user_management < database.sql
+
+Configure as variáveis de ambiente:
+
+bashcp .env.example .env
+# Edite o arquivo .env com suas configurações
+
+Configure permissões de diretórios:
+
+bashmkdir -p logs cache
+chmod 755 logs cache
+
+Execute a aplicação:
+
+bash# Usando PHP Built-in Server
+composer start
+
+# Ou usando Apache/Nginx
+# Aponte o DocumentRoot para a pasta /public
+
+Acesse a aplicação:
+
+http://localhost:8080
+Credenciais de Demonstração
+
+Admin: admin@example.com / admin123
+Manager: manager@example.com / manager123
+User: user@example.com / user123
+
+Principais Alterações Implementadas
+1. Biblioteca slim/twig-view
+
+Substituída implementação manual do Twig pela biblioteca slim/twig-view
+Configuração simplificada no container
+Uso do TwigMiddleware para integração automática
+Retorno direto nos controllers: return $this->twig->render($response, 'template.twig', $data);
+
+2. Biblioteca zeuxisoo/slim-whoops
+
+Substituída filp/whoops por zeuxisoo/slim-whoops
+Integração específica para Slim Framework
+Middleware simplificado: $app->add(new WhoopsMiddleware());
+Melhor tratamento de erros em ambiente de desenvolvimento
+
+3. Remoção de declare(strict_types=1)
+
+Removida declaração de tipos estritos de todos os arquivos PHP
+Mantidas tipagens de parâmetros e retornos nos métodos
+Flexibilidade aumentada para conversões automáticas de tipos
+
+Boas Práticas Implementadas
+1. Princípios SOLID
+
+Single Responsibility: Cada classe tem uma responsabilidade específica
+Open/Closed: Interfaces permitem extensão sem modificação
+Liskov Substitution: Implementações podem ser substituídas
+Interface Segregation: Interfaces específicas e coesas
+Dependency Inversion: Dependência de abstrações, não implementações
+
+2. PSR Standards
+
+PSR-4: Autoloading padrão implementado
+PSR-12: Estilo de código seguido
+PSR-7: HTTP Message interfaces utilizadas
+PSR-11: Container interface implementada
+
+3. Segurança
+
+Senhas hasheadas com PASSWORD_DEFAULT
+Validação de entrada rigorosa
+Sanitização de dados
+Proteção contra SQL Injection (prepared statements)
+Session management seguro
+CSRF protection ready
+
+4. Arquitetura
+
+Separação clara de responsabilidades (MVC)
+Repository Pattern para acesso a dados
+Service Layer para lógica de negócio
+Dependency Injection para desacoplamento
+Middleware para funcionalidades transversais
+
+5. Performance e Manutenibilidade
+
+Query Builder para queries otimizadas
+Lazy loading de dependências
+Caching de templates Twig
+Logs estruturados com Monolog
+Tratamento de erros elegante com Slim-Whoops
+
+Este sistema fornece uma base sólida e escalável para gerenciamento de usuários, seguindo as melhores práticas de desenvolvimento PHP moderno com as bibliotecas solicitadas, e pode ser facilmente expandido com novos módulos e funcionalidades.# Sistema de Gerenciamento de Usuários - PHP MVC com Slim Framework 4
+Este é um sistema completo de gerenciamento de usuários desenvolvido com PHP 8.3, Slim Framework 4 e arquitetura MVC, seguindo princípios SOLID e boas práticas de desenvolvimento.
+

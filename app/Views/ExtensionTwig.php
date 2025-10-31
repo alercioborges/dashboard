@@ -11,11 +11,13 @@ class ExtensionTwig extends AbstractExtension
 {
     private RouteParserInterface $routeParser;
     private string $currentRoute;
+    private string $baseDir;
 
-    public function __construct(RouteParserInterface $routeParser, string $currentRoute = '')
+    public function __construct(RouteParserInterface $routeParser, string $currentRoute = '', string $baseDir = '')
     {
         $this->routeParser = $routeParser;
         $this->currentRoute = $currentRoute;
+        $this->baseDir = $baseDir;
     }
 
     public function getFunctions(): array
@@ -42,24 +44,21 @@ class ExtensionTwig extends AbstractExtension
     public function isActiveRoute(string $routeName): bool
     {
         try {
+            
             $routeUrl = $this->routeParser->urlFor($routeName);
             $routePath = parse_url($routeUrl, PHP_URL_PATH);
-            $routePath = preg_replace('#^' . preg_quote($this->getBaseDir(), '#') . '#', '', $routePath);
-            $routePath = rtrim($routePath, '/');
-
-            $current = rtrim($this->currentRoute, '/');
-
-            return $current === $routePath;
+            
+            if ($this->baseDir && str_starts_with($routePath, $this->baseDir)) {
+                $routePath = substr($routePath, strlen($this->baseDir));
+            }
+            
+            $routePath = '/' . trim($routePath, '/');
+            $currentPath = '/' . trim($this->currentRoute, '/');
+            
+            return $currentPath === $routePath;
         } catch (\Throwable $e) {
             return false;
         }
-    }
-
-    private function getBaseDir(): string
-    {
-        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-        $baseDir = str_replace('/public/index.php', '', $scriptName);
-        return rtrim($baseDir, '/');
     }
 
     /**
@@ -81,8 +80,6 @@ class ExtensionTwig extends AbstractExtension
 
         return false;
     }
-
-
 
     private function loadTwig()
     {

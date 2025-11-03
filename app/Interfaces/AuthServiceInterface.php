@@ -28,5 +28,5 @@ interface AuthServiceInterface
     /**
      * Check if current user has permission
      */
-    public function hasPermission(string $permission): bool;
+    /*public function hasPermission(string $permission): bool;*/
 }

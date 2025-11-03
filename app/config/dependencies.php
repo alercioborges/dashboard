@@ -30,6 +30,14 @@ use App\Services\RoleService;
 use App\Controllers\RoleController;
 use App\Models\Role;
 
+use App\Middleware\AuthMiddleware;
+use App\Services\AuthService;
+use App\Interfaces\AuthServiceInterface;
+use App\Controllers\AuthController;
+use Psr\Log\LoggerInterface;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
 return [
 
     // Register the appConfig in the container
@@ -214,5 +222,48 @@ return [
             $c->get(Validator::class)
         );
     },
+
+    // AuthService implements AuthServiceInterface
+    AuthServiceInterface::class => function (ContainerInterface $c): AuthServiceInterface {
+        return new AuthService(
+            $c->get(UserRepositoryInterface::class)
+        );
+    },
+
+    // AuthService
+    AuthService::class => function (ContainerInterface $c): AuthService {
+        return new AuthService(
+            $c->get(UserRepositoryInterface::class)
+        );
+    },
+
+    // Logger (necessário para o AuthController)
+    LoggerInterface::class => function (ContainerInterface $c): LoggerInterface {
+        $appConfig = $c->get('appConfig');
+        $logger = new Logger('app');
+
+        $logPath = __DIR__ . '/../../storage/logs/app.log';
+        $handler = new StreamHandler($logPath, Logger::DEBUG);
+        $logger->pushHandler($handler);
+
+        return $logger;
+    },
+
+    // AuthController
+    AuthController::class => function (ContainerInterface $c): AuthController {
+        return new AuthController(
+            $c->get(Twig::class),
+            $c->get(AuthServiceInterface::class),
+            $c->get(LoggerInterface::class)
+        );
+    },
+
+    // AuthMiddleware
+    AuthMiddleware::class => function (ContainerInterface $c): AuthMiddleware {
+        return new AuthMiddleware(
+            $c->get(AuthServiceInterface::class)
+        );
+    },
+
 
 ];

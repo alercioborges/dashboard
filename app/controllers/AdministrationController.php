@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Core\Controller;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
@@ -13,9 +14,8 @@ use Psr\Log\LoggerInterface;
  * 
  * Handles user authentication (login/logout)
  */
-class AuthController
+class AuthController extends Controller
 {
-    private Twig $twig;
     private AuthServiceInterface $authService;
     private LoggerInterface $logger;
 
@@ -24,7 +24,7 @@ class AuthController
         AuthServiceInterface $authService,
         LoggerInterface $logger
     ) {
-        $this->twig = $twig;
+        parent::__construct($twig);
         $this->authService = $authService;
         $this->logger = $logger;
     }
@@ -36,9 +36,7 @@ class AuthController
     {
         // Redirect if already authenticated
         if (isset($_SESSION['user'])) {
-            return $response
-                ->withHeader('Location', '/')
-                ->withStatus(302);
+            return redirect('/');
         }
 
         $data = [
@@ -48,7 +46,7 @@ class AuthController
 
         unset($_SESSION['errors']);
 
-        return $this->twig->render($response, 'auth/login.twig', $data);
+        return $this->twig->render($response, 'login.twig', $data);
     }
 
     /**

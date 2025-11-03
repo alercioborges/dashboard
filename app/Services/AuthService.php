@@ -85,6 +85,8 @@ class AuthService implements AuthServiceInterface
     /**
      * Check if current user has permission
      */
+
+    /*
     public function hasPermission(string $permission): bool
     {
         $user = $this->getCurrentUser();
@@ -95,4 +97,5 @@ class AuthService implements AuthServiceInterface
 
         return $this->userRepository->hasPermission($user['id'], $permission);
     }
+    */
 }

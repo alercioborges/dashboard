@@ -254,7 +254,8 @@ return [
         return new AuthController(
             $c->get(Twig::class),
             $c->get(AuthServiceInterface::class),
-            $c->get(LoggerInterface::class)
+            $c->get(LoggerInterface::class),
+            $c->get(Validator::class)
         );
     },
 

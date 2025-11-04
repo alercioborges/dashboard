@@ -9,7 +9,6 @@ use Slim\Views\Twig;
 use App\Core\Controller;
 use App\Services\UserService;
 use App\Services\Validators\Validator;
-
 use App\Models\Role;
 
 class UserController extends Controller

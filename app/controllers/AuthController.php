@@ -59,35 +59,44 @@ class AuthController extends Controller
      */
     public function login(Request $request, Response $response): Response
     {
-        $data = $request->getParsedBody();
-        $email = $data['email'] ?? '';
-        $password = $data['password'] ?? '';
+        try {
 
-        $result = $this->authService->authenticate($email, $password);
+            $data = $this->validator->validate([
+                'email'     => 'required:email:max@60',
+                'password'  => 'required:max@30'
+            ]);
+            
+            $result = $this->authService->authenticate($data['email'], $data['password']);
+            
+            dd($result);
+            
+            if ($result['success']) {
+                $_SESSION['user'] = $result['user'];
 
-        if ($result['success']) {
-            $_SESSION['user'] = $result['user'];
+                $this->logger->info('User logged in successfully', [
+                    'user_id' => $result['user']['id'],
+                    'email' => $result['user']['email']
+                ]);
 
-            $this->logger->info('User logged in successfully', [
-                'user_id' => $result['user']['id'],
-                'email' => $result['user']['email']
+                return redirect('/');
+            }
+
+            $_SESSION['errors'] = $result['errors'];
+
+            $this->logger->warning('Failed login attempt', [
+                'email' => $email,
+                'ip' => $request->getServerParams()['REMOTE_ADDR'] ?? 'unknown'
             ]);
 
             return $response
-                ->withHeader('Location', '/')
+                ->withHeader('Location', '/login')
                 ->withStatus(302);
+
+
+        } catch (\Exception $e) {
+
+            return redirect('/login');
         }
-
-        $_SESSION['errors'] = $result['errors'];
-
-        $this->logger->warning('Failed login attempt', [
-            'email' => $email,
-            'ip' => $request->getServerParams()['REMOTE_ADDR'] ?? 'unknown'
-        ]);
-
-        return $response
-            ->withHeader('Location', '/login')
-            ->withStatus(302);
     }
 
     /**

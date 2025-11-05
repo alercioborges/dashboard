@@ -1,0 +1,4 @@
+[2025-11-05T14:27:21.377806+00:00] app.WARNING: Failed login attempt {"email":"","ip":"::1"} []
+[2025-11-05T14:28:19.361560+00:00] app.WARNING: Failed login attempt {"email":"","ip":"::1"} []
+[2025-11-05T14:29:31.795761+00:00] app.WARNING: Failed login attempt {"email":"","ip":"::1"} []
+[2025-11-05T14:31:50.493240+00:00] app.WARNING: Failed login attempt {"email":"","ip":"::1"} []

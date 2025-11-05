@@ -39,11 +39,12 @@
 						</spab>
 					</div>
 					<div class="card-body login-card-body">
-						<form action="../index3.html" method="post">
+						<form action="{{ route_redirect('login') }}" method="POST">
 							<div class="input-group mb-1">
+								{{ message('error') }}
 								<div class="form-floating">
-									<input id="loginEmail" type="email" class="form-control" value="" placeholder=""/>
-									<label for="loginEmail">Email</label>
+									<input id="email" type="email" name="email" class="form-control" value="" placeholder="" autofocus required />
+									<label for="email">Email</label>
 								</div>
 								<div class="input-group-text">
 									<span class="bi bi-envelope"></span>
@@ -51,8 +52,8 @@
 							</div>
 							<div class="input-group mb-1">
 								<div class="form-floating">
-									<input id="loginPassword" type="password" class="form-control" placeholder=""/>
-									<label for="loginPassword">Password</label>
+									<input id="password" type="password" name="password" class="form-control" placeholder="" required />
+									<label for="password">Password</label>
 								</div>
 								<div class="input-group-text">
 									<span class="bi bi-lock-fill"></span>
@@ -93,13 +94,13 @@
 				</div>
 				<!-- /.login-box -->
 				<!--begin::Third Party Plugin(OverlayScrollbars)-->
-				<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></script>
+				<script src="{{ base_path }}/assets/adminlte/js/overlayscrollbars.browser.es6.min.js"></script>
 				<!--end::Third Party Plugin(OverlayScrollbars)-->
 				<!--begin::Required Plugin(popperjs for Bootstrap 5)-->
-				<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+				<script src="{{ base_path }}/assets/adminlte/js/popper.min.js"></script>
 				<!--end::Required Plugin(popperjs for Bootstrap 5)-->
 				<!--begin::Required Plugin(Bootstrap 5)-->
-				<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"></script>
+				<script src="{{ base_path }}/assets/adminlte/js/bootstrap.min.js"></script>
 				<!--end::Required Plugin(Bootstrap 5)-->
 				<!--begin::Required Plugin(AdminLTE)-->
 				<script src="{{ base_path }}/assets/adminlte/js/adminlte.js"></script>

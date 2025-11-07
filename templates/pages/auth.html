@@ -41,9 +41,10 @@
 					<div class="card-body login-card-body">
 						<form action="{{ route_redirect('login') }}" method="POST">
 							<div class="input-group mb-1">
-								{{ message('error') }}
+								{{ message('error')|raw }}
 								<div class="form-floating">
-									<input id="email" type="email" name="email" class="form-control" value="" placeholder="" autofocus required />
+									<input id="email" type="email" name="email" class="form-control" value="{{ OLD_INPUT['email'] }}" placeholder="" autofocus required />
+									{{ message('email')|raw }}
 									<label for="email">Email</label>
 								</div>
 								<div class="input-group-text">
@@ -53,6 +54,7 @@
 							<div class="input-group mb-1">
 								<div class="form-floating">
 									<input id="password" type="password" name="password" class="form-control" placeholder="" required />
+									{{ message('password')|raw }}
 									<label for="password">Password</label>
 								</div>
 								<div class="input-group-text">

@@ -49,7 +49,11 @@ class User extends Model implements UserRepositoryInterface
     {
         return $this->queryBuilder->select(
             $this->table,
-            ['email'],
+            [
+                'email',
+                'password',
+                'is_active'
+            ],
             ['email' => $email]
         );
     }

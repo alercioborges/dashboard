@@ -39,19 +39,28 @@ class AuthController extends Controller
      */
     public function index(Request $request, Response $response): Response
     {
-        // Redirect if already authenticated
-        if (isset($_SESSION['user'])) {
-            return redirect('/');
-        }
+        try {
 
-        return $this->twig->render(
-            $response,
-            'auth.html',
-            [
-                'TITLE' => 'Acessar',
-                'OLDPUT_EMAIL' => $_SESSION['email'] ?? NULL
-            ]
-        );
+            // Redirect if already authenticated
+            if (isset($_SESSION['user'])) {
+                return redirect('/');
+            }
+
+            return $this->twig->render(
+                $response,
+                'auth.html',
+                [
+                    'TITLE' => 'Acessar',
+                    'OLD_INPUT' => $this->getOldInput()
+                ]
+            );
+        } catch (\Exception $e) {
+
+            return $this->twig->render(
+                $response,
+                'error.html'
+            );
+        }
     }
 
     /**
@@ -62,14 +71,18 @@ class AuthController extends Controller
         try {
 
             $data = $this->validator->validate([
-                'email'     => 'required:email:max@60',
-                'password'  => 'required:max@30'
+                'email'     => 'required:email',
+                'password'  => 'required'
             ]);
-            
+
+            if ($this->validator->hasErrors($data)) {
+                $this->setOldInput($data);
+                back();
+            }
+
             $result = $this->authService->authenticate($data['email'], $data['password']);
-            
             dd($result);
-            
+
             if ($result['success']) {
                 $_SESSION['user'] = $result['user'];
 
@@ -91,8 +104,6 @@ class AuthController extends Controller
             return $response
                 ->withHeader('Location', '/login')
                 ->withStatus(302);
-
-
         } catch (\Exception $e) {
 
             return redirect('/login');

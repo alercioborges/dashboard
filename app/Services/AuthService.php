@@ -25,26 +25,13 @@ class AuthService implements AuthServiceInterface
      */
     public function authenticate(string $email, string $password): array
     {
-        $errors = [];
-
-        // Validate input
-        if (empty($email)) {
-            $errors[] = 'Email is required';
-        }
-
-        if (empty($passworrd)) {
-            $errors[] = 'Password is required';
-        }
-
-        if (!empty($errors)) {
-            return ['success' => false, 'errors' => $errors];
-        }
-
         // Find user by email
         $user = $this->userRepository->findByEmail($email);
 
         if (!$user) {
-            return ['success' => false, 'errors' => ['Invalid credentials']];
+            return [
+                'success' => false,
+                'errors' => ['Invalid credentials']];
         }
 
         // Check if user is active

@@ -44,3 +44,7 @@ function back(): void
     \App\Services\RedirectService::back();    
     exit;
 }
+
+function currentRoutte() {
+    return \App\Services\LoadFileService::file('/app/config/app.php')['current_route'];
+}

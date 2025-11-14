@@ -50,9 +50,11 @@ class User extends Model implements UserRepositoryInterface
         return $this->queryBuilder->select(
             $this->table,
             [
+                'id',
                 'email',
                 'password',
-                'is_active'
+                'is_active',
+                'role_id'
             ],
             ['email' => $email]
         );

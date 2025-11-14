@@ -23,34 +23,22 @@ class AuthService implements AuthServiceInterface
     /**
      * Authenticate user with email and password
      */
-    public function authenticate(string $email, string $password): array
+    public function authenticate(string $email, string $password): bool
     {
         // Find user by email
         $user = $this->userRepository->findByEmail($email);
 
-        if (!$user) {
-            return [
-                'success' => false,
-                'errors' => ['Invalid credentials']];
+        if (!$user || $user[0]['is_active'] === 0) {
+            return false;
         }
 
-        // Check if user is active
-        if (!$user['is_active']) {
-            return ['success' => false, 'errors' => ['Account is inactive']];
-        }
-
-        // Verify password
-        if (!password_verify($password, $user['password'])) {
-            return ['success' => false, 'errors' => ['Invalid credentials']];
-        }
-
-        // Remove sensitive data
-        unset($user['password']);
-
-        return [
-            'success' => true,
-            'user' => $user
-        ];
+        return password_verify($password, $user[0]['password']) ?
+            ($_SESSION['user'] = [
+                'id'      => $user[0]['id'],
+                'role_id' => $user[0]['role_id'],
+                'logged'  => true
+            ]) && true
+            : false;
     }
 
     /**
@@ -58,7 +46,16 @@ class AuthService implements AuthServiceInterface
      */
     public function isAuthenticated(): bool
     {
-        return isset($_SESSION['user']) && !empty($_SESSION['user']);
+        if (
+            !isset($_SESSION['user'])
+            || empty($_SESSION['user'])
+            || $_SESSION['user']['logged'] !== true
+            || !(int)$_SESSION['user']['id'] > 0
+        ) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -67,6 +64,15 @@ class AuthService implements AuthServiceInterface
     public function getCurrentUser(): ?array
     {
         return $_SESSION['user'] ?? null;
+    }
+
+    /**
+     * Logout user
+     */
+    public function logout(): void
+    {
+        session_unset();
+        session_destroy();
     }
 
     /**

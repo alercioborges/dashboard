@@ -13,7 +13,7 @@ interface AuthServiceInterface
     /**
      * Authenticate user with email and password
      */
-    public function authenticate(string $email, string $password): array;
+    public function authenticate(string $email, string $password): bool;
 
     /**
      * Check if user is authenticated
@@ -24,6 +24,11 @@ interface AuthServiceInterface
      * Get current authenticated user
      */
     public function getCurrentUser(): ?array;
+
+    /**
+     * Logout user
+     */
+    public function logout(): void;
 
     /**
      * Check if current user has permission

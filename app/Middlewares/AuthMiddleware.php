@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Middleware;
+namespace App\Middlewares;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -26,10 +26,7 @@ class AuthMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if (!$this->authService->isAuthenticated()) {
-            $response = new Response();
-            return $response
-                ->withHeader('Location', '/auth/login')
-                ->withStatus(302);
+            return redirect('/login');
         }
 
         return $handler->handle($request);

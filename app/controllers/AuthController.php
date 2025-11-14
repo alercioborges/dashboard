@@ -80,30 +80,12 @@ class AuthController extends Controller
                 back();
             }
 
-            $result = $this->authService->authenticate($data['email'], $data['password']);
-            dd($result);
-
-            if ($result['success']) {
-                $_SESSION['user'] = $result['user'];
-
-                $this->logger->info('User logged in successfully', [
-                    'user_id' => $result['user']['id'],
-                    'email' => $result['user']['email']
-                ]);
-
-                return redirect('/');
-            }
-
-            $_SESSION['errors'] = $result['errors'];
-
-            $this->logger->warning('Failed login attempt', [
-                'email' => $email,
-                'ip' => $request->getServerParams()['REMOTE_ADDR'] ?? 'unknown'
-            ]);
-
-            return $response
-                ->withHeader('Location', '/login')
-                ->withStatus(302);
+            $logged = $this->authService->authenticate($data['email'], $data['password']);
+            
+            if ($logged) return redirect('/');
+            
+            flash('error', error("Nome de usuário e/ou senha incorreto"));
+            return redirect('/login');
         } catch (\Exception $e) {
 
             return redirect('/login');
@@ -115,16 +97,20 @@ class AuthController extends Controller
      */
     public function logout(Request $request, Response $response): Response
     {
-        $userId = $_SESSION['user']['id'] ?? null;
+        try {
 
-        session_destroy();
+            $this->authService->logout();
+            return redirect('/login');
+        } catch (\Exception $e) {
 
-        if ($userId) {
-            $this->logger->info('User logged out', ['user_id' => $userId]);
+            return $this->twig->render(
+                $response,
+                'dashboard.html.twig',
+                [
+                    'TITLE' => 'Lista de usuários',
+                    'ERROR' => 'Não é possível atualizar o usuários'
+                ]
+            );
         }
-
-        return $response
-            ->withHeader('Location', '/')
-            ->withStatus(302);
     }
 }

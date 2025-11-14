@@ -189,7 +189,11 @@
                 <!--begin::Menu Footer-->
                 <li class="user-footer">
                   <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="#" class="btn btn-default btn-flat float-end">Sign out</a>
+                  
+                  <form class="float-end" action="{{ route_redirect('logout') }}" method="POST" >
+                    <button type="submit" class="btn btn-default">Sign out</button>
+                  </form>
+
                 </li>
                 <!--end::Menu Footer-->
               </ul>

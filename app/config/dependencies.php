@@ -30,7 +30,7 @@ use App\Services\RoleService;
 use App\Controllers\RoleController;
 use App\Models\Role;
 
-use App\Middleware\AuthMiddleware;
+use App\Middlewares\AuthMiddleware;
 use App\Services\AuthService;
 use App\Interfaces\AuthServiceInterface;
 use App\Controllers\AuthController;

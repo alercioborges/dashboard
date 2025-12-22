@@ -5,6 +5,11 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<title>Acessar</title>
+		<!-- begin::Remova page cache -->
+		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    	<meta http-equiv="Pragma" content="no-cache">
+    	<meta http-equiv="Expires" content="0">
+		<!--end::Remova page cache -->
 		<!--begin::Accessibility Meta Tags-->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
 		<meta name="color-scheme" content="light dark"/>
@@ -96,6 +101,26 @@
 				</div>
 				<!-- /.login-box -->
 				<!--begin::Third Party Plugin(OverlayScrollbars)-->
+
+				<script>
+					// Impede navegação para trás após logout
+					(function() {
+					    // Detecta se veio de uma navegação "back"
+					    if (window.performance && window.performance.navigation.type === 2) {
+					        // Recarrega a página para forçar verificação de sessão
+					        window.location.reload();
+					    }
+					    
+					    // Alternativa: Impede completamente o botão voltar
+					    window.history.pushState(null, null, window.location.href);
+					    window.onpopstate = function() {
+					        window.history.pushState(null, null, window.location.href);
+					        // Opcionalmente, redireciona para login
+					        // window.location.href = 'login.php';
+					    };
+					})();
+				</script>
+
 				<script src="{{ base_path }}/assets/adminlte/js/overlayscrollbars.browser.es6.min.js"></script>
 				<!--end::Third Party Plugin(OverlayScrollbars)-->
 				<!--begin::Required Plugin(popperjs for Bootstrap 5)-->

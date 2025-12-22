@@ -34,6 +34,11 @@ function getUrl(): string
     return \App\Services\LoadFileService::file('/app/config/app.php')['url'];
 }
 
+function getDir(): string
+{
+    return \App\Services\LoadFileService::file('/app/config/app.php')['baseDir'];
+}
+
 function redirect(string $target): Slim\Psr7\Response
 {
     return \App\Services\RedirectService::redirect($target);

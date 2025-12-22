@@ -81,9 +81,18 @@ class AuthController extends Controller
             }
 
             $logged = $this->authService->authenticate($data['email'], $data['password']);
-            
-            if ($logged) return redirect('/');
-            
+
+            if ($logged) {
+
+                if (isset($_SESSION['redirect'])) {
+                    $redirect = $_SESSION['redirect'];
+                    unset($_SESSION['redirect']);
+                    return redirect($redirect);
+                }
+
+                return redirect('/');
+            }
+
             flash('error', error("Nome de usuário e/ou senha incorreto"));
             return redirect('/login');
         } catch (\Exception $e) {
@@ -100,6 +109,7 @@ class AuthController extends Controller
         try {
 
             $this->authService->logout();
+
             return redirect('/login');
         } catch (\Exception $e) {
 

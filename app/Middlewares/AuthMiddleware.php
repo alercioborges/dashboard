@@ -8,12 +8,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Slim\Psr7\Response;
 use App\Interfaces\AuthServiceInterface;
+use Doctrine\DBAL\Schema\DefaultExpression\CurrentTime;
 
-/**
- * Authentication Middleware
- * 
- * Ensures user is authenticated before accessing protected routes
- */
 class AuthMiddleware implements MiddlewareInterface
 {
     private AuthServiceInterface $authService;
@@ -26,6 +22,10 @@ class AuthMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if (!$this->authService->isAuthenticated()) {
+
+            $path = explode(\getDir(), $request->getUri()->getPath());
+            $_SESSION['redirect'] = $path[1];
+            
             return redirect('/login');
         }
 

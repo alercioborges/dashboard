@@ -37,9 +37,17 @@ ____________________________________________________________
 
 
 INSERT INTO `tbl_roles` VALUES(
-  NULL,
-  'Gerente',
+  1,
+  'Usuário logado',
   '',
   NOW(),
   NULL
-)
+);
+
+INSERT INTO `tbl_roles` VALUES(
+  2,
+  'Administrador',
+  '',
+  NOW(),
+  NULL
+);

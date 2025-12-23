@@ -58,7 +58,9 @@ class Role extends Model implements RoleRepositoryInterface
                 'id',
                 'name'
             ],
-            [],
+            [
+                'id NOT IN' => [1, 2]
+            ],
             [],
             $limit,
             $offset

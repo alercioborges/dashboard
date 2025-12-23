@@ -21,8 +21,8 @@ class RoleController extends Controller
         $this->roleService = $roleService;
         $this->validator = $validator;
     }
-    
-    
+
+
     public function show(Request $request, Response $response): Response
     {
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
@@ -53,5 +53,36 @@ class RoleController extends Controller
                 ]
             );
         }
+    }
+
+    public function create(Request $request, Response $response): Response
+    {
+        try {
+
+            return $this->twig->render(
+                $response,
+                'roles-create.twig',
+                [
+                    'TITLE'     => 'Criar novo perfil de usuário',
+                    'OLD_INPUT' => $this->getOldInput()
+                ]
+            );
+        } catch (\Exception $e) {
+
+            return $this->twig->render(
+                $response,
+                'roles-create.twig',
+                [
+                    'TITLE' => 'Criar novo perfil usuário',
+                    'ERROR' => 'Ocorreu um erro ao tentar criar novo perfil de usuário'
+                ]
+            );
+        }
+    }
+
+    public function store(Request $request, Response $response): Response
+    {
+        dd($_POST);
+        return $response;
     }
 }

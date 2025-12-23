@@ -40,6 +40,11 @@ return [
                                 'icon'  => 'nav-icon bi bi-plus-circle',
                                 'route' => 'roles-user.show'
                             ],
+                            [
+                                'label' => 'Criar perfil de usuário',
+                                'icon'  => 'nav-icon bi bi-plus-circle',
+                                'route' => 'roles-user.create'
+                            ],                            
                         ],
                     ],
                 ],

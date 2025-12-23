@@ -34,21 +34,29 @@ class QueryBuilderService
 
             // Montagem de condições (WHERE)
             foreach ($conditions as $column => $value) {
-                // Verifica se há operador na chave (ex: "email LIKE", "id >")
+
+                // IN / NOT IN
+                if (is_array($value) && preg_match('/\s(IN|NOT IN)$/i', $column)) {
+                    $param = preg_replace('/\W/', '_', $column);
+                    $qb->andWhere($column . ' (:' . $param . ')')
+                        ->setParameter($param, $value, ArrayParameterType::INTEGER);
+                    continue;
+                }
+
+                // Operadores simples
                 if (preg_match('/\s(=|<>|>|<|>=|<=|LIKE)$/i', $column)) {
                     $param = preg_replace('/\W/', '_', $column);
                     $qb->andWhere($column . ' :' . $param)
                         ->setParameter($param, $value);
-                } elseif (is_array($value)) {
-                    $param = preg_replace('/\W/', '_', $column);
-                    $qb->andWhere($qb->expr()->in($column, ':' . $param))
-                        ->setParameter($param, $value, ArrayParameterType::STRING);
-                } else {
-                    $param = str_replace('.', '_', $column);
-                    $qb->andWhere($column . ' = :' . $param)
-                        ->setParameter($param, $value);
+                    continue;
                 }
+
+                // Igualdade padrão
+                $param = str_replace('.', '_', $column);
+                $qb->andWhere($column . ' = :' . $param)
+                    ->setParameter($param, $value);
             }
+
 
             // Ordenação (ORDER BY)
             foreach ($orderBy as $column => $direction) {

@@ -1,0 +1,35 @@
+{% extends "base.twig" %}
+
+{% block content %}
+
+	<link href="{{ base_path }}/assets/css/form-validation.css" rel="stylesheet"/>
+
+	<div class="col-md-8 mx-auto border border-dark p-3 rounded">
+		<form
+		id="userForm" method="POST" action="{{ route_redirect('roles-user.store') }}">
+		<!-- Name -->
+		<div class="form-group mb-3">
+			<label for="name" class="form-label">Nome
+				<span class="text-danger">*</span>
+			</label>
+			<input type="text" value="{{ OLD_INPUT['name'] }}" class="form-control border border-dark" id="name" name="name" autofocus data-rules="required|min=2|max=30|onlyLetter" placeholder="Digite seu nome" onkeyup="this.value = this.value.toUpperCase()" autocomplete="given-name" aria-required="true" spellcheck="false">
+			{{ message('firstname')|raw }}
+		</div>
+
+		<!-- Description -->
+		<div class="form-group mb-3">
+			<label for="description" class="form-label">Descrição</label>
+			<textarea class="col-12" id="description" name="description" rows="4" placeholder="Descrição"></textarea>
+		</div>
+
+
+		<!-- Submit button -->
+		<div>
+			<button type="Submit" class="btn btn-primary">Cadastrar</button>
+		</div>
+	</form>
+</div>
+
+<!-- <script src="{{ base_path }}/assets/js/form-validation,js"></script>-->
+
+{% endblock %}

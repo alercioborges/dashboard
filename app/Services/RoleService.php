@@ -49,7 +49,7 @@ class RoleService
      */
     public function getUserByName(string $name): ?array
     {
-        //return $this->userRepository->findByEmail($email);
+        return $this->roleRepository->findByEmail($email);
         return [];
     }
 

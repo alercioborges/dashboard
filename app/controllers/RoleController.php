@@ -82,7 +82,38 @@ class RoleController extends Controller
 
     public function store(Request $request, Response $response): Response
     {
-        dd($_POST);
-        return $response;
+        try {
+
+            $data = $this->validator->validate([
+                'name'       => 'required:max@30:min@2:onlyLetter:uppercase',
+                'description' => 'required:max@30:min@6'
+            ]);            /*
+
+            if ($this->roleService->getRoleByName($data['name'])) {
+                $this->validator->setError('name', 'Esse nome já existe');
+            }
+
+            if ($this->validator->hasErrors($data)) {
+                $this->setOldInput($data);
+                back();
+            }
+
+            $this->userService->createUser($data);
+
+            flash('message', success('Usuário criado com sucesso'));
+
+            return redirect('/admin/users');
+        } catch (\Exception $e) {
+
+            return $this->twig->render(
+                $response,
+                'users-create.twig',
+                [
+                    'TITLE' => 'Cadastrar novo usuário',
+                    'ERROR' => 'Ocorreu um erro ao tentar cadastrar novo usuário'
+                ]
+            );
+        }
+        */
     }
 }

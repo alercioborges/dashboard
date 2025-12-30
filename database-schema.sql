@@ -12,6 +12,21 @@ CREATE TABLE `tbl_roles` (
 
 _____________________________________________________________________
 
+
+CREATE TABLE user_remember_tokens (
+    id int(11) NOT NULL AUTO_INCREMENT,,
+    user_id int(11) NOT NULL,
+    token_hash VARCHAR(255) NOT NULL,
+    expires_at timestamp NOT NULL,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX (user_id),
+    UNIQUE (token_hash),
+    CONSTRAINT `fk_users_remember_tokens` FOREIGN KEY (`user_id`) REFERENCES `tbl_users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+_____________________________________________________________________
+
+
 -- Table structure for table `tbl_users`
 
 CREATE TABLE `tbl_users` (

@@ -82,12 +82,14 @@ class RoleController extends Controller
 
     public function store(Request $request, Response $response): Response
     {
+        /*
+
         try {
 
             $data = $this->validator->validate([
                 'name'       => 'required:max@30:min@2:onlyLetter:uppercase',
                 'description' => 'required:max@30:min@6'
-            ]);            /*
+            ]);            
 
             if ($this->roleService->getRoleByName($data['name'])) {
                 $this->validator->setError('name', 'Esse nome já existe');
@@ -114,6 +116,9 @@ class RoleController extends Controller
                 ]
             );
         }
+        
         */
+
+        return $response;
     }
 }

@@ -13,8 +13,8 @@ CREATE TABLE `tbl_roles` (
 _____________________________________________________________________
 
 
-CREATE TABLE user_remember_tokens (
-    id int(11) NOT NULL AUTO_INCREMENT,,
+CREATE TABLE tbl_user_remember_tokens (
+    id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id int(11) NOT NULL,
     token_hash VARCHAR(255) NOT NULL,
     expires_at timestamp NOT NULL,

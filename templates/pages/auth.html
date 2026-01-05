@@ -40,7 +40,7 @@
 				<div class="card-header">
 					<span class="link-dark text-center link-offset-2 link-opacity-100">
 						<h1 class="mb-0">
-							<b>Dashboard</h1>
+							<b>Moodle</h1>
 						</spab>
 					</div>
 					<div class="card-body login-card-body">
@@ -69,11 +69,14 @@
 							<!--begin::Row-->
 							<div class="row">
 								<div class="col-8 d-inline-flex align-items-center">
-									<div class="form-check">
-										<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
-										<label class="form-check-label" for="flexCheckDefault">
-											Remember Me
+									<div class="form-check">										
+										
+										<input type="hidden" name="remember" value="0">
+										<input class="form-check-input" type="checkbox" name="remember" value="1" id="remember" {{ remember is defined and remember == 1 ? 'checked' : '0' }} >
+										<label class="form-check-label" for="remember">
+											Lembrar-me
 										</label>
+
 									</div>
 								</div>
 								<!-- /.col -->
@@ -110,14 +113,6 @@
 					        // Recarrega a página para forçar verificação de sessão
 					        window.location.reload();
 					    }
-					    
-					    // Alternativa: Impede completamente o botão voltar
-					    window.history.pushState(null, null, window.location.href);
-					    window.onpopstate = function() {
-					        window.history.pushState(null, null, window.location.href);
-					        // Opcionalmente, redireciona para login
-					        // window.location.href = 'login.php';
-					    };
 					})();
 				</script>
 

@@ -74,7 +74,7 @@ class AuthController extends Controller
                 'email'     => 'required:email',
                 'password'  => 'required'
             ]);
-
+            
             if ($this->validator->hasErrors($data)) {
                 $this->setOldInput($data);
                 back();
@@ -93,8 +93,11 @@ class AuthController extends Controller
                 return redirect('/');
             }
 
+            $this->setOldInput($data);
+
             flash('error', error("Nome de usuário e/ou senha incorreto"));
             return redirect('/login');
+            
         } catch (\Exception $e) {
 
             return redirect('/login');

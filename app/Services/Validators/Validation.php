@@ -60,7 +60,7 @@ abstract class Validation extends Sanitize
         }
     }
 
-    public function hasErrors(array $formData)
+    public function hasErrors(array $formData): bool
     {
         return !empty($this->errors);
     }

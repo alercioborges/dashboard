@@ -4,6 +4,10 @@ use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
 
+session_set_cookie_params([
+    'lifetime' => 0
+    ]);
+
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }

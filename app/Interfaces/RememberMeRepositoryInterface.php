@@ -4,9 +4,9 @@ namespace App\Interfaces;
 
 interface RememberMeRepositoryInterface
 {
-    public function create(int $userId): void;
+    public function store(int $userId, string $hash, DateTimeInterface $expiresAt): ?array;
 
-    public function autoLogin(): ?int;
+    public function findValidUserByToken(string $hash): ?array;
 
-    public function forget(): void;
+    public function delete(string $hash): bool;
 }

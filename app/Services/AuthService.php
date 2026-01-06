@@ -80,7 +80,7 @@ class AuthService implements AuthServiceInterface
                 setcookie(
                     session_name(),
                     '',
-                    time() - 42000,
+                    time() - 60,
                     $params["path"],
                     $params["domain"],
                     $params["secure"],

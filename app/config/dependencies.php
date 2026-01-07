@@ -30,11 +30,16 @@ use App\Services\RoleService;
 use App\Controllers\RoleController;
 use App\Models\Role;
 
+use App\Interfaces\RememberMeRepositoryInterface;
+use App\Services\RememberMeService;
+use App\Models\RememberMe;
+
 use App\Middlewares\AuthMiddleware;
 
 use App\Services\AuthService;
 use App\Interfaces\AuthServiceInterface;
 use App\Controllers\AuthController;
+use Doctrine\DBAL\Query;
 use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -227,14 +232,16 @@ return [
     // AuthService implements AuthServiceInterface
     AuthServiceInterface::class => function (ContainerInterface $c): AuthServiceInterface {
         return new AuthService(
-            $c->get(UserRepositoryInterface::class)
+            $c->get(UserRepositoryInterface::class),
+            $c->get(RememberMeRepositoryInterface::class)
         );
     },
 
     // AuthService
     AuthService::class => function (ContainerInterface $c): AuthService {
         return new AuthService(
-            $c->get(UserRepositoryInterface::class)
+            $c->get(UserRepositoryInterface::class),
+            $c->get(RememberMeRepositoryInterface::class)
         );
     },
 
@@ -267,5 +274,18 @@ return [
         );
     },
 
+     // RememberMe
+    RememberMe::class => function (ContainerInterface $c): RememberMe {
+        return new RememberMe(
+            $c->get(QueryBuilderService::class),
+        );
+    },
+
+    // RememberMeRepositoryInterface
+    RememberMeRepositoryInterface::class => function (ContainerInterface $c): RememberMe {
+        return new RememberMe(
+            $c->get(QueryBuilderService::class)
+        );
+    },
 
 ];

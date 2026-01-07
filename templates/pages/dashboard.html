@@ -3,4 +3,11 @@
 {% block content %}
     <h1>Bem-vindo ao Dashboard!</h1>
     <p>Este conteúdo foi injetado no bloco "content".</p>
+    <pre>
+        {{ dump(session
+        ) }}
+    </pre>
+    <pre>
+        {{ dump(cookie) }}
+    </pre>
 {% endblock %}

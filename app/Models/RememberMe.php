@@ -9,19 +9,18 @@ use DateTimeInterface;
 
 class RememberMe extends Model implements RememberMeRepositoryInterface
 {
-    protected string $table = 'tbl_remember_tokens';
+    protected string $table = 'tbl_user_remember_tokens';
 
     public function __construct(QueryBuilderService $queryBuilder)
     {
         parent::__construct($queryBuilder);
     }
 
-    public function store(int $userId, string $hash, DateTimeInterface $expiresAt)
+    public function store(int $userId, string $hash, DateTimeInterface $expiresAt): int
     {
         return $this->queryBuilder->insert(
             $this->table,
             [
-                'id'         => NULL,
                 'user_id'    => $userId,
                 'token_hash' => $hash,
                 'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
@@ -57,5 +56,15 @@ class RememberMe extends Model implements RememberMeRepositoryInterface
         return $this->queryBuilder->delete($this->table, [
             'token_hash' => $hash
         ]);
+    }
+
+    public function deleteExpiredToken(): bool
+    {
+        return $this->queryBuilder->delete(
+            $this->table,
+            [
+                'expires_at' => '< NOW()'
+            ]
+        );
     }
 }

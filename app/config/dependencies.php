@@ -79,6 +79,7 @@ return [
         if ($appConfig['env'] === 'development') {
             $twig->addExtension(new \Twig\Extension\DebugExtension());
             $twig->getEnvironment()->addGlobal('session', $_SESSION ?? []);
+            $twig->getEnvironment()->addGlobal('cookies', $_COOKIE ?? []);
         }
 
         return $twig;
@@ -274,7 +275,7 @@ return [
         );
     },
 
-     // RememberMe
+    // RememberMe
     RememberMe::class => function (ContainerInterface $c): RememberMe {
         return new RememberMe(
             $c->get(QueryBuilderService::class),
@@ -285,6 +286,13 @@ return [
     RememberMeRepositoryInterface::class => function (ContainerInterface $c): RememberMe {
         return new RememberMe(
             $c->get(QueryBuilderService::class)
+        );
+    },
+
+    // RememberMeService
+    RememberMeService::class => function (ContainerInterface $c): RememberMeService {
+        return new RememberMeService(
+            $c->get(RememberMe::class)
         );
     },
 

@@ -71,8 +71,8 @@
 								<div class="col-8 d-inline-flex align-items-center">
 									<div class="form-check">										
 										
-										<input type="hidden" name="remember" value="0">
-										<input class="form-check-input" type="checkbox" name="remember" value="1" id="remember" {{ remember is defined and remember == 1 ? 'checked' : '0' }} >
+										<input type="hidden" name="remember" value="">
+										<input class="form-check-input" type="checkbox" name="remember" value="1" id="remember" {{ remember is defined and remember == 1 ? 'checked' : '' }} >
 										<label class="form-check-label" for="remember">
 											Lembrar-me
 										</label>

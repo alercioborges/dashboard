@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Interfaces\AuthServiceInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\RememberMeRepositoryInterface;
+use SessionHandler;
 
 /**
  * Authentication Service
@@ -35,11 +36,7 @@ class AuthService implements AuthServiceInterface
             return false;
         }
 
-        $_SESSION['user'] = [
-            'id'      => $user[0]['id'],
-            'role_id' => $user[0]['role_id'],
-            'logged'  => true
-        ];
+        $this->createSessionUser($user[0]['id'], $user[0]['role_id']);
 
         if ($remember) {
             $this->createRememberMeToken($user[0]['id']);
@@ -49,28 +46,28 @@ class AuthService implements AuthServiceInterface
     }
 
 
-    private function createRememberMeToken(int $userId)
+    private function createRememberMeToken(int $userId): void
     {
         $token = bin2hex(random_bytes(32));
         $hash  = hash('sha256', $token);
 
-        $expiresAt = new \DateTime('7 days');
+        $expiresAt = new \DateTime('+1 minute'); //  (' 7 days');
 
-        $result = $this->rememberMeRepository->store($userId, $hash, $expiresAt);
+        $this->rememberMeRepository->store($userId, $hash, $expiresAt);
 
-        setcookie(
-            'remember_me',
-            $token,
-            [
-                'expires'  => $expiresAt->getTimestamp(),
-                'path'     => '/',
-                'secure'   => isset($_SERVER['HTTPS']),
-                'httponly' => true,
-                'samesite' => 'Lax'
-            ]
-        );
-
-        return $result;
+        if (!isset($_COOKIE['remember_me'])) {
+            setcookie(
+                'remember_me',
+                $token,
+                [
+                    'expires'  => $expiresAt->getTimestamp(),
+                    'path'     => '/',
+                    'secure'   => isset($_SERVER['HTTPS']),
+                    'httponly' => true,
+                    'samesite' => 'Lax'
+                ]
+            );
+        }
     }
 
     /**
@@ -79,19 +76,44 @@ class AuthService implements AuthServiceInterface
     public function isAuthenticated(): bool
     {
         if (
-            !isset($_SESSION['user'])
-            || empty($_SESSION['user'])
-            || $_SESSION['user']['logged'] !== true
-            || !(int)$_SESSION['user']['id'] > 0
+            isset($_SESSION['user']) &&
+            !empty($_SESSION['user']) &&
+            ($_SESSION['user']['logged'] ?? false) === true &&
+            (int)($_SESSION['user']['id'] ?? 0) > 0
         ) {
-            return false;
+            return true;
         }
 
         if (!empty($_COOKIE['remember_me'])) {
             return $this->loginViaRememberMe($_COOKIE['remember_me']);
         }
 
+        return false;
+    }
+
+
+    private function loginViaRememberMe(string $token): bool
+    {
+        $hash = hash('sha256', $token);
+
+        $user = $this->rememberMeRepository->findValidUserByToken($hash);
+
+        if (!$user) {
+            return false;
+        }
+
+        $this->createSessionUser($user['id'], $user['role_id']);
+
         return true;
+    }
+
+    private function createSessionUser(int $userid, int $roleId): array
+    {
+        return $_SESSION['user'] = [
+            'id'      => $userid,
+            'role_id' => $roleId,
+            'logged'  => true
+        ];
     }
 
     /**
@@ -107,6 +129,14 @@ class AuthService implements AuthServiceInterface
      */
     public function logout(): void
     {
+        if (!empty($_COOKIE['remember_me'])) {
+
+            $hash = hash('sha256', $_COOKIE['remember_me']);
+            $this->rememberMeRepository->delete($hash);
+
+            setcookie('remember_me', '', time() - 3600, '/');
+        }
+
         if (session_status() === PHP_SESSION_ACTIVE) {
             $_SESSION = [];
 
@@ -115,7 +145,7 @@ class AuthService implements AuthServiceInterface
                 setcookie(
                     session_name(),
                     '',
-                    time() - 60,
+                    time() - 3600,
                     $params["path"],
                     $params["domain"],
                     $params["secure"],

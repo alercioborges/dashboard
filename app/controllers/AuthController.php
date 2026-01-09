@@ -79,8 +79,10 @@ class AuthController extends Controller
                 $this->setOldInput($data);
                 back();
             }
+
+            $remember = (bool) ($data['remember'] ?? false);
             
-            $logged = $this->authService->authenticate($data['email'], $data['password'], $data['remember']);
+            $logged = $this->authService->authenticate($data['email'], $data['password'], $remember);
 
             if ($logged) {
 

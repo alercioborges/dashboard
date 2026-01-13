@@ -18,7 +18,7 @@ $pathUrl = (function (): array {
     $baseDir = $baseDir ? '/' . $baseDir : '';
 
     // pegar só o path, sem query string
-    $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $requestUri = parse_url(($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 
     if (str_starts_with($requestUri, $baseDir)) {
         $requestUri = substr($requestUri, strlen($baseDir));

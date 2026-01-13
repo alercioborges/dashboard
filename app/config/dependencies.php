@@ -38,6 +38,10 @@ use App\Middlewares\AuthMiddleware;
 
 use App\Services\AuthService;
 use App\Interfaces\AuthServiceInterface;
+
+use App\Services\ForgotPasswordService;
+use App\Interfaces\ForgotPasswordServiceInterface;
+
 use App\Controllers\AuthController;
 use Doctrine\DBAL\Query;
 use Psr\Log\LoggerInterface;
@@ -263,7 +267,6 @@ return [
         return new AuthController(
             $c->get(Twig::class),
             $c->get(AuthServiceInterface::class),
-            $c->get(LoggerInterface::class),
             $c->get(Validator::class)
         );
     },
@@ -293,6 +296,20 @@ return [
     RememberMeService::class => function (ContainerInterface $c): RememberMeService {
         return new RememberMeService(
             $c->get(RememberMe::class)
+        );
+    },
+
+    // ForgotPasswordService implements ForgotPasswordServiceInterface
+    ForgotPasswordServiceInterface::class => function (ContainerInterface $c): ForgotPasswordServiceInterface {
+        return new ForgotPasswordService(
+            $c->get(UserRepositoryInterface::class)
+        );
+    },
+
+    // ForgotPasswordService
+    ForgotPasswordService::class => function (ContainerInterface $c): ForgotPasswordService {
+        return new ForgotPasswordService(
+            $c->get(UserRepositoryInterface::class)
         );
     },
 

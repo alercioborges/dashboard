@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Interfaces\AuthServiceInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\RememberMeRepositoryInterface;
-use SessionHandler;
+
 
 /**
  * Authentication Service

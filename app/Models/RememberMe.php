@@ -58,13 +58,10 @@ class RememberMe extends Model implements RememberMeRepositoryInterface
         ]);
     }
 
-    public function deleteExpiredToken(): bool
+    public function deleteExpiredToken()
     {
-        return $this->queryBuilder->delete(
-            $this->table,
-            [
-                'expires_at' => '< NOW()'
-            ]
+        return $this->queryBuilder->query(
+            "DELETE FROM {$this->table} WHERE expires_at < NOW()"
         );
     }
 }

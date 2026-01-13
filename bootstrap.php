@@ -1,6 +1,5 @@
 <?php
 
-use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
 
@@ -16,20 +15,7 @@ $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 $dotenv->safeLoad();
 
-// Load app config
-$appConfig = require __DIR__ . '/app/config/app.php';
-
-// Setting container DI
-$containerBuilder = new ContainerBuilder();
-$containerBuilder->addDefinitions(__DIR__ . '/app/config/dependencies.php');
-
-// Compile container in production
-if ($appConfig['env'] === 'production') {
-    $containerBuilder->enableCompilation(__DIR__ . '/storage/cache');
-}
-
-// Create variable container
-$container = $containerBuilder->build();
+$container = require_once __DIR__ . '/app/config/container.php';
 
 // Create aplication
 AppFactory::setContainer($container);

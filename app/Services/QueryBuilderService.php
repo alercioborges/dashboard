@@ -191,26 +191,7 @@ class QueryBuilderService
     /**
      * DELETE
      */
-    public function delete(string $table, array $conditions): int
-    {
-        try {
-            if (empty($conditions)) {
-                throw new Exception("DELETE sem WHERE não permitido.");
-            }
-
-            $qb = $this->connection->createQueryBuilder();
-            $qb->delete($table);
-
-            foreach ($conditions as $col => $val) {
-                $qb->andWhere($col . ' = :' . $col)
-                    ->setParameter($col, $val);
-            }
-
-            return $qb->executeStatement();
-        } catch (DBALException $e) {
-            throw new Exception("Erro no DELETE: " . $e->getMessage(), 0, $e);
-        }
-    }
+    public function delete(string $table, array $conditions): int {return 0;}
 
     /**
      * Query customizada

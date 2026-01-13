@@ -4,10 +4,10 @@
 PHP_PATH="/c/wamp64/bin/php/php8.3.22/php.exe"
 
 # Caminho do script PHP
-SCRIPT_PATH="/c/wamp64/www/dashboard/app/config/cli/remember_me.php"
+SCRIPT_PATH="/c/wamp64/www/dashboard/app/cli/remember_me.php"
 
-echo "Iniciando limpeza de registros..."
-echo "----------------------------------"
+echo "Iniciando limpeza de registros...\n"
+echo "----------------------------------\n"
 
 "$PHP_PATH" "$SCRIPT_PATH"
 

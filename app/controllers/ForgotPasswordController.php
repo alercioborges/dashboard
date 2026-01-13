@@ -7,32 +7,31 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 use App\Core\Controller;
-use App\Interfaces\AuthServiceInterface;
+use App\Interfaces\ForgotPassworServiceInterface;
 use App\Services\Validators\Validator;
 
 /**
- * Authentication Controller
+ * Forgo tPassword Controller
  * 
- * Handles user authentication (login/logout)
+ * 
  */
-class AuthController extends Controller
+class ForgotPasswordController extends Controller
 {
-    private AuthServiceInterface $authService;
+    private ForgotPassworServiceInterface $forgotService;
     private Validator $validator;
 
     public function __construct(
         Twig $twig,
-        AuthServiceInterface $authService,
-
+        ForgotPassworServiceInterface $forgotService,
         Validator $validator
     ) {
         parent::__construct($twig);
-        $this->authService = $authService;
+        $this->forgotService = $forgotService;
         $this->validator = $validator;
     }
 
     /**
-     * Show login form
+     * Show forgot password form
      */
     public function index(Request $request, Response $response): Response
     {
@@ -45,9 +44,9 @@ class AuthController extends Controller
 
             return $this->twig->render(
                 $response,
-                'auth.html',
+                'forgot.html',
                 [
-                    'TITLE' => 'Acessar',
+                    'TITLE' => 'Esqueceu a senha',
                     'OLD_INPUT' => $this->getOldInput()
                 ]
             );
@@ -63,43 +62,24 @@ class AuthController extends Controller
     /**
      * Process login
      */
-    public function login(Request $request, Response $response): Response
+    public function redefine(Request $request, Response $response): Response
     {
         try {
-
-            $data = $this->validator->validate([
-                'email'     => 'required:email',
-                'password'  => 'required'
-            ]);
             
+            $data = $this->validator->validate([
+                'email' => 'required:email'
+            ]);
+
             if ($this->validator->hasErrors($data)) {
                 $this->setOldInput($data);
                 back();
             }
 
-            $remember = (bool) ($data['remember'] ?? false);
-            
-            $logged = $this->authService->authenticate($data['email'], $data['password'], $remember);
+            return redirect('/forgot');
 
-            if ($logged) {
-
-                if (isset($_SESSION['redirect'])) {
-                    $redirect = $_SESSION['redirect'];
-                    unset($_SESSION['redirect']);
-                    return redirect($redirect);
-                }
-
-                return redirect('/');
-            }
-
-            $this->setOldInput($data);
-
-            flash('error', error("Nome de usuário e/ou senha incorreto"));
-            return redirect('/login');
-            
         } catch (\Exception $e) {
 
-            return redirect('/login');
+            return redirect('/forgot');
         }
     }
 

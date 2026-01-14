@@ -7,7 +7,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 use App\Core\Controller;
-use App\Interfaces\ForgotPassworServiceInterface;
+use App\Interfaces\ForgotPasswordServiceInterface;
 use App\Services\Validators\Validator;
 
 /**
@@ -17,12 +17,12 @@ use App\Services\Validators\Validator;
  */
 class ForgotPasswordController extends Controller
 {
-    private ForgotPassworServiceInterface $forgotService;
+    private ForgotPasswordServiceInterface $forgotService;
     private Validator $validator;
 
     public function __construct(
         Twig $twig,
-        ForgotPassworServiceInterface $forgotService,
+        ForgotPasswordServiceInterface $forgotService,
         Validator $validator
     ) {
         parent::__construct($twig);
@@ -50,6 +50,7 @@ class ForgotPasswordController extends Controller
                     'OLD_INPUT' => $this->getOldInput()
                 ]
             );
+
         } catch (\Exception $e) {
 
             return $this->twig->render(
@@ -85,7 +86,7 @@ class ForgotPasswordController extends Controller
 
     /**
      * Process logout
-     */
+     
     public function logout(Request $request, Response $response): Response
     {
         try {
@@ -105,4 +106,5 @@ class ForgotPasswordController extends Controller
             );
         }
     }
+    */
 }

@@ -42,15 +42,19 @@ class ForgotPasswordController extends Controller
                 return redirect('/');
             }
 
+            $sent = $_SESSION['forgot_password_sent'] ?? false;
+
+            unset($_SESSION['forgot_password_sent']);
+
             return $this->twig->render(
                 $response,
                 'forgot.html',
                 [
                     'TITLE' => 'Esqueceu a senha',
-                    'OLD_INPUT' => $this->getOldInput()
+                    'OLD_INPUT' => $this->getOldInput(),
+                    'SENT' => $sent
                 ]
             );
-
         } catch (\Exception $e) {
 
             return $this->twig->render(
@@ -66,7 +70,7 @@ class ForgotPasswordController extends Controller
     public function redefine(Request $request, Response $response): Response
     {
         try {
-            
+
             $data = $this->validator->validate([
                 'email' => 'required:email'
             ]);
@@ -76,8 +80,13 @@ class ForgotPasswordController extends Controller
                 back();
             }
 
+            $this->forgotService->process($data['email']);
+
+            $_SESSION['forgot_password_sent'] = true;
+
             return redirect('/forgot');
 
+            return redirect('/forgot');
         } catch (\Exception $e) {
 
             return redirect('/forgot');
@@ -106,5 +115,5 @@ class ForgotPasswordController extends Controller
             );
         }
     }
-    */
+     */
 }

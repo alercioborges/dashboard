@@ -50,6 +50,29 @@ CREATE TABLE `tbl_users` (
 
 ____________________________________________________________
 
+CREATE TABLE tbl_password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token_hash VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_password_resets_user
+        FOREIGN KEY (user_id)
+        REFERENCES tbl_users(id)
+        ON DELETE CASCADE,
+
+    UNIQUE KEY uk_password_resets_token_hash (token_hash),
+
+    KEY idx_password_resets_user_id (user_id),
+
+    KEY idx_password_resets_expires_at (expires_at)
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+____________________________________________________________
 
 INSERT INTO `tbl_roles` VALUES(
   1,

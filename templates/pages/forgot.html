@@ -44,55 +44,98 @@
 
 <!--begin::Body-->
 <body class="login-page bg-primary bg-gradient">
-    
     <div class="col-md-5">
         <div class="card card-outline card-primary">
-            <!-- begin::Card Header -->
-            <div class="card-header">
-                <span class="link-dark link-offset-2 link-opacity-100">
-                    <h5 class="mb-0">
-                        Para redefinir sua senha, preencha seu e-mail abaixo. Se sua conta for encontrada no banco de dados, um e-mail será enviado para seu endereço de e-mail, com as instruções sobre como restabelecer seu acesso.
-                    </h5>
-                </span>
-            </div>
-            <!-- end::Card Header -->
-            
-            <!-- begin::Card Body -->
-            <div class="card-body login-card-body">
-                <!-- begin::Login Form -->
-                <form action="{{ route_redirect('redefine.redefine') }}" method="POST">
-                    <!-- begin::Email Input Group -->
-                    <div class="input-group mb-1">
-                        {{ message('error')|raw }}
-                        <div class="form-floating">
-                            <input id="email" type="email" name="email" class="form-control" value="{{ OLD_INPUT['email'] }}" placeholder="" autofocus required/>
-                            {{ message('email')|raw }}
-                            <label for="email">Email</label>
-                        </div>
-                        <div class="input-group-text">
-                            <span class="bi bi-envelope"></span>
-                        </div>
-                    </div>
-                    <!-- end::Email Input Group -->
+            {% if SENT %}
+                <!-- begin::Success Message Card -->
+                <!-- begin::Card Header -->
+                <div class="card-header">
+                    <span class="link-dark link-offset-2 link-opacity-100">
+                        <h5 class="mb-0">
+                            <p>
+                                Se o e-mail estiver correto, um e-mail deve ter sido enviado a você.
+                                Este e-mail contém instruções simples para confirmar e completar a
+                                alteração de senha.
+                            </p>
+                            <p>
+                                Em caso de dificuldades, contate o administrador do site.
+                            </p>
+                        </h5>
+                    </span>
+                </div>
+                <!-- end::Card Header -->
 
+                <!-- begin::Card Body -->
+                <div class="card-body login-card-body">
                     <!--begin::Row-->
                     <div class="row">                       
-                        <!-- begin::Submit Button -->
+                        <!-- begin::Back Button -->
                         <div class="col-4">
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary">Buscar</button>
+                                <button type="button" class="btn btn-secondary">
+                                    <a href="{{ route_redirect('login.index') }}" class="text-white link-offset-2 link-underline link-underline-opacity-0">
+                                        Voltar
+                                    </a>
+                                </button>
                             </div>
                         </div>
-                        <!-- end::Submit Button -->
+                        <!-- end::Back Button -->
                     </div>
                     <!--end::Row-->
-                </form>                
-                <!-- end::Login Form -->                
-            </div>
-            <!-- end::Card Body -->
+                </div>
+                <!-- end::Card Body -->
+                <!-- end::Success Message Card -->
+            {% else %}
+                <!-- begin::Password Reset Request Form -->
+                <!-- begin::Card Header -->
+                <div class="card-header">
+                    <span class="link-dark link-offset-2 link-opacity-100">
+                        <h5 class="mb-0">
+                            <p>
+                                Para redefinir sua senha, preencha seu e-mail abaixo. Se sua conta for encontrada no banco de dados, um e-mail será enviado para seu endereço de e-mail, com as instruções sobre como restabelecer seu acesso.
+                            </p>
+                        </h5>
+                    </span>
+                </div>
+                <!-- end::Card Header -->
+                
+                <!-- begin::Card Body -->
+                <div class="card-body login-card-body">
+                    <!-- begin::Password Reset Form -->
+                    <form action="{{ route_redirect('redefine.redefine') }}" method="POST">
+                        <!-- begin::Email Input Group -->
+                        <div class="input-group mb-1">
+                            {{ message('error')|raw }}
+                            <div class="form-floating">
+                                <input id="email" type="email" name="email" class="form-control" value="{{ OLD_INPUT['email'] }}" placeholder="" autofocus required/>
+                                {{ message('email')|raw }}
+                                <label for="email">Email</label>
+                            </div>
+                            <div class="input-group-text">
+                                <span class="bi bi-envelope"></span>
+                            </div>
+                        </div>
+                        <!-- end::Email Input Group -->
+
+                        <!--begin::Row-->
+                        <div class="row">                       
+                            <!-- begin::Submit Button -->
+                            <div class="col-4">
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">Buscar</button>
+                                </div>
+                            </div>
+                            <!-- end::Submit Button -->
+                        </div>
+                        <!--end::Row-->
+                    </form>                
+                    <!-- end::Password Reset Form -->                
+                </div>
+                <!-- end::Card Body -->
+                <!-- end::Password Reset Request Form -->
+            {% endif %}
         </div>
     </div>
-  
     <!-- /.login-container -->
     
     <!-- begin::Password Toggle Script -->
@@ -100,18 +143,22 @@
         document.addEventListener('DOMContentLoaded', function () {
             const toggleButton = document.getElementById('togglePassword');
             const passwordInput = document.getElementById('password');
-            const icon = toggleButton.querySelector('span');
+            
+            // Check if elements exist before adding event listener
+            if (toggleButton && passwordInput) {
+                const icon = toggleButton.querySelector('span');
 
-            toggleButton.addEventListener('click', function () {
-                const isPassword = passwordInput.getAttribute('type') === 'password';
+                toggleButton.addEventListener('click', function () {
+                    const isPassword = passwordInput.getAttribute('type') === 'password';
 
-                // Toggle input type between password and text
-                passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+                    // Toggle input type between password and text
+                    passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
 
-                // Toggle icon between eye and eye-slash
-                icon.classList.toggle('bi-eye-fill', !isPassword);
-                icon.classList.toggle('bi-eye-slash-fill', isPassword);
-            });
+                    // Toggle icon between eye and eye-slash
+                    icon.classList.toggle('bi-eye-fill', !isPassword);
+                    icon.classList.toggle('bi-eye-slash-fill', isPassword);
+                });
+            }
         });
     </script>
     <!-- end::Password Toggle Script -->

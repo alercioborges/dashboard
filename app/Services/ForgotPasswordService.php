@@ -40,12 +40,12 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
 
         // EXEMPLO (tabela password_resets):
         /*
-        $this->userRepository->storePasswordResetToken(
+        $this->userRepository->storePasswordReset(
             $user['id'],
             password_hash($token, PASSWORD_DEFAULT),
             $expiresAt
         );
-        */
+        */       
 
         /**
          * 6️⃣ Envio de e-mail
@@ -54,9 +54,10 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
          * https://seusite.com/reset-password?token=XXXX
          */
 
-        /*
-        $resetLink = $_ENV['APP_URL'] . '/reset-password?token=' . $token;
+        
+        $resetLink = getUrl() . '/reset-password?token=' . $token;
 
+        /*
         $this->mailer->send(
             $email,
             'Redefinição de senha',
@@ -68,5 +69,6 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
             ]
         );
         */
+        
     }
 }

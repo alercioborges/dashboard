@@ -19,7 +19,8 @@ CREATE TABLE tbl_user_remember_tokens (
     token_hash VARCHAR(255) NOT NULL,
     expires_at timestamp NOT NULL,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX (user_id),
+    KEY idx_user_id (user_id),
+    KEY idx_expires_at (expires_at),
     UNIQUE (token_hash),
     CONSTRAINT `fk_users_remember_tokens` FOREIGN KEY (`user_id`) REFERENCES `tbl_users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -58,19 +59,13 @@ CREATE TABLE tbl_password_resets (
     used_at DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_token_hash (token_hash),
+    KEY idx_user_id (user_id),
+    KEY idx_expires_at (expires_at),
+    CONSTRAINT fk_password_resets_user FOREIGN KEY (user_id) 
+    REFERENCES tbl_users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 
-    CONSTRAINT fk_password_resets_user
-        FOREIGN KEY (user_id)
-        REFERENCES tbl_users(id)
-        ON DELETE CASCADE,
-
-    UNIQUE KEY uk_password_resets_token_hash (token_hash),
-
-    KEY idx_password_resets_user_id (user_id),
-
-    KEY idx_password_resets_expires_at (expires_at)
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ____________________________________________________________
 

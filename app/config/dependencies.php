@@ -48,6 +48,8 @@ use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
+use App\Services\MailerService;
+
 return [
 
     // Register the appConfig in the container
@@ -55,6 +57,9 @@ return [
 
     // Register the dbConfig in the container
     'dbConfig' => require __DIR__ . '/database.php',
+
+    // Register the dbConfig in the container
+    'smtpConfig' => require __DIR__ . '/smtp.php',
 
     // Twig
     Twig::class => function (ContainerInterface $c): Twig {
@@ -105,7 +110,10 @@ return [
 
     // Twig Middleware
     TwigMiddleware::class => function (ContainerInterface $c) {
-        return TwigMiddleware::createFromContainer($c->get(App::class), Twig::class);
+        return TwigMiddleware::createFromContainer(
+            $c->get(App::class),
+            Twig::class
+        );
     },
 
 
@@ -310,6 +318,12 @@ return [
     ForgotPasswordService::class => function (ContainerInterface $c): ForgotPasswordService {
         return new ForgotPasswordService(
             $c->get(UserRepositoryInterface::class)
+        );
+    },
+
+    MailerService::class => function (ContainerInterface $c): MailerService {
+        return new MailerService(
+            $c->get('smtpConfig')
         );
     },
 

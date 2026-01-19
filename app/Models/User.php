@@ -168,4 +168,11 @@ class User extends Model implements UserRepositoryInterface
 
         return (int) $result[0]['total'];
     }
+
+    /*
+    public function storePasswordReset(inr id, )
+    {
+        $this->passwordService->make($data['password'])
+    }
+    */
 }

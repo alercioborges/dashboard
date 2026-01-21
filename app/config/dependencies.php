@@ -47,6 +47,7 @@ use Doctrine\DBAL\Query;
 use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use Monolog\Level;
 
 use App\Services\MailerService;
 
@@ -261,10 +262,12 @@ return [
     // Logger (necessário para o AuthController)
     LoggerInterface::class => function (ContainerInterface $c): LoggerInterface {
         $appConfig = $c->get('appConfig');
-        $logger = new Logger('app');
 
+        $logger = new Logger('app');
         $logPath = __DIR__ . '/../../storage/logs/app.log';
-        $handler = new StreamHandler($logPath, Logger::DEBUG);
+
+        $handler = new StreamHandler($logPath, Level::Debug);
+
         $logger->pushHandler($handler);
 
         return $logger;
@@ -310,20 +313,25 @@ return [
     // ForgotPasswordService implements ForgotPasswordServiceInterface
     ForgotPasswordServiceInterface::class => function (ContainerInterface $c): ForgotPasswordServiceInterface {
         return new ForgotPasswordService(
-            $c->get(UserRepositoryInterface::class)
+            $c->get(UserRepositoryInterface::class),
+            $c->get(MailerService::class),
+            $c->get(LoggerInterface::class)
         );
     },
 
     // ForgotPasswordService
     ForgotPasswordService::class => function (ContainerInterface $c): ForgotPasswordService {
         return new ForgotPasswordService(
-            $c->get(UserRepositoryInterface::class)
+            $c->get(UserRepositoryInterface::class),
+            $c->get(MailerService::class),
+            $c->get(LoggerInterface::class)
         );
     },
 
     MailerService::class => function (ContainerInterface $c): MailerService {
         return new MailerService(
-            $c->get('smtpConfig')
+            $c->get('smtpConfig'),
+            $c->get(LoggerInterface::class)
         );
     },
 

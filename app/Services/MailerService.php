@@ -4,33 +4,38 @@ namespace App\Services;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Psr\Log\LoggerInterface;
 
 class MailerService
 {
-    private PHPMailer $mailer;
+    private PHPMailer $mail;
+    private LoggerInterface $logger;
 
-    public function __construct(array $config)
+    public function __construct(array $config, LoggerInterface $logger)
     {
-        $this->mailer = new PHPMailer(true);
+        $this->logger = $logger;
 
-        // SMTP
-        $this->mailer->isSMTP();
-        $this->mailer->Host       = $config['host'];
-        $this->mailer->SMTPAuth   = true;
-        $this->mailer->Username   = $config['username'];
-        $this->mailer->Password   = $config['password'];
-        $this->mailer->Port       = $config['port'];
-        $this->mailer->SMTPSecure = $config['encryption'];
+        $this->mail = new PHPMailer(true);
 
-        // Charset e HTML
-        $this->mailer->CharSet = 'UTF-8';
-        $this->mailer->isHTML(true);
+        $this->mail->isSMTP();
+        $this->mail->Host       = $config['host'];
+        $this->mail->SMTPAuth   = $config['auth'];
+        $this->mail->Username   = $config['username'];
+        $this->mail->Password   = $config['password'];
+        $this->mail->Port       = $config['port'];
+        $this->mail->SMTPSecure = $config['encryption'];
 
-        // From
-        $this->mailer->setFrom(
+        $this->mail->CharSet = 'UTF-8';
+        $this->mail->isHTML(true);
+
+        $this->mail->setFrom(
             $config['from_email'],
             $config['from_name']
         );
+
+        // 🔍 DEBUG (ATIVAR TEMPORARIAMENTE)
+        $this->mail->SMTPDebug = 2;
+        $this->mail->Debugoutput = 'error_log';
     }
 
     public function send(
@@ -40,19 +45,18 @@ class MailerService
         ?string $textBody = null
     ): bool {
         try {
-            $this->mailer->clearAddresses();
-            $this->mailer->clearAttachments();
+            $this->mail->clearAddresses();
+            $this->mail->clearAttachments();
 
-            $this->mailer->addAddress($to);
-            $this->mailer->Subject = $subject;
-            $this->mailer->Body    = $htmlBody;
-            $this->mailer->AltBody = $textBody ?? strip_tags($htmlBody);
+            $this->mail->addAddress($to);
+            $this->mail->Subject = $subject;
+            $this->mail->Body    = $htmlBody;
+            $this->mail->AltBody = $textBody ?? strip_tags($htmlBody);
 
-            return $this->mailer->send();
+            return $this->mail->send();
 
         } catch (Exception $e) {
-            // Ideal: LoggerInterface
-            // error_log($e->getMessage());
+            $this->logger->error('[MAIL ERROR] ' . $e->getMessage());
             return false;
         }
     }

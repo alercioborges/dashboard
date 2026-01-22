@@ -36,7 +36,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'users.twig',
+                'pages/users.twig',
                 [
                     'TITLE'        => 'Lista de usuários',
                     'USERS'        => $pagination['data'],
@@ -48,7 +48,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'users.twig',
+                'pages/users.twig',
                 [
                     'TITLE' => 'Lista de usuários',
                     'ERROR' => 'Não foi possível carregar lista usuários'
@@ -66,7 +66,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'users-create.twig',
+                'pages/users-create.twig',
                 [
                     'TITLE'     => 'Cadastrar novo usuário',
                     'OLD_INPUT' => $this->getOldInput(),
@@ -77,7 +77,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'users.twig',
+                'pages/users.twig',
                 [
                     'TITLE' => 'Cadastrar novo usuário',
                     'ERROR' => 'Ocorreu um erro ao tentar cadastrar novo usuário'
@@ -116,7 +116,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'users-create.twig',
+                'pages/users-create.twig',
                 [
                     'TITLE' => 'Cadastrar novo usuário',
                     'ERROR' => 'Ocorreu um erro ao tentar cadastrar novo usuário'
@@ -133,7 +133,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'user-profile.twig',
+                'pages/user-profile.twig',
                 [
                     'TITLE'     => 'Perfil do usuário',
                     'USER_DATA' => $userData
@@ -143,7 +143,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'user-profile.twig',
+                'pages/user-profile.twig',
                 [
                     'TITLE' => 'Cadastrar novo usuário',
                     'ERROR' => 'Ocorreu um erro ao tentar visualizar perfil de usuário'
@@ -161,7 +161,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'user-edit.twig',
+                'pages/user-edit.twig',
                 [
                     'TITLE' => 'Modificar perfil',
                     'USER_DATA' => $userData,
@@ -173,7 +173,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'users.twig',
+                'pages/users.twig',
                 [
                     'TITLE' => 'Lista de usuários',
                     'ERROR' => 'Não é possível atualizar o usuários'
@@ -211,7 +211,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'user-edit.twig',
+                'pages/user-edit.twig',
                 [
                     'TITLE' => 'Cadastrar novo usuário',
                     'ERROR' => 'Ocorreu um erro ao tentar atualizar cadastro de  usuário'
@@ -228,7 +228,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'user-delete.twig',
+                'pages/user-delete.twig',
                 [
                     'TITLE'     => 'Excluir cadastro de usuário',
                     'USER_DATA' => $userData
@@ -239,7 +239,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'users-delete.twig',
+                'pages/users-delete.twig',
                 [
                     'TITLE' => 'Excluir cadastro de usuário',
                     'ERROR' => 'Ocorreu um erro ao tentar excluir cadastro de usuário'
@@ -262,7 +262,7 @@ class UserController extends Controller
 
             return $this->twig->render(
                 $response,
-                'user-delete.twig',
+                'pages/user-delete.twig',
                 [
                     'TITLE' => 'Lista de usuários',
                     'ERROR' => 'Ocorreu um erro ao tentar excluir cadastro de  usuário'

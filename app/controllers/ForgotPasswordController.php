@@ -48,7 +48,7 @@ class ForgotPasswordController extends Controller
 
             return $this->twig->render(
                 $response,
-                'forgot.html',
+                'pages/forgot.html',
                 [
                     'TITLE' => 'Esqueceu a senha',
                     'OLD_INPUT' => $this->getOldInput(),
@@ -59,7 +59,7 @@ class ForgotPasswordController extends Controller
 
             return $this->twig->render(
                 $response,
-                'error.html'
+                'pages/error.html'
             );
         }
     }
@@ -107,7 +107,7 @@ class ForgotPasswordController extends Controller
 
             return $this->twig->render(
                 $response,
-                'dashboard.html.twig',
+                'pages/dashboard.html.twig',
                 [
                     'TITLE' => 'Lista de usuários',
                     'ERROR' => 'Não é possível atualizar o usuários'

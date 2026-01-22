@@ -9,6 +9,7 @@ use Slim\Views\Twig;
 use App\Core\Controller;
 use App\Interfaces\AuthServiceInterface;
 use App\Services\Validators\Validator;
+use Psr\Log\LoggerInterface;
 
 /**
  * Authentication Controller
@@ -19,15 +20,17 @@ class AuthController extends Controller
 {
     private AuthServiceInterface $authService;
     private Validator $validator;
+    private LoggerInterface $logger;
 
     public function __construct(
         Twig $twig,
         AuthServiceInterface $authService,
-
+        LoggerInterface $logger,
         Validator $validator
     ) {
         parent::__construct($twig);
         $this->authService = $authService;
+        $this->logger = $logger;
         $this->validator = $validator;
     }
 
@@ -42,20 +45,23 @@ class AuthController extends Controller
             if (isset($_SESSION['user'])) {
                 return redirect('/');
             }
-
+            
             return $this->twig->render(
                 $response,
-                'auth.html',
+                'pages/auth.html',
                 [
                     'TITLE' => 'Acessar',
                     'OLD_INPUT' => $this->getOldInput()
                 ]
             );
+
         } catch (\Exception $e) {
+
+            $this->logger->error('[AUTH_ERROR]: ' . $e);
 
             return $this->twig->render(
                 $response,
-                'error.html'
+                'pages/error.html'
             );
         }
     }
@@ -113,11 +119,12 @@ class AuthController extends Controller
             $this->authService->logout();
 
             return redirect('/login');
+
         } catch (\Exception $e) {
 
             return $this->twig->render(
                 $response,
-                'dashboard.html.twig',
+                'pages/dashboard.html.twig',
                 [
                     'TITLE' => 'Lista de usuários',
                     'ERROR' => 'Não é possível atualizar o usuários'

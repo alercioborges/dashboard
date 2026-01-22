@@ -5,15 +5,18 @@ namespace App\Services;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Psr\Log\LoggerInterface;
+use Slim\Views\Twig;
 
 class MailerService
 {
     private PHPMailer $mail;
     private LoggerInterface $logger;
+    private Twig $twig;
 
-    public function __construct(array $config, LoggerInterface $logger)
+    public function __construct(array $config, LoggerInterface $logger, Twig $twig)
     {
         $this->logger = $logger;
+        $this->twig = $twig;
 
         $this->mail = new PHPMailer(true);
 
@@ -41,22 +44,29 @@ class MailerService
     public function send(
         string $to,
         string $subject,
-        string $htmlBody,
-        ?string $textBody = null
+         string $template,
+         array $data = [],
+         ?string $textBody = null
     ): bool {
+
         try {
+
             $this->mail->clearAddresses();
             $this->mail->clearAttachments();
 
+            $html = $this->twig->fetch('emails/' . $template, $data);
+
             $this->mail->addAddress($to);
             $this->mail->Subject = $subject;
-            $this->mail->Body    = $htmlBody;
-            $this->mail->AltBody = $textBody ?? strip_tags($htmlBody);
+            $this->mail->Body    = $html;
+            $this->mail->AltBody = $textBody ?? strip_tags($html);
 
             return $this->mail->send();
 
         } catch (Exception $e) {
+            
             $this->logger->error('[MAIL ERROR] ' . $e->getMessage());
+
             return false;
         }
     }

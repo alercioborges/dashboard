@@ -66,7 +66,7 @@ return [
     Twig::class => function (ContainerInterface $c): Twig {
         $appConfig = $c->get('appConfig');
 
-        $twig = Twig::create(__DIR__ . "/../../templates/pages/", [
+        $twig = Twig::create(__DIR__ . "/../../templates/", [
             'cache' => $appConfig['env'] === 'production'
                 ? __DIR__ . '/../../storage/localcache'
                 : false,
@@ -278,6 +278,7 @@ return [
         return new AuthController(
             $c->get(Twig::class),
             $c->get(AuthServiceInterface::class),
+            $c->get(LoggerInterface::class),
             $c->get(Validator::class)
         );
     },
@@ -331,7 +332,8 @@ return [
     MailerService::class => function (ContainerInterface $c): MailerService {
         return new MailerService(
             $c->get('smtpConfig'),
-            $c->get(LoggerInterface::class)
+            $c->get(LoggerInterface::class),
+            $c->get(Twig::class)
         );
     },
 

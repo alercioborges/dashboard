@@ -65,15 +65,14 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
         $resetLink = getUrl() . '/reset-password?token=' . $token;
 
         try {
+
             $this->mailer->send(
                 $email,
                 'Redefinição de senha',
-                '<h1>Teste de envio</h1>',
-                'Teste de envio'
+                'reset-password.twig'
             );
 
             $this->logger->info('E-mail enviado com sucesso para ' . $email);
-
 
 
         } catch (\Throwable $e) {

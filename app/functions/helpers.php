@@ -53,3 +53,8 @@ function back(): void
 function currentRoutte() {
     return \App\Services\LoadFileService::file('/app/config/app.php')['current_route'];
 }
+
+function loader(string $file): mixed
+{
+    return \App\Services\LoadFileService::file($file);
+}

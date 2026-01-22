@@ -20,7 +20,7 @@ class AdministrationController extends Controller
     {
         return $this->twig->render(
             $response,
-            'admin.html',
+            'pages/admin.html',
             [
                 'TITLE' => 'Administração do site'
             ]

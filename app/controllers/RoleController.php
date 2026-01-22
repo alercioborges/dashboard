@@ -34,7 +34,7 @@ class RoleController extends Controller
 
             return $this->twig->render(
                 $response,
-                'roles-user.twig',
+                'pages/roles-user.twig',
                 [
                     'TITLE' => 'Lista de perfis de usuários',
                     'ROLES' => $pagination['data'],
@@ -46,7 +46,7 @@ class RoleController extends Controller
 
             return $this->twig->render(
                 $response,
-                'roles-user.twig',
+                'pages/roles-user.twig',
                 [
                     'TITLE' => 'Lista de perfis de usuários',
                     'ERROR' => 'Não foi possível carregar lista usuários'
@@ -61,7 +61,7 @@ class RoleController extends Controller
 
             return $this->twig->render(
                 $response,
-                'roles-create.twig',
+                'pages/roles-create.twig',
                 [
                     'TITLE'     => 'Criar novo perfil de usuário',
                     'OLD_INPUT' => $this->getOldInput()
@@ -71,7 +71,7 @@ class RoleController extends Controller
 
             return $this->twig->render(
                 $response,
-                'roles-create.twig',
+                'pages/roles-create.twig',
                 [
                     'TITLE' => 'Criar novo perfil usuário',
                     'ERROR' => 'Ocorreu um erro ao tentar criar novo perfil de usuário'
@@ -109,7 +109,7 @@ class RoleController extends Controller
 
             return $this->twig->render(
                 $response,
-                'users-create.twig',
+                'pages/users-create.twig',
                 [
                     'TITLE' => 'Cadastrar novo usuário',
                     'ERROR' => 'Ocorreu um erro ao tentar cadastrar novo usuário'

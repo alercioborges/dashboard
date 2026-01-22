@@ -11,6 +11,6 @@ class DashboardController extends Controller
 {
     public function index(Request $request, Response $response): Response
     {
-        return $this->twig->render($response, 'dashboard.html');
+        return $this->twig->render($response, '/pages/dashboard.html');
     }
 }

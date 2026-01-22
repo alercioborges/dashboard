@@ -9,7 +9,7 @@ class LoadFileService
         $file = path() . $file;
 
         if (!file_exists($file)) {
-            throw new \Exception("Este arquivo não existe: ($file)");
+            throw new \Exception("This file does not exist or could not be found: ($file)");
         }
 
         return require $file;

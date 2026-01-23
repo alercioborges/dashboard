@@ -191,7 +191,46 @@ class QueryBuilderService
     /**
      * DELETE
      */
-    public function delete(string $table, array $conditions): int {return 0;}
+    public function delete(string $table, array $conditions): bool
+    {
+        try {
+            if (empty($conditions)) {
+                throw new Exception("DELETE sem WHERE não permitido.");
+            }
+
+            $qb = $this->connection->createQueryBuilder();
+            $qb->delete($table);
+
+            foreach ($conditions as $column => $value) {
+
+                // IN / NOT IN
+                if (is_array($value) && preg_match('/\s(IN|NOT IN)$/i', $column)) {
+                    $param = preg_replace('/\W/', '_', $column);
+                    $qb->andWhere($column . ' (:' . $param . ')')
+                        ->setParameter($param, $value, ArrayParameterType::INTEGER);
+                    continue;
+                }
+
+                // Operadores (=, <>, >, <, >=, <=, LIKE)
+                if (preg_match('/\s(=|<>|>|<|>=|<=|LIKE)$/i', $column)) {
+                    $param = preg_replace('/\W/', '_', $column);
+                    $qb->andWhere($column . ' :' . $param)
+                        ->setParameter($param, $value);
+                    continue;
+                }
+
+                // Igualdade padrão
+                $param = str_replace('.', '_', $column);
+                $qb->andWhere($column . ' = :' . $param)
+                    ->setParameter($param, $value);
+            }
+
+            return $qb->executeStatement();
+            
+        } catch (DBALException $e) {
+            throw new Exception("Erro no DELETE: " . $e->getMessage(), 0, $e);
+        }
+    }
 
     /**
      * Query customizada

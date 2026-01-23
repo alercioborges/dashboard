@@ -49,4 +49,10 @@ interface UserRepositoryInterface
      * Get number of active users
      */
     public function countAll(): int;
+
+    public function storePasswordReset(
+        int $userId,
+        string $tokenHash,
+        \DateTimeImmutable $expiresAt
+    ): ?int;
 }

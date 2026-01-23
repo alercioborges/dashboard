@@ -57,7 +57,7 @@ class User extends Model implements UserRepositoryInterface
                 'role_id'
             ],
             ['email' => $email]
-        );
+        )[0];
     }
 
 
@@ -169,10 +169,26 @@ class User extends Model implements UserRepositoryInterface
         return (int) $result[0]['total'];
     }
 
-    /*
-    public function storePasswordReset(inr id, )
-    {
-        $this->passwordService->make($data['password'])
+    public function storePasswordReset(
+        int $userId,
+        string $tokenHash,
+        \DateTimeImmutable $expiresAt
+    ): ?int {
+
+        $this->queryBuilder->delete(
+            'tbl_password_resets',
+            ['user_id' => $userId]
+        );
+
+        return $this->queryBuilder->insert(
+            'tbl_password_resets',
+            [
+                'id'         => null,
+                'user_id'    => $userId,
+                'token_hash' => $tokenHash,
+                'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
+                'created_at' => date('Y-m-d H:i:s'),
+            ]
+        );
     }
-    */
 }

@@ -87,33 +87,17 @@ class ForgotPasswordController extends Controller
             return redirect('/forgot');
 
             return redirect('/forgot');
+
         } catch (\Exception $e) {
 
             return redirect('/forgot');
         }
     }
 
-    /**
-     * Process logout
-     
-    public function logout(Request $request, Response $response): Response
-    {
-        try {
+    public function reset(Request $request, Response $response): Response
+    {   
+        dd($_GET['token']);
 
-            $this->authService->logout();
-
-            return redirect('/login');
-        } catch (\Exception $e) {
-
-            return $this->twig->render(
-                $response,
-                'pages/dashboard.html.twig',
-                [
-                    'TITLE' => 'Lista de usuários',
-                    'ERROR' => 'Não é possível atualizar o usuários'
-                ]
-            );
-        }
-    }
-     */
+        return $response;
+    } 
 }

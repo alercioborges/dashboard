@@ -40,7 +40,6 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
                 password_hash($token, PASSWORD_DEFAULT),
                 $expiresAt
             );
-
         } catch (\Exception $e) {
 
             $this->logger->error('Error while trying to save password reset token: ' . $e->getMessage());
@@ -76,4 +75,11 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
             );
         }
     }
+
+    public function validateToken(string $token): ?array
+    {
+        return $this->userRepository->findValidPasswordReset($token);
+    }
+
+    
 }

@@ -55,4 +55,8 @@ interface UserRepositoryInterface
         string $tokenHash,
         \DateTimeImmutable $expiresAt
     ): ?int;
+
+    public function findValidPasswordReset(string $token): ?array;
+
+    public function updatePassword(int $userId, string $hashedPassword): bool;
 }

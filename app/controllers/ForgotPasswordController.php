@@ -55,6 +55,7 @@ class ForgotPasswordController extends Controller
                     'SENT' => $sent
                 ]
             );
+
         } catch (\Exception $e) {
 
             return $this->twig->render(
@@ -93,11 +94,65 @@ class ForgotPasswordController extends Controller
             return redirect('/forgot');
         }
     }
+    
 
     public function reset(Request $request, Response $response): Response
-    {   
-        dd($_GET['token']);
+    {
+        $token = $request->getQueryParams()['token'] ?? null;
 
-        return $response;
-    } 
+        if (!$token) {
+            return redirect('/forgot');
+        }
+
+        $reset = $this->forgotService->validateToken($token);
+        
+        if (!$reset) {
+            flash('message', error('Token inválido ou expirado.'));
+            return redirect('/forgot');
+        }
+
+        return $this->twig->render(
+            $response,
+            'pages/reset-password.html',
+            [
+                'OLD_INPUT' => $this->getOldInput(),
+                'TOKEN' => $token
+            ]
+        );
+    }
+
+
+    public function store(Request $request, Response $response): Response
+    {
+        $data = $this->validator->validate([
+            'token' => 'required',
+            'password' => 'required',
+            'password-confirm' => 'required'
+        ]);
+
+        if ($data['password'] !== $data['password-confirm']) {
+            $this->validator->setError('password' ,'Estas senhas não são iguais');
+            $this->validator->setError('password-confirm' ,'Estas senhas não são iguais');
+        }
+        
+        if ($this->validator->hasErrors($data)) {
+            $this->setOldInput($data);
+            back();
+        }
+
+        $reset = $this->forgotService->fvalidateToken($data['token']);
+
+        if (!$reset) {
+            flash('message', error('Token inválido ou expirado.'));
+            return redirect('/forgot');
+        }
+
+        $this->forgotService->resetPassword(
+            (int) $reset['user_id'],
+            $data['password']
+        );
+
+        $_SESSION['success'] = 'Senha redefinida com sucesso!';
+        return redirect('/login');
+    }
 }

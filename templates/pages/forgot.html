@@ -46,6 +46,7 @@
 <body class="login-page bg-primary bg-gradient">
     <div class="col-md-5">
         <div class="card card-outline card-primary">
+            {{ message('message')|raw }}
             {% if SENT %}
                 <!-- begin::Success Message Card -->
                 <!-- begin::Card Header -->
@@ -72,11 +73,11 @@
                         <!-- begin::Back Button -->
                         <div class="col-4">
                             <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-secondary">
-                                    <a href="{{ route_redirect('login.index') }}" class="text-white link-offset-2 link-underline link-underline-opacity-0">
+                                
+                                    <a href="{{ route_redirect('login.index') }}" class="btn btn-secondary">
                                         Voltar
                                     </a>
-                                </button>
+                                
                             </div>
                         </div>
                         <!-- end::Back Button -->
@@ -122,7 +123,12 @@
                             <!-- begin::Submit Button -->
                             <div class="col-4">
                                 <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-primary">Buscar</button>
+                                    <button type="submit" class="btn btn-primary">Buscar</button>                                    
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="d-grid gap-2">                                    
+                                    <a href="{{ route_redirect('login.index') }}" class="btn btn-secondary">Cancelar</a>
                                 </div>
                             </div>
                             <!-- end::Submit Button -->

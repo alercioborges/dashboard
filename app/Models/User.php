@@ -191,4 +191,32 @@ class User extends Model implements UserRepositoryInterface
             ]
         );
     }
+
+    public function findValidPasswordReset(string $token): ?array
+    {
+        $resets = $this->queryBuilder->select(
+            'tbl_password_resets',
+            ['token_hash'],
+            [
+                'expires_at >' => (new \DateTime())->format('Y-m-d H:i:s')
+            ]
+        );
+
+        foreach ($resets as $reset) {
+            if ($this->passwordService->verify($token, $reset['token_hash'])) {
+                return $reset;
+            }
+        }
+
+        return null;
+    }
+
+    public function updatePassword(int $userId, string $hashedPassword): bool
+    {
+        return $this->queryBuilder->update(
+            $this->table,
+            ['password' => $hashedPassword],
+            ['id' => $userId]
+        );
+    }
 }

@@ -76,14 +76,19 @@ class UserService
         $total    = $this->countUsers();
         $numPages = (int) ceil($total / $limit);
         $offset   = ($page - 1) * $limit;
-        
+
         $data =  $this->userRepository->getAll($limit, $offset);
-        
+
         return [
             'data'        => $data,
             'numPages'    => $numPages,
             'currentPage' => $page,
             'total'       => $total
         ];
+    }
+
+    public function validateToken(string $token): ?array
+    {
+        return $this->userRepository->findValidPasswordReset($token);
     }
 }

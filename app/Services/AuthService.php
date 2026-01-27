@@ -32,14 +32,14 @@ class AuthService implements AuthServiceInterface
         // Find user by email
         $user = $this->userRepository->findByEmail($email);
 
-        if (!$user || $user[0]['is_active'] === 0 || !password_verify($password, $user[0]['password'])) {
+        if (!$user || $user['is_active'] === 0 || !password_verify($password, $user['password'])) {
             return false;
         }
 
-        $this->createSessionUser($user[0]['id'], $user[0]['role_id']);
+        $this->createSessionUser($user['id'], $user['role_id']);
 
         if ($remember) {
-            $this->createRememberMeToken($user[0]['id']);
+            $this->createRememberMeToken($user['id']);
         }
 
         return true;

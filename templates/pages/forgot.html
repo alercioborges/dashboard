@@ -1,202 +1,261 @@
 <!doctype html>
-<html lang="pt-br">
-<!--begin::Head-->
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>{{ TITLE }}</title>
-    
-    <!--begin::Accessibility Meta Tags-->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
-    <meta name="color-scheme" content="light dark"/>
-    <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)"/>
-    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)"/>
-    <!--end::Accessibility Meta Tags-->
-    
-    <!--begin::Primary Meta Tags-->
-    <meta name="author" content="ColorlibHQ"/>
-    <!--end::Primary Meta Tags-->
-    
-    <!--begin::Accessibility Features-->
-    <!-- Skip links will be dynamically added by accessibility.js -->
-    <meta name="supported-color-schemes" content="light dark"/>
-    <link rel="preload" href="{{ base_path }}/assets/adminlte/css/adminlte.css" as="style"/>
-    <!--end::Accessibility Features-->
-    
-    <!--begin::Fonts-->
-    <link rel="stylesheet" href="{{ base_path }}/assets/adminlte/css/index.css"/>
-    <!--end::Fonts-->
-    
-    <!--begin::Third Party Plugin(OverlayScrollbars)-->
-    <link rel="stylesheet" href="{{ base_path }}/assets/adminlte/css/overlayscrollbars.min.css"/>
-    <!--end::Third Party Plugin(OverlayScrollbars)-->
-    
-    <!--begin::Third Party Plugin(Bootstrap Icons)-->
-    <link rel="stylesheet" href="{{ base_path }}/assets/adminlte/css/bootstrap-icons.min.css"/>
-    <!--end::Third Party Plugin(Bootstrap Icons)-->
-    
-    <!--begin::Required Plugin(AdminLTE)-->
-    <link rel="stylesheet" href="{{ base_path }}/assets/adminlte/css/adminlte.css"/>
-    <!--end::Required Plugin(AdminLTE)-->
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">    
-</head>
-<!--end::Head-->
+<html
+	lang="pt-br">
+	<!--begin::Head-->
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>{{ TITLE }}</title>
 
-<!--begin::Body-->
-<body class="login-page bg-primary bg-gradient">
-    <div class="col-md-5">
-        <div class="card card-outline card-primary">
-            {{ message('message')|raw }}
-            {% if SENT %}
-                <!-- begin::Success Message Card -->
-                <!-- begin::Card Header -->
-                <div class="card-header">
-                    <span class="link-dark link-offset-2 link-opacity-100">
-                        <h5 class="mb-0">
-                            <p>
-                                Se o e-mail estiver correto, um e-mail deve ter sido enviado a você.
-                                Este e-mail contém instruções simples para confirmar e completar a
-                                alteração de senha.
-                            </p>
-                            <p>
-                                Em caso de dificuldades, contate o administrador do site.
-                            </p>
-                        </h5>
-                    </span>
-                </div>
-                <!-- end::Card Header -->
+		<!--begin::Accessibility Meta Tags-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
+		<meta name="color-scheme" content="light dark"/>
+		<meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)"/>
+		<meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)"/>
+		<!--end::Accessibility Meta Tags-->
 
-                <!-- begin::Card Body -->
-                <div class="card-body login-card-body">
-                    <!--begin::Row-->
-                    <div class="row">                       
-                        <!-- begin::Back Button -->
-                        <div class="col-4">
-                            <div class="d-grid gap-2">
-                                
-                                    <a href="{{ route_redirect('login.index') }}" class="btn btn-secondary">
-                                        Voltar
-                                    </a>
-                                
-                            </div>
-                        </div>
-                        <!-- end::Back Button -->
-                    </div>
-                    <!--end::Row-->
-                </div>
-                <!-- end::Card Body -->
-                <!-- end::Success Message Card -->
-            {% else %}
-                <!-- begin::Password Reset Request Form -->
-                <!-- begin::Card Header -->
-                <div class="card-header">
-                    <span class="link-dark link-offset-2 link-opacity-100">
-                        <h5 class="mb-0">
-                            <p>
-                                Para redefinir sua senha, preencha seu e-mail abaixo. Se sua conta for encontrada no banco de dados, um e-mail será enviado para seu endereço de e-mail, com as instruções sobre como restabelecer seu acesso.
-                            </p>
-                        </h5>
-                    </span>
-                </div>
-                <!-- end::Card Header -->
+		<!--begin::Primary Meta Tags-->
+		<meta name="author" content="ColorlibHQ"/> <!--end::Primary Meta Tags-->
+
+		<!--begin::Accessibility Features-->
+		<!-- Skip links will be dynamically added by accessibility.js -->
+		<meta name="supported-color-schemes" content="light dark"/> <link rel="preload" href="{{ base_path }}/assets/adminlte/css/adminlte.css" as="style"/>
+		<!--end::Accessibility Features-->
+
+		<!--begin::Fonts-->
+		<link rel="stylesheet" href="{{ base_path }}/assets/adminlte/css/index.css"/> <!--end::Fonts-->
+
+		<!--begin::Third Party Plugin(OverlayScrollbars)-->
+		<link rel="stylesheet" href="{{ base_path }}/assets/adminlte/css/overlayscrollbars.min.css"/> <!--end::Third Party Plugin(OverlayScrollbars)-->
+
+		<!--begin::Third Party Plugin(Bootstrap Icons)-->
+		<link rel="stylesheet" href="{{ base_path }}/assets/adminlte/css/bootstrap-icons.min.css"/> <!--end::Third Party Plugin(Bootstrap Icons)-->
+
+		<!--begin::Required Plugin(AdminLTE)-->
+		<link
+		rel="stylesheet" href="{{ base_path }}/assets/adminlte/css/adminlte.css"/> <!--end::Required Plugin(AdminLTE)-->
+
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+	</head>
+	<!--end::Head-->
+
+	<!--begin::Body-->
+	<body class="login-page bg-primary bg-gradient">
+		<div class="col-md-5">
+			<div class="card card-outline card-primary">
+
+				{% if SENT %}
+					<!-- begin::Success Message Card -->
+					<!-- begin::Card Header -->
+						<div class="card-header"> <span class="link-dark link-offset-2 link-opacity-100">
+							<h5 class="mb-0">
+								<p>
+									Se o e-mail estiver correto, um e-mail deve ter sido enviado a você.
+									                                Este e-mail contém instruções simples para confirmar e completar a
+									                                alteração de senha.
+								</p>
+								<p>
+									Em caso de dificuldades, contate o administrador do site.
+								</p>
+							</h5>
+						</span>
+					</div>
+					<!-- end::Card Header -->
+
+					<!-- begin::Card Body -->
+					<div
+						class="card-body login-card-body">
+						<!--begin::Row-->
+						<div
+							class="row">
+							<!-- begin::Back Button -->
+							<div class="col-4">
+								<div class="d-grid gap-2">
+
+									<a href="{{ route_redirect('login.index') }}" class="btn btn-secondary">
+										Voltar
+									</a>
+
+								</div>
+							</div>
+							<!-- end::Back Button -->
+						</div>
+						<!--end::Row-->
+					</div>
+					<!-- end::Card Body -->
+					<!-- end::Success Message Card -->
+
+				{% elseif REDEFINED %}
+					<!-- begin::Success Message Card -->
+					<!-- begin::Card Header -->
+						<div class="card-header"> <span class="link-dark link-offset-2 link-opacity-100">
+							<h5 class="mb-0">
+								<p>
+									Sua senha foi alterada com sucesso!
+								</p>
+							</h5>
+						</span>
+					</div>
+					<!-- end::Card Header -->
+
+					<!-- begin::Card Body -->
+					<div
+						class="card-body login-card-body">
+						<!--begin::Row-->
+						<div
+							class="row">
+							<!-- begin::Back Button -->
+							<div class="col-4">
+								<div class="d-grid gap-2">
+
+									<a href="{{ route_redirect('login.index') }}" class="btn btn-primary">
+										Concluir
+									</a>
+
+								</div>
+							</div>
+							<!-- end::Back Button -->
+						</div>
+						<!--end::Row-->
+					</div>
+					<!-- end::Card Body -->
+					<!-- end::Success Message Card -->
+				{% else %}
+					<!-- begin::Password Reset Request Form -->
+					<!-- begin::Card Header -->
+						<div class="card-header"> {{ message('message')|raw }}
+						<span class="link-dark link-offset-2 link-opacity-100">
+							<h5 class="mb-0">
+								<p>
+									Para redefinir sua senha, preencha seu e-mail abaixo. Se sua conta for encontrada no banco de dados, um e-mail será enviado para seu endereço de e-mail, com as instruções sobre como restabelecer seu acesso.
+								</p>
+							</h5>
+						</span>
+					</div>
+					<!-- end::Card Header -->
+
+					<!-- begin::Card Body -->
+					<div
+						class="card-body login-card-body">
+						<!-- begin::Password Reset Form -->
+						<form
+							action="{{ route_redirect('forgot.redefine') }}" method="POST">
+							<!-- begin::Email Input Group -->
+							<div class="input-group mb-1">
+								{{ message('error')|raw }}
+								<div class="form-floating">
+									<input id="email" type="email" name="email" class="form-control" value="{{ OLD_INPUT['email'] }}" placeholder="" autofocus required/>
+									{{ message('email')|raw }}
+									<label for="email">Email</label>
+								</div>
+								<div class="input-group-text">
+									<span class="bi bi-envelope"></span>
+								</div>
+							</div>
+							<!-- end::Email Input Group -->
+
+							<!--begin::Row-->
+							<div
+								class="row">
+								<!-- begin::Submit Button -->
+								<div class="col-4">
+									<div class="d-grid gap-2">
+										<button type="submit" id="search-email" class="btn btn-primary">
+											Buscar
+											<span id="btb-spinner" class="spinner-border spinner-border-sm d-none ms-2" role="status" aria-hidden="true"></span>
+										</button>
+									</div>
+								</div>
+								<div class="col-4">
+									<div class="d-grid gap-2">
+										<a href="{{ route_redirect('login.index') }}" id="cancel-search-email" class="btn btn-secondary">Cancelar</a>
+									</div>
+								</div>
+								<!-- end::Submit Button -->
+							</div>
+							<!--end::Row-->
+						</form>
+						<!-- end::Password Reset Form -->
+					</div>
+					<!-- end::Card Body -->
+					<!-- end::Password Reset Request Form -->
+				{% endif %}
+			</div>
+		</div>
+		<!-- /.login-container -->
+
+		<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+        const spinner = document.getElementById('btb-spinner');
+        const button = document.getElementById('search-email');
+        const cancelLink = document.getElementById('cancel-search-email');
+
+        if (form && spinner && button) {
+            form.addEventListener('submit', function () {
+                spinner.classList.remove('d-none');
+                button.disabled = true;
                 
-                <!-- begin::Card Body -->
-                <div class="card-body login-card-body">
-                    <!-- begin::Password Reset Form -->
-                    <form action="{{ route_redirect('forgot.redefine') }}" method="POST">
-                        <!-- begin::Email Input Group -->
-                        <div class="input-group mb-1">
-                            {{ message('error')|raw }}
-                            <div class="form-floating">
-                                <input id="email" type="email" name="email" class="form-control" value="{{ OLD_INPUT['email'] }}" placeholder="" autofocus required/>
-                                {{ message('email')|raw }}
-                                <label for="email">Email</label>
-                            </div>
-                            <div class="input-group-text">
-                                <span class="bi bi-envelope"></span>
-                            </div>
-                        </div>
-                        <!-- end::Email Input Group -->
+                // Desabilita o link de cancelar
+                if (cancelLink) {
+                    cancelLink.style.pointerEvents = 'none';
+                    cancelLink.classList.add('disabled');
+                    cancelLink.setAttribute('aria-disabled', 'true');
+                }
+            });
+        }
+    });
+</script>
+		<!-- begin::Password Toggle Script -->
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+const toggleButton = document.getElementById('togglePassword');
+const passwordInput = document.getElementById('password');
 
-                        <!--begin::Row-->
-                        <div class="row">                       
-                            <!-- begin::Submit Button -->
-                            <div class="col-4">
-                                <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-primary">Buscar</button>                                    
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="d-grid gap-2">                                    
-                                    <a href="{{ route_redirect('login.index') }}" class="btn btn-secondary">Cancelar</a>
-                                </div>
-                            </div>
-                            <!-- end::Submit Button -->
-                        </div>
-                        <!--end::Row-->
-                    </form>                
-                    <!-- end::Password Reset Form -->                
-                </div>
-                <!-- end::Card Body -->
-                <!-- end::Password Reset Request Form -->
-            {% endif %}
-        </div>
-    </div>
-    <!-- /.login-container -->
-    
-    <!-- begin::Password Toggle Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const toggleButton = document.getElementById('togglePassword');
-            const passwordInput = document.getElementById('password');
-            
-            // Check if elements exist before adding event listener
-            if (toggleButton && passwordInput) {
-                const icon = toggleButton.querySelector('span');
+// Check if elements exist before adding event listener
+if (toggleButton && passwordInput) {
+const icon = toggleButton.querySelector('span');
 
-                toggleButton.addEventListener('click', function () {
-                    const isPassword = passwordInput.getAttribute('type') === 'password';
+toggleButton.addEventListener('click', function () {
+const isPassword = passwordInput.getAttribute('type') === 'password';
 
-                    // Toggle input type between password and text
-                    passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+// Toggle input type between password and text
+passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
 
-                    // Toggle icon between eye and eye-slash
-                    icon.classList.toggle('bi-eye-fill', !isPassword);
-                    icon.classList.toggle('bi-eye-slash-fill', isPassword);
-                });
-            }
-        });
-    </script>
-    <!-- end::Password Toggle Script -->
+// Toggle icon between eye and eye-slash
+icon.classList.toggle('bi-eye-fill', ! isPassword);
+icon.classList.toggle('bi-eye-slash-fill', isPassword);
+});
+}
+});
+		</script>
+		<!-- end::Password Toggle Script -->
 
-    <!-- begin::Prevent Back Navigation After Logout -->
-    <script>
-        // Prevents back navigation after logout
-        (function () {
-            // Detects if came from a "back" navigation
-            if (window.performance && window.performance.navigation.type === 2) {
-                // Reloads the page to force session verification
-                window.location.reload();
-            }
-        })();
-    </script>
-    <!-- end::Prevent Back Navigation After Logout -->
+		<!-- begin::Prevent Back Navigation After Logout -->
+		<script>
+			// Prevents back navigation after logout
+(function () { // Detects if came from a "back" navigation
+if (window.performance && window.performance.navigation.type === 2) { // Reloads the page to force session verification
+window.location.reload();
+}
+})();
+		</script>
+		<!-- end::Prevent Back Navigation After Logout -->
 
-    <!--begin::Third Party Plugin(OverlayScrollbars)-->
-    <script src="{{ base_path }}/assets/adminlte/js/overlayscrollbars.browser.es6.min.js"></script>
-    <!--end::Third Party Plugin(OverlayScrollbars)-->
-    
-    <!--begin::Required Plugin(popperjs for Bootstrap 5)-->
-    <script src="{{ base_path }}/assets/adminlte/js/popper.min.js"></script>
-    <!--end::Required Plugin(popperjs for Bootstrap 5)-->
-    
-    <!--begin::Required Plugin(Bootstrap 5)-->
-    <script src="{{ base_path }}/assets/adminlte/js/bootstrap.min.js"></script>
-    <!--end::Required Plugin(Bootstrap 5)-->
-    
-    <!--begin::Required Plugin(AdminLTE)-->
-    <script src="{{ base_path }}/assets/adminlte/js/adminlte.js"></script>
-    <!--end::Required Plugin(AdminLTE)-->
-</body>
-<!--end::Body-->
+		<!--begin::Third Party Plugin(OverlayScrollbars)-->
+		<script src="{{ base_path }}/assets/adminlte/js/overlayscrollbars.browser.es6.min.js"></script>
+		<!--end::Third Party Plugin(OverlayScrollbars)-->
+
+		<!--begin::Required Plugin(popperjs for Bootstrap 5)-->
+		<script src="{{ base_path }}/assets/adminlte/js/popper.min.js"></script>
+		<!--end::Required Plugin(popperjs for Bootstrap 5)-->
+
+		<!--begin::Required Plugin(Bootstrap 5)-->
+		<script src="{{ base_path }}/assets/adminlte/js/bootstrap.min.js"></script>
+		<!--end::Required Plugin(Bootstrap 5)-->
+
+		<!--begin::Required Plugin(AdminLTE)-->
+		<script src="{{ base_path }}/assets/adminlte/js/adminlte.js"></script>
+		<!--end::Required Plugin(AdminLTE)-->
+	</body>
+	<!--end::Body-->
 </html>

@@ -28,6 +28,9 @@ class MailerService
         $this->mail->Port       = $config['port'];
         $this->mail->SMTPSecure = $config['encryption'];
 
+        $this->mail->Timeout = 5;
+        $this->mail->SMTPKeepAlive = false;
+
         $this->mail->CharSet = 'UTF-8';
         $this->mail->isHTML(true);
 

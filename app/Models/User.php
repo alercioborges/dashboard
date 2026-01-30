@@ -196,7 +196,7 @@ class User extends Model implements UserRepositoryInterface
     {
         $resets = $this->queryBuilder->select(
             'tbl_password_resets',
-            ['token_hash'],
+            ['token_hash', 'user_id'],
             [
                 'expires_at >' => (new \DateTime())->format('Y-m-d H:i:s')
             ]
@@ -211,12 +211,27 @@ class User extends Model implements UserRepositoryInterface
         return null;
     }
 
-    public function updatePassword(int $userId, string $hashedPassword): bool
+    public function updatePassword(int $userId, string $password): bool
     {
-        return $this->queryBuilder->update(
+        $result = $this->queryBuilder->update(
             $this->table,
-            ['password' => $hashedPassword],
+            ['password' => $this->passwordService->make($password)],
             ['id' => $userId]
+        );
+
+        $this->queryBuilder->delete(
+            'tbl_password_resets',
+            ['user_id' => $userId]
+        );
+
+        return $result > 0;
+    }
+
+    public function deleteExpiredToken(): bool
+    {
+        return $this->queryBuilder->delete(
+            'tbl_password_resets',
+            ['token_hash >' => (new \DateTime())->format('Y-m-d H:i:s') ]
         );
     }
 }

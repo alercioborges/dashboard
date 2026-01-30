@@ -43,19 +43,21 @@ class ForgotPasswordController extends Controller
             }
 
             $sent = $_SESSION['forgot_password_sent'] ?? false;
-
             unset($_SESSION['forgot_password_sent']);
+
+            $redefined = $_SESSION['redefined_password'] ?? false;
+            unset($_SESSION['redefined_password']);
 
             return $this->twig->render(
                 $response,
                 'pages/forgot.html',
                 [
-                    'TITLE' => 'Esqueceu a senha',
+                    'TITLE'     => 'Esqueceu a senha',
                     'OLD_INPUT' => $this->getOldInput(),
-                    'SENT' => $sent
+                    'SENT'      => $sent,
+                    'REDEFINED' => $redefined
                 ]
             );
-
         } catch (\Exception $e) {
 
             return $this->twig->render(
@@ -85,16 +87,22 @@ class ForgotPasswordController extends Controller
 
             $_SESSION['forgot_password_sent'] = true;
 
-            return redirect('/forgot');
+            $response = redirect('/forgot');
 
-            return redirect('/forgot');
+            ignore_user_abort(true);
+            
+            if (function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
 
+            return $response;
+            
         } catch (\Exception $e) {
 
             return redirect('/forgot');
         }
     }
-    
+
 
     public function reset(Request $request, Response $response): Response
     {
@@ -105,7 +113,7 @@ class ForgotPasswordController extends Controller
         }
 
         $reset = $this->forgotService->validateToken($token);
-        
+
         if (!$reset) {
             flash('message', error('Token inválido ou expirado.'));
             return redirect('/forgot');
@@ -131,16 +139,16 @@ class ForgotPasswordController extends Controller
         ]);
 
         if ($data['password'] !== $data['password-confirm']) {
-            $this->validator->setError('password' ,'Estas senhas não são iguais');
-            $this->validator->setError('password-confirm' ,'Estas senhas não são iguais');
+            $this->validator->setError('password', 'Estas senhas não são iguais');
+            $this->validator->setError('password-confirm', 'Estas senhas não são iguais');
         }
-        
+
         if ($this->validator->hasErrors($data)) {
             $this->setOldInput($data);
             back();
         }
 
-        $reset = $this->forgotService->fvalidateToken($data['token']);
+        $reset = $this->forgotService->validateToken($data['token']);
 
         if (!$reset) {
             flash('message', error('Token inválido ou expirado.'));
@@ -152,7 +160,8 @@ class ForgotPasswordController extends Controller
             $data['password']
         );
 
-        $_SESSION['success'] = 'Senha redefinida com sucesso!';
-        return redirect('/login');
+        $_SESSION['redefined_password'] = true;
+
+        return redirect('/forgot');
     }
 }

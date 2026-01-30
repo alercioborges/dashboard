@@ -58,5 +58,7 @@ interface UserRepositoryInterface
 
     public function findValidPasswordReset(string $token): ?array;
 
-    public function updatePassword(int $userId, string $hashedPassword): bool;
+    public function updatePassword(int $userId, string $password): bool;
+
+    public function deleteExpiredToken(): bool;
 }

@@ -5,8 +5,9 @@ namespace App\Services;
 use App\Interfaces\ForgotPasswordServiceInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Services\MailerService;
+use Dotenv\Util\Str;
 use Psr\Log\LoggerInterface;
-
+use Stringable;
 
 class ForgotPasswordService implements ForgotPasswordServiceInterface
 {
@@ -81,5 +82,14 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
         return $this->userRepository->findValidPasswordReset($token);
     }
 
-    
+
+    public function resetPassword(int $userId, string $password): bool
+    {
+        return $this->userRepository->updatePassword($userId, $password);
+    }
+
+    public function deleteToken()
+    {
+        return $this->userRepository->deleteExpiredToken();
+    }
 }

@@ -86,9 +86,4 @@ class UserService
             'total'       => $total
         ];
     }
-
-    public function validateToken(string $token): ?array
-    {
-        return $this->userRepository->findValidPasswordReset($token);
-    }
 }

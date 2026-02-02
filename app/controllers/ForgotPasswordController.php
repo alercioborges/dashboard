@@ -5,13 +5,14 @@ namespace App\Controllers;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
+use Psr\Log\LoggerInterface;
 
 use App\Core\Controller;
 use App\Interfaces\ForgotPasswordServiceInterface;
 use App\Services\Validators\Validator;
 
 /**
- * Forgo tPassword Controller
+ * Forgot Password Controller
  * 
  * 
  */
@@ -19,15 +20,18 @@ class ForgotPasswordController extends Controller
 {
     private ForgotPasswordServiceInterface $forgotService;
     private Validator $validator;
+    private LoggerInterface $logger;
 
     public function __construct(
         Twig $twig,
         ForgotPasswordServiceInterface $forgotService,
-        Validator $validator
+        Validator $validator,
+         LoggerInterface $logger
     ) {
         parent::__construct($twig);
         $this->forgotService = $forgotService;
         $this->validator = $validator;
+        $this->logger = $logger;
     }
 
     /**

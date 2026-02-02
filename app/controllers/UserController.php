@@ -6,6 +6,8 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
+use Psr\Log\LoggerInterface;
+
 use App\Core\Controller;
 use App\Services\UserService;
 use App\Services\Validators\Validator;
@@ -16,13 +18,15 @@ class UserController extends Controller
     private UserService $userService;
     private Validator $validator;
     private Role $role;
+    private LoggerInterface $logger;
 
-    public function __construct(Twig $twig, UserService $userService, Validator $validator, Role $role)
+    public function __construct(Twig $twig, UserService $userService, Validator $validator, Role $role, LoggerInterface $logger)
     {
         parent::__construct($twig);
         $this->userService = $userService;
         $this->validator   = $validator;
         $this->role        = $role;
+        $this->logger      = $logger;
     }
 
     public function show(Request $request, Response $response): Response
@@ -73,6 +77,7 @@ class UserController extends Controller
                     'ROLES'     => $userRoles
                 ]
             );
+            
         } catch (\Exception $e) {
 
             return $this->twig->render(
@@ -112,7 +117,10 @@ class UserController extends Controller
             flash('message', success('Usuário criado com sucesso'));
 
             return redirect('/admin/users');
+
         } catch (\Exception $e) {
+                                    
+            $this->logger->error('Error while trying to save new user: ' . $e->getMessage() ."-". $e->getFile() ."-". $e->getLine());
 
             return $this->twig->render(
                 $response,

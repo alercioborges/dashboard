@@ -10,15 +10,3 @@ $rememberMeService = $container->get(RememberMeService::class);
 $rememberMeService->deleteRememberMe();
 
 echo "Tokens expirados removidos com sucesso.\n";
-
-
-
-
-use App\Services\ForgotPasswordService;
-
-$forgotPasswordService = $container->get(ForgotPasswordService::class);
-
-// Executar limpeza
-$forgotPasswordService->deleteToken();
-
-echo "Tokens expirados removidos com sucesso.\n";

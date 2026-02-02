@@ -47,7 +47,7 @@ class User extends Model implements UserRepositoryInterface
      */
     public function findByEmail(string $email): ?array
     {
-        return $this->queryBuilder->select(
+        $user = $this->queryBuilder->select(
             $this->table,
             [
                 'id',
@@ -57,7 +57,9 @@ class User extends Model implements UserRepositoryInterface
                 'role_id'
             ],
             ['email' => $email]
-        )[0];
+        );
+
+        return $user[0] ?? NULL;
     }
 
 

@@ -5,9 +5,8 @@ namespace App\Services;
 use App\Interfaces\ForgotPasswordServiceInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Services\MailerService;
-use Dotenv\Util\Str;
+
 use Psr\Log\LoggerInterface;
-use Stringable;
 
 class ForgotPasswordService implements ForgotPasswordServiceInterface
 {
@@ -41,6 +40,7 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
                 password_hash($token, PASSWORD_DEFAULT),
                 $expiresAt
             );
+            
         } catch (\Exception $e) {
 
             $this->logger->error('Error while trying to save password reset token: ' . $e->getMessage());

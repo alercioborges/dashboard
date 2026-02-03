@@ -1,15 +1,19 @@
 #!/bin/bash
 
-# Caminho do PHP do Wamp
 PHP_PATH="/c/wamp64/bin/php/php8.3.22/php.exe"
 
-# Caminho do script PHP
-SCRIPT_PATH="/c/wamp64/www/dashboard/app/cli/remember_me.php"
+SCRIPTS=(
+  "/c/wamp64/www/dashboard/app/cli/remember_me.php"
+  "/c/wamp64/www/dashboard/app/cli/forgot_password.php"
+)
 
-echo "Iniciando limpeza de registros...\n"
-echo "----------------------------------\n"
+echo "Iniciando limpeza de registros..."
+echo "----------------------------------"
 
-"$PHP_PATH" "$SCRIPT_PATH"
+for SCRIPT in "${SCRIPTS[@]}"; do
+  echo "➡️ Executando: $SCRIPT"
+  "$PHP_PATH" "$SCRIPT"
+done
 
 echo "----------------------------------"
 echo "Processo finalizado."

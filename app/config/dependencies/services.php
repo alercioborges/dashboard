@@ -9,6 +9,7 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 
+use PHPMailer\PHPMailer\PHPMailer;
 
 use App\Services\{
     QueryBuilderService,
@@ -70,11 +71,16 @@ return [
         return $logger;
     },
 
+    PHPMailer::class => function (): PHPMailer {
+        return new PHPMailer(true);
+    },
+
     MailerService::class => function (ContainerInterface $c): MailerService {
         return new MailerService(
             $c->get('smtpConfig'),
             $c->get(LoggerInterface::class),
-            $c->get(Twig::class)
+            $c->get(Twig::class),
+            $c->get(PHPMailer::class)
         );
     },
 

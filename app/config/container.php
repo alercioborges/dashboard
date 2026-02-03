@@ -1,12 +1,17 @@
 <?php
 
 use DI\ContainerBuilder;
+use Dotenv\Dotenv;
 
 // Load vendor
-loader('/vendor/autoload.php');
+require __DIR__ . '/../../vendor/autoload.php';
+
+// ENSURE .env IS LOADED (WEB + CLI)
+$dotenv = Dotenv::createImmutable(dirname(__DIR__, 2));
+$dotenv->safeLoad();
 
 // Load app config
-$appConfig = loader('/app/config/app.php');
+$appConfig = require __DIR__ . '/../config/app.php';
 
 // Setting container DI
 $containerBuilder = new ContainerBuilder();
@@ -18,15 +23,11 @@ $containerBuilder->addDefinitions(__DIR__ . '/dependencies/repositories.php');
 $containerBuilder->addDefinitions(__DIR__ . '/dependencies/services.php');
 $containerBuilder->addDefinitions(__DIR__ . '/dependencies/controllers.php');
 $containerBuilder->addDefinitions(__DIR__ . '/dependencies/middleware.php');
-$containerBuilder->addDefinitions(__DIR__ . '/dependencies/cli.php'); // <--- IMPORTANTE
-
+$containerBuilder->addDefinitions(__DIR__ . '/dependencies/cli.php');
 
 // Compile container in production
 if ($appConfig['env'] === 'production') {
     $containerBuilder->enableCompilation(__DIR__ . '/../../storage/cache');
 }
 
-// Create variable container
-$container = $containerBuilder->build();
-
-return $container;
+return $containerBuilder->build();

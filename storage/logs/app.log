@@ -1,2 +1,7 @@
 [2026-02-02T11:35:06.177697-03:00] app.ERROR: Error while trying to save new user: Undefined array key 0-C:\wamp64\www\dashboard\app\Models\User.php-62 [] []
 [2026-02-02T16:02:10.646180-03:00] app.INFO: Password reset email sent {"email":"alercio.borges@gmail.com"} []
+[2026-02-03T14:31:37.668044-03:00] app.INFO: Password reset email sent {"email":"alercio.borges@gmail.com"} []
+[2026-02-03T17:03:01.995785-03:00] app.INFO: Password reset email sent {"email":"alercio1@email.com"} []
+[2026-02-03T17:05:17.724319-03:00] app.INFO: Password reset email sent {"email":"alercio.borges@gmail.com"} []
+[2026-02-03T17:07:20.515650-03:00] app.INFO: Password reset email sent {"email":"alercio.borges@gmail.com"} []
+[2026-02-03T17:24:56.968764-03:00] app.INFO: Password reset email sent {"email":"alercio.borges@gmail.com"} []

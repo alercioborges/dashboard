@@ -9,14 +9,17 @@ use Slim\Views\Twig;
 
 class MailerService
 {
-    private PHPMailer $mail;
+    private array $config;
     private LoggerInterface $logger;
-    private Twig $twig;
+    private Twig $twig;    
+    private PHPMailer $mail;
 
-    public function __construct(array $config, LoggerInterface $logger, Twig $twig)
+    public function __construct(array $config, LoggerInterface $logger, Twig $twig, PHPMailer $mail)
     {
+        $this->config = $config;
         $this->logger = $logger;
         $this->twig = $twig;
+        $this->mail = $mail;
 
         $this->mail = new PHPMailer(true);
 

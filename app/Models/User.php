@@ -233,7 +233,7 @@ class User extends Model implements UserRepositoryInterface
     {
         return $this->queryBuilder->delete(
             'tbl_password_resets',
-            ['token_hash >' => (new \DateTime())->format('Y-m-d H:i:s') ]
+            ['expires_at' . ' <' => (new \DateTime())->format('Y-m-d H:i:s') ]
         );
     }
 }

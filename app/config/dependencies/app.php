@@ -8,9 +8,9 @@ return [
     // APPLICATION CORE
     // -------------------------------------------------------
 
-    'appConfig' =>  require __DIR__ . '/../app.php',
-    'dbConfig'  => require __DIR__ . '/../database.php',
-    'smtpConfig' => require __DIR__ . '/../smtp.php',
+    'appConfig'  => loader('/app/config/app.php'),
+    'dbConfig'   => loader('/app/config/database.php'),
+    'smtpConfig' => loader('/app/config/smtp.php'),
 
     /**
      * PSR-7 Response Factory (REQUIRED FOR CLI)

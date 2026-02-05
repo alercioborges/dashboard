@@ -51,7 +51,7 @@ class AuthService implements AuthServiceInterface
         $token = bin2hex(random_bytes(32));
         $hash  = hash('sha256', $token);
 
-        $expiresAt = new \DateTime('+1 minute'); //  (' 7 days');
+        $expiresAt = new \DateTime('7 days');
 
         $this->rememberMeRepository->store($userId, $hash, $expiresAt);
 

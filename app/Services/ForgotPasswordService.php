@@ -21,11 +21,12 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
         $this->logger = $logger;
     }
 
+
     public function process(string $email): void
     {
         $user = $this->userRepository->findByEmail($email);
 
-        if (!$user) { //|| (int)$user['is_active'] !== 1) {
+        if (!$user || (int)$user['is_active'] !== 1) {
             return;
         }
 
@@ -35,18 +36,18 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
 
         try {
 
-            $this->userRepository->storePasswordReset(
+            $forgotId = $this->userRepository->storePasswordReset(
                 (int) $user['id'],
                 password_hash($token, PASSWORD_DEFAULT),
                 $expiresAt
-            );
+            );            
             
         } catch (\Exception $e) {
 
             $this->logger->error('Error while trying to save password reset token: ' . $e->getMessage());
         }
 
-        $resetLink = getUrl() . '/forgot/reset-password?token=' . $token;
+        $resetLink = getUrl() . '/forgot/reset-password?id=' . $forgotId . '&token=' . $token;
 
         try {
 
@@ -65,6 +66,7 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
                 'Password reset email sent',
                 ['email' => $email]
             );
+
         } catch (\Throwable $e) {
 
             $this->logger->error(
@@ -77,15 +79,16 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
         }
     }
 
+
     public function validateToken(string $token): ?array
     {
         return $this->userRepository->findValidPasswordReset($token);
     }
 
 
-    public function resetPassword(int $userId, string $password): bool
+    public function resetPassword(int $forgotId, int $userId, string $password): bool
     {
-        return $this->userRepository->updatePassword($userId, $password);
+        return $this->userRepository->updatePassword($forgotId, $userId, $password);
     }
 
     public function deleteToken()

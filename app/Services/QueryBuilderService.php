@@ -194,6 +194,7 @@ class QueryBuilderService
     public function delete(string $table, array $conditions): bool
     {
         try {
+
             if (empty($conditions)) {
                 throw new Exception("DELETE sem WHERE não permitido.");
             }
@@ -202,6 +203,16 @@ class QueryBuilderService
             $qb->delete($table);
 
             foreach ($conditions as $column => $value) {
+
+                if ($value === 'IS NULL') {
+                    $qb->andWhere($column . ' IS NULL');
+                    continue;
+                }
+
+                if ($value === 'NOT NULL') {
+                    $qb->andWhere($column . ' IS NOT NULL');
+                    continue;
+                }
 
                 // IN / NOT IN
                 if (is_array($value) && preg_match('/\s(IN|NOT IN)$/i', $column)) {
@@ -226,8 +237,9 @@ class QueryBuilderService
             }
 
             return $qb->executeStatement();
-            
+
         } catch (DBALException $e) {
+            
             throw new Exception("Erro no DELETE: " . $e->getMessage(), 0, $e);
         }
     }

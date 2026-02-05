@@ -60,8 +60,11 @@ class RememberMe extends Model implements RememberMeRepositoryInterface
 
     public function deleteExpiredToken()
     {
-        return $this->queryBuilder->query(
-            "DELETE FROM {$this->table} WHERE expires_at < NOW()"
+        return $this->queryBuilder->delete(
+            $this->table,
+            [
+                'expires_at <' => (new \DateTime())->format('Y-m-d H:i:s')
+            ]
         );
     }
 }

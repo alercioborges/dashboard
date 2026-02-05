@@ -111,8 +111,9 @@ class ForgotPasswordController extends Controller
     public function reset(Request $request, Response $response): Response
     {
         $token = $request->getQueryParams()['token'] ?? null;
+        $forgotId = $request->getQueryParams()['id'] ?? null;
 
-        if (!$token) {
+        if (!$token || !$forgotId) {
             return redirect('/forgot');
         }
 
@@ -128,7 +129,8 @@ class ForgotPasswordController extends Controller
             'pages/reset-password.html',
             [
                 'OLD_INPUT' => $this->getOldInput(),
-                'TOKEN' => $token
+                'TOKEN'     => $token,
+                'ID'        => $forgotId
             ]
         );
     }
@@ -137,11 +139,12 @@ class ForgotPasswordController extends Controller
     public function store(Request $request, Response $response): Response
     {
         $data = $this->validator->validate([
-            'token' => 'required',
-            'password' => 'required',
+            'id'               => 'required',
+            'token'            => 'required',
+            'password'         => 'required',
             'password-confirm' => 'required'
         ]);
-
+        
         if ($data['password'] !== $data['password-confirm']) {
             $this->validator->setError('password', 'Estas senhas não são iguais');
             $this->validator->setError('password-confirm', 'Estas senhas não são iguais');
@@ -158,8 +161,9 @@ class ForgotPasswordController extends Controller
             flash('message', error('Token inválido ou expirado.'));
             return redirect('/forgot');
         }
-
+        
         $this->forgotService->resetPassword(
+            (int) $data['id'],
             (int) $reset['user_id'],
             $data['password']
         );

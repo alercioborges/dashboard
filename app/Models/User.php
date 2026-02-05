@@ -171,21 +171,16 @@ class User extends Model implements UserRepositoryInterface
         return (int) $result[0]['total'];
     }
 
+
     public function storePasswordReset(
         int $userId,
         string $tokenHash,
         \DateTimeImmutable $expiresAt
     ): ?int {
 
-        $this->queryBuilder->delete(
-            'tbl_password_resets',
-            ['user_id' => $userId]
-        );
-
         return $this->queryBuilder->insert(
             'tbl_password_resets',
             [
-                'id'         => null,
                 'user_id'    => $userId,
                 'token_hash' => $tokenHash,
                 'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
@@ -193,6 +188,7 @@ class User extends Model implements UserRepositoryInterface
             ]
         );
     }
+
 
     public function findValidPasswordReset(string $token): ?array
     {
@@ -210,10 +206,11 @@ class User extends Model implements UserRepositoryInterface
             }
         }
 
-        return null;
+        return NULL;
     }
+    
 
-    public function updatePassword(int $userId, string $password): bool
+    public function updatePassword(int $forgotId, int $userId, string $password): bool
     {
         $result = $this->queryBuilder->update(
             $this->table,
@@ -221,19 +218,24 @@ class User extends Model implements UserRepositoryInterface
             ['id' => $userId]
         );
 
-        $this->queryBuilder->delete(
+        $this->queryBuilder->update(
             'tbl_password_resets',
-            ['user_id' => $userId]
+            ['used_at' => (new \DateTime())->format('Y-m-d H:i:s')],
+            ['id' => $forgotId]
         );
 
         return $result > 0;
     }
-
+    
+    
     public function deleteExpiredToken(): bool
     {
         return $this->queryBuilder->delete(
             'tbl_password_resets',
-            ['expires_at' . ' <' => (new \DateTime())->format('Y-m-d H:i:s') ]
+            [
+                'expires_at <' => (new \DateTime())->format('Y-m-d H:i:s'),
+                'used_at'      => 'IS NULL'
+            ]
         );
     }
 }

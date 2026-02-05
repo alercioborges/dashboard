@@ -8,5 +8,5 @@ interface ForgotPasswordServiceInterface
 
     public function validateToken(string $token): ?array;
 
-     public function resetPassword(int $userId, string $password): bool;
+     public function resetPassword(int $forgotId, int $userId, string $password): bool;
 }

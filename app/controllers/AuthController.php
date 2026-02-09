@@ -112,11 +112,11 @@ class AuthController extends Controller
     /**
      * Process logout
      */
-    public function logout(Request $request, Response $response): Response
+    public function logout(Request $request, Response $response, array $args): Response
     {
         try {
-
-            $this->authService->logout();
+            
+            $this->authService->logout($args['id']);
 
             return redirect('/login');
 

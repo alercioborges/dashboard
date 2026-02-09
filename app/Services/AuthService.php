@@ -127,7 +127,7 @@ class AuthService implements AuthServiceInterface
     /**
      * Logout user
      */
-    public function logout(): void
+    public function logout(int $userId): void
     {
         if (!empty($_COOKIE['remember_me'])) {
 
@@ -155,6 +155,8 @@ class AuthService implements AuthServiceInterface
 
             session_destroy();
         }
+
+        $this->rememberMeRepository->deleteOnLogout($userId);
     }
 
     /**

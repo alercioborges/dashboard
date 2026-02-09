@@ -28,7 +28,7 @@ interface AuthServiceInterface
     /**
      * Logout user
      */
-    public function logout(): void;
+    public function logout(int $userId): void;
 
     /**
      * Check if current user has permission

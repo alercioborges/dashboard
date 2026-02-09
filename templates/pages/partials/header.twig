@@ -190,7 +190,7 @@
                 <li class="user-footer">
                   <a href="#" class="btn btn-default btn-flat">Profile</a>
                   
-                  <form class="float-end" action="{{ route_redirect('logout') }}" method="POST" >
+                  <form class="float-end" action="{{ route_redirect('logout', {'id' : session['user']['id']}) }}" method="POST" >
                     <button type="submit" class="btn btn-default">Sign out</button>
                   </form>
 

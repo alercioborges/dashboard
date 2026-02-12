@@ -27,8 +27,10 @@ use App\Interfaces\{
     RoleRepositoryInterface,
     RememberMeRepositoryInterface,
     AuthServiceInterface,
-    ForgotPasswordServiceInterface
+    ForgotPasswordServiceInterface,
+    PermissionRepositoryInterface
 };
+use App\Models\Permission;
 
 return [
 
@@ -50,7 +52,8 @@ return [
     AuthServiceInterface::class =>
         fn(ContainerInterface $c) => new AuthService(
             $c->get(UserRepositoryInterface::class),
-            $c->get(RememberMeRepositoryInterface::class)
+            $c->get(RememberMeRepositoryInterface::class),
+            $c->get(PermissionRepositoryInterface::class)
         ),
 
     ForgotPasswordServiceInterface::class =>

@@ -68,6 +68,26 @@ CREATE TABLE tbl_password_resets (
 
 ____________________________________________________________
 
+CREATE TABLE `tbl_permissions` (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  slug varchar(100) NOT NULL,
+  description varchar(255),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`)
+)
+
+_______________________________________________
+
+CREATE TABLE `tbl_role_permissions` (
+  `role_id` int(11) NOT NULL,
+  `permission_id` int(11) NOT NULL,
+  PRIMARY KEY (`role_id`, `permission_id`),
+  FOREIGN KEY (`role_id`) REFERENCES `tbl_roles`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`permission_id`) REFERENCES `tbl_permissions`(`id`) ON DELETE CASCADE
+);
+
+_________________________________________
+
 INSERT INTO `tbl_roles` VALUES(
   1,
   'Usuário logado',

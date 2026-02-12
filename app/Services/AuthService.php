@@ -3,9 +3,10 @@
 namespace App\Services;
 
 use App\Interfaces\AuthServiceInterface;
+use App\Interfaces\PermissionRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\RememberMeRepositoryInterface;
-
+use App\Models\Permission;
 
 /**
  * Authentication Service
@@ -17,11 +18,13 @@ class AuthService implements AuthServiceInterface
 {
     private UserRepositoryInterface $userRepository;
     private RememberMeRepositoryInterface $rememberMeRepository;
+    private PermissionRepositoryInterface $permissionRepository;
 
-    public function __construct(UserRepositoryInterface $userRepository, RememberMeRepositoryInterface $rememberMeRepository)
+    public function __construct(UserRepositoryInterface $userRepository, RememberMeRepositoryInterface $rememberMeRepository, PermissionRepositoryInterface $permissionRepository)
     {
         $this->userRepository = $userRepository;
         $this->rememberMeRepository = $rememberMeRepository;
+        $this->permissionRepository = $permissionRepository;
     }
 
     /**
@@ -162,8 +165,6 @@ class AuthService implements AuthServiceInterface
     /**
      * Check if current user has permission
      */
-
-    /*
     public function hasPermission(string $permission): bool
     {
         $user = $this->getCurrentUser();
@@ -172,7 +173,14 @@ class AuthService implements AuthServiceInterface
             return false;
         }
 
-        return $this->userRepository->hasPermission($user['id'], $permission);
+        if (!isset($_SESSION['user']['permissions'])) {
+
+            $permissions = $this->permissionRepository
+                ->getPermissionsByRoleId($user['role_id']);
+
+            $_SESSION['user']['permissions'] = array_column($permissions, 'slug');
+        }
+
+        return in_array($permission, $_SESSION['user']['permissions']);
     }
-    */
 }

@@ -17,13 +17,15 @@ class Permission extends Model implements PermissionRepositoryInterface
 
     public function getPermissionsByRoleId(int $roleId): array
     {
-        return $this->queryBuilder->selectWithJoin(
-            'tbl_role_permissions rp',
+        $permissionData = $this->queryBuilder->selectWithJoin(
+            'tbl_role_permissions',
             [
-                'tbl_permissions p' => ['INNER', 'p.id = rp.permission_id']
+                'tbl_permissions p' => ['INNER', 'p.id = m.permission_id']
             ],
             ['p.slug'],
-            ['rp.role_id' => $roleId]
+            ['m.role_id' => $roleId]
         );
+        
+        return array_column($permissionData, 'slug');
     }
 }

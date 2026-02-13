@@ -4,6 +4,8 @@ use Psr\Container\ContainerInterface;
 use Slim\App;
 
 use App\Middlewares\AuthMiddleware;
+use App\Middlewares\PermissionMiddleware;
+
 use App\Interfaces\AuthServiceInterface;
 
 return [
@@ -25,22 +27,40 @@ return [
     },
 
     /**
-     * Register middleware into Slim application (WEB CONTEXT ONLY)
+     * Permission Middleware Factory
      *
-     * This definition is only used when the application is running
-     * in HTTP mode (not CLI).
+     * This returns a callable factory so we can pass
+     * dynamic permissions to the middleware.
+     *
+     * Usage:
+     * ->add($container->get(PermissionMiddleware::class)('users.create'))
+     */
+    PermissionMiddleware::class => function (ContainerInterface $c): callable {
+
+        return function (string $permission) use ($c): PermissionMiddleware {
+
+            return new PermissionMiddleware(
+                $c->get(AuthServiceInterface::class),
+                $permission
+            );
+
+        };
+    },
+
+    /**
+     * Register middleware into Slim application (WEB CONTEXT ONLY)
      */
     'http.middlewares' => function (ContainerInterface $c): callable {
 
         return function (App $app) use ($c) {
 
-            // Body parsing (for POST/PUT/PATCH requests)
+            // Body parsing
             $app->addBodyParsingMiddleware();
 
-            // Method override (allows _METHOD to simulate HTTP verbs)
+            // Method override
             $app->add(new Slim\Middleware\MethodOverrideMiddleware());
 
-            // Authentication middleware (custom)
+            // Global Authentication middleware
             $app->add($c->get(AuthMiddleware::class));
 
             return $app;

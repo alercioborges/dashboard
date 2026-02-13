@@ -72,19 +72,19 @@ CREATE TABLE `tbl_permissions` (
   id int(11) NOT NULL AUTO_INCREMENT,
   slug varchar(100) NOT NULL,
   description varchar(255),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `slug` (`slug`)
+  PRIMARY KEY (id),
+  UNIQUE KEY slug (slug)
 )
 
 _______________________________________________
 
-CREATE TABLE `tbl_role_permissions` (
-  `role_id` int(11) NOT NULL,
-  `permission_id` int(11) NOT NULL,
-  PRIMARY KEY (`role_id`, `permission_id`),
-  FOREIGN KEY (`role_id`) REFERENCES `tbl_roles`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`permission_id`) REFERENCES `tbl_permissions`(`id`) ON DELETE CASCADE
-);
+CREATE TABLE tbl_role_permissions (
+  role_id int(11) NOT NULL,
+  permission_id int(11) NOT NULL,
+  PRIMARY KEY (role_id, permission_id),
+  FOREIGN KEY (role_id) REFERENCES tbl_roles(id) ON DELETE CASCADE,
+  FOREIGN KEY (permission_id) REFERENCES tbl_permissions(id) ON DELETE CASCADE
+)
 
 _________________________________________
 
@@ -103,3 +103,16 @@ INSERT INTO `tbl_roles` VALUES(
   NOW(),
   NULL
 );
+
+____________________________
+
+INSERT INTO tbl_permissions (slug, description) VALUES
+('users.view', 'Visualizar usuários'),
+('users.create', 'Criar usuários'),
+('users.edit', 'Editar usuários'),
+('users.delete', 'Excluir usuários');
+
+INSERT INTO tbl_role_permissions (role_id, permission_id)
+SELECT 2, id FROM tbl_permissions;
+
+_________________________

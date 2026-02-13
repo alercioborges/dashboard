@@ -168,17 +168,17 @@ class AuthService implements AuthServiceInterface
     public function hasPermission(string $permission): bool
     {
         $user = $this->getCurrentUser();
-
+        
         if (!$user) {
             return false;
         }
-
+       
         if (!isset($_SESSION['user']['permissions'])) {
-
+            
             $permissions = $this->permissionRepository
                 ->getPermissionsByRoleId($user['role_id']);
-
-            $_SESSION['user']['permissions'] = array_column($permissions, 'slug');
+            
+            $_SESSION['user']['permissions'] = $permissions;
         }
 
         return in_array($permission, $_SESSION['user']['permissions']);

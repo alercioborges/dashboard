@@ -94,16 +94,12 @@ class User extends Model implements UserRepositoryInterface
         return $this->queryBuilder->insert(
             $this->table,
             [
-                'id'          => NULL,
                 'firstname'   => $data['firstname'],
                 'lastname'    => $data['lastname'],
                 'email'       => $data['email'],
                 'password'    => $this->passwordService->make($data['password']),
-                'role_id'     => $data['role_id'],
-                'is_active'   => 1,
-                'last_login'  => NULL,
-                'created_at'  => date('Y-m-d H:i:s'),
-                'updated_at'  => NULL
+                'role_id'     => 1,
+                'is_active'   => 1
             ]
         );
     }
@@ -119,8 +115,7 @@ class User extends Model implements UserRepositoryInterface
                 'firstname'   => $data['firstname'],
                 'lastname'    => $data['lastname'],
                 'email'       => $data['email'],
-                'role_id'     => $data['role_id'],
-                'updated_at'  => date('Y-m-d H:i:s')
+                'role_id'     => $data['role_id']
             ],
             ['id' => $id]
         );
@@ -183,8 +178,7 @@ class User extends Model implements UserRepositoryInterface
             [
                 'user_id'    => $userId,
                 'token_hash' => $tokenHash,
-                'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
-                'created_at' => date('Y-m-d H:i:s'),
+                'expires_at' => $expiresAt->format('Y-m-d H:i:s')
             ]
         );
     }

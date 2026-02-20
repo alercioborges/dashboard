@@ -6,9 +6,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use Slim\Psr7\Response;
 use App\Interfaces\AuthServiceInterface;
-use Doctrine\DBAL\Schema\DefaultExpression\CurrentTime;
 
 class AuthMiddleware implements MiddlewareInterface
 {
@@ -23,7 +21,7 @@ class AuthMiddleware implements MiddlewareInterface
     {
         if (!$this->authService->isAuthenticated()) {
 
-            $path = explode(\getDir(), $request->getUri()->getPath());
+            $path = explode(getDir(), $request->getUri()->getPath());
             $_SESSION['redirect'] = $path[1];
             
             return redirect('/login');

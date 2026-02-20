@@ -1,16 +1,39 @@
 -- Table structure for table `tbl_roles`
 
-CREATE TABLE `tbl_roles` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
-  `description` text,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
+CREATE TABLE tbl_roles (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  name varchar(50) NOT NULL,
+  description text,
+  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY name (name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 _____________________________________________________________________
+
+-- Table structure for table `tbl_users`
+
+CREATE TABLE tbl_users (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  firstname varchar(100) NOT NULL,
+  lastname varchar(100) NOT NULL,
+  email varchar(255) NOT NULL,
+  password varchar(255) NOT NULL,
+  role_id int(11) NOT NULL,
+  is_active tinyint(1) NOT NULL DEFAULT '1',
+  last_login timestamp DEFAULT NULL,
+  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY `email` (email),
+  KEY `idx_role_id` (role_id),
+  KEY `idx_is_active` (is_active),
+  KEY `idx_created_at` (created_at),
+  CONSTRAINT `fk_users_role` FOREIGN KEY (role_id) REFERENCES tbl_roles (id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+____________________________________________________________
 
 
 CREATE TABLE tbl_user_remember_tokens (
@@ -22,34 +45,11 @@ CREATE TABLE tbl_user_remember_tokens (
     KEY idx_user_id (user_id),
     KEY idx_expires_at (expires_at),
     UNIQUE (token_hash),
-    CONSTRAINT `fk_users_remember_tokens` FOREIGN KEY (`user_id`) REFERENCES `tbl_users` (`id`)
+    CONSTRAINT fk_users_remember_tokens FOREIGN KEY (user_id) REFERENCES tbl_users (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-_____________________________________________________________________
 
-
--- Table structure for table `tbl_users`
-
-CREATE TABLE `tbl_users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `firstname` varchar(100) NOT NULL,
-  `lastname` varchar(100) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `role_id` int(11) NOT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `last_login` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`),
-  KEY `idx_role_id` (`role_id`),
-  KEY `idx_is_active` (`is_active`),
-  KEY `idx_created_at` (`created_at`),
-  CONSTRAINT `fk_users_role` FOREIGN KEY (`role_id`) REFERENCES `tbl_roles` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-____________________________________________________________
+_____________________________________________
 
 CREATE TABLE tbl_password_resets (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -57,13 +57,13 @@ CREATE TABLE tbl_password_resets (
     token_hash VARCHAR(255) NOT NULL,
     expires_at DATETIME NOT NULL,
     used_at DATETIME NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,    
     UNIQUE KEY uk_token_hash (token_hash),
     KEY idx_user_id (user_id),
     KEY idx_expires_at (expires_at),
     CONSTRAINT fk_password_resets_user FOREIGN KEY (user_id) 
     REFERENCES tbl_users(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 ____________________________________________________________
@@ -74,7 +74,7 @@ CREATE TABLE `tbl_permissions` (
   description varchar(255),
   PRIMARY KEY (id),
   UNIQUE KEY slug (slug)
-)
+);
 
 _______________________________________________
 
@@ -84,24 +84,33 @@ CREATE TABLE tbl_role_permissions (
   PRIMARY KEY (role_id, permission_id),
   FOREIGN KEY (role_id) REFERENCES tbl_roles(id) ON DELETE CASCADE,
   FOREIGN KEY (permission_id) REFERENCES tbl_permissions(id) ON DELETE CASCADE
-)
+);
 
 _________________________________________
 
-INSERT INTO `tbl_roles` VALUES(
+INSERT INTO tbl_roles (id, name, description) VALUES( 
   1,
-  'Usuário logado',
-  '',
-  NOW(),
-  NULL
+  'Somente Leitura',
+  ''
 );
 
-INSERT INTO `tbl_roles` VALUES(
+INSERT INTO tbl_roles (id, name, description) VALUES(
   2,
   'Administrador',
-  '',
-  NOW(),
-  NULL
+  ''
+);
+
+INSERT INTO tbl_roles (id, name, description) VALUES(
+  3,
+  'Gerente',
+  ''
+);
+
+
+INSERT INTO tbl_roles (id, name, description) VALUES(
+  4,
+  'Supervisores',
+  ''
 );
 
 ____________________________

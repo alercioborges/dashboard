@@ -98,8 +98,7 @@ class UserController extends Controller
             $data = $this->validator->validate([
                 'firstname' => 'required:max@30:min@2:onlyLetter:uppercase',
                 'lastname'  => 'required:max@30:min@2:onlyLetter:uppercase',
-                'email'     => 'required:email:max@60',
-                'role_id'   => 'required',
+                'email'     => 'required:email:max@60',                
                 'password'  => 'required:max@30:min@6'
             ]);
 

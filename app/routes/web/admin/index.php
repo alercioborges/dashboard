@@ -16,4 +16,5 @@ $app->group('/admin', function (Slim\Routing\RouteCollectorProxy $group) use ($c
     // Users routs
     require 'roles-user.php';
     
-})->add(AuthMiddleware::class);
+})
+->add(AuthMiddleware::class);

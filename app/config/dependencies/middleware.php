@@ -5,8 +5,9 @@ use Slim\App;
 
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\PermissionMiddleware;
-
 use App\Interfaces\AuthServiceInterface;
+use App\Middlewares\SetupMiddleware;
+use App\Interfaces\UserRepositoryInterface;
 
 return [
 
@@ -23,6 +24,12 @@ return [
     AuthMiddleware::class => function (ContainerInterface $c): AuthMiddleware {
         return new AuthMiddleware(
             $c->get(AuthServiceInterface::class)
+        );
+    },
+
+    SetupMiddleware::class => function (ContainerInterface $c): SetupMiddleware {
+        return new SetupMiddleware(
+            $c->get(UserRepositoryInterface::class)
         );
     },
 

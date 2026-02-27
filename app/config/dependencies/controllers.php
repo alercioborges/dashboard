@@ -8,7 +8,8 @@ use App\Controllers\{
     UserController,
     RoleController,
     AuthController,
-    ForgotPasswordController
+    ForgotPasswordController,
+    SetupController
 };
 
 use App\Services\{
@@ -77,8 +78,18 @@ return [
             $c->get(ForgotPasswordService::class),
             $c->get(Validator::class),
             $c->get(LoggerInterface::class)
-            
+
         );
     },
+
+    SetupController::class => function (ContainerInterface $c): SetupController {
+        return new SetupController(
+            $c->get(Twig::class),
+            $c->get(UserService::class),
+            $c->get(Validator::class),
+            $c->get(LoggerInterface::class),
+            $c->get(AuthServiceInterface::class)
+        );
+    }
 
 ];

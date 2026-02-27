@@ -123,6 +123,20 @@ class User extends Model implements UserRepositoryInterface
         return $result > 0;
     }
 
+
+    public function changeRole(int $userId, int $roleId):bool
+    {
+        $result = $this->queryBuilder->update(
+            $this->table,
+            [
+                'role_id' => $roleId
+            ],
+            ['id' => $userId]
+        );
+
+        return $result > 0;
+    }
+
     /**
      * Get specific users data
      */

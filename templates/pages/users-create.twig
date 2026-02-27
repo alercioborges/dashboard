@@ -33,24 +33,7 @@
 				<input type="email" value="{{ OLD_INPUT['email'] }}" class="form-control border border-dark" id="email" name="email" data-rules="required|email" autocomplete="email" onkeyup="this.value = this.value.toLowerCase()" aria-required="true" inputmode="email" spellcheck="false">
 				{{ message('email')|raw }}
 			</div>
-
-
-			<!-- User profile -->
-			<div class="form-group mb-3">
-				<label for="role_id" class="form-label">Perfil de Usuário
-					<span class="text-danger">*</span>
-				</label>
-				<select class="form-select border border-dark" id="role_id" name="role_id" data-rules="required">
-					<option value="">Selecione um perfil</option>
-				
-				{% for data in ROLES %}
-					<option value="{{ data.id }}">{{ data.name }}</option>
-				{% endfor %}
-
-				</select>
-				{{ message('role_id')|raw }}
-			</div>
-
+			
 			<!-- Password -->
 			<div class="mb-3">
 				<label for="senha" class="form-label">Senha

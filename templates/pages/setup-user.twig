@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pt-br">
+<!--begin::Head-->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>{{ TITLE }}</title>
+    
+    <!-- begin::Remove page cache -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!--end::Remove page cache -->
+    
+    <!--begin::Accessibility Meta Tags-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
+    <meta name="color-scheme" content="light dark"/>
+    <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)"/>
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)"/>
+    <!--end::Accessibility Meta Tags-->
+    
+    <!--begin::Primary Meta Tags-->
+    <meta name="author" content="ColorlibHQ"/>
+    <!--end::Primary Meta Tags-->
+    
+    <!--begin::Accessibility Features-->
+    <!-- Skip links will be dynamically added by accessibility.js -->
+    <meta name="supported-color-schemes" content="light dark"/>
+    <link rel="preload" href="{{ base_path }}/assets/adminlte/css/adminlte.css" as="style"/>
+    <!--end::Accessibility Features-->
+    
+    <!--begin::Fonts-->
+    <link rel="stylesheet" href="{{ base_path }}/assets/adminlte/css/index.css"/>
+    <!--end::Fonts-->
+    
+    <!--begin::Third Party Plugin(OverlayScrollbars)-->
+    <link rel="stylesheet" href="{{ base_path }}/assets/adminlte/css/overlayscrollbars.min.css"/>
+    <!--end::Third Party Plugin(OverlayScrollbars)-->
+    
+    <!--begin::Third Party Plugin(Bootstrap Icons)-->
+    <link rel="stylesheet" href="{{ base_path }}/assets/adminlte/css/bootstrap-icons.min.css"/>
+    <!--end::Third Party Plugin(Bootstrap Icons)-->
+    
+    <!--begin::Required Plugin(AdminLTE)-->
+    <link rel="stylesheet" href="{{ base_path }}/assets/adminlte/css/adminlte.css"/>
+    <!--end::Required Plugin(AdminLTE)-->
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">    
+    
+</head>
+<!--end::Head-->
+
+<!--begin::Body-->
+<body>
+    
+    <link href="{{ base_path }}/assets/css/form-validation.css" rel="stylesheet"/>
+
+    <div class="col-md-8 mx-auto border border-dark p-3 rounded">
+        <form
+            id="userForm" method="post" action="{{ route_redirect('setup.store') }}">
+            <!-- firstname -->
+            <div class="form-group mb-3">
+                <label for="firstname" class="form-label">Nome
+                    <span class="text-danger">*</span>
+                </label>
+                <input type="text" value="{{ OLD_INPUT['firstname'] }}" class="form-control border border-dark" id="firstname" name="firstname" autofocus data-rules="required|min=2|max=30|onlyLetter" placeholder="Digite seu nome" onkeyup="this.value = this.value.toUpperCase()" autocomplete="given-name" aria-required="true" spellcheck="false">
+                {{ message('firstname')|raw }}
+            </div>
+
+            <!-- lastname -->
+            <div class="form-group mb-3">
+                <label for="lastname" class="form-label">Sobrenome
+                    <span class="text-danger">*</span>
+                </label>
+                <input type="text" value="{{ OLD_INPUT['lastname'] }}" class="form-control border border-dark" id="lastname" name="lastname" onkeyup="this.value = this.value.toUpperCase()" data-rules="required|min=2|max=30|onlyLetter" placeholder="Digite seu sobrenome" autocomplete="family-name" aria-required="true" spellcheck="false">
+                {{ message('lastname')|raw }}
+            </div>
+
+            <!-- E-mail -->
+            <div class="form-group mb-3">
+                <label for="email" class="form-label">E-mail
+                    <span class="text-danger">*</span>
+                </label>
+                <input type="email" value="{{ OLD_INPUT['email'] }}" class="form-control border border-dark" id="email" name="email" data-rules="required|email" autocomplete="email" onkeyup="this.value = this.value.toLowerCase()" aria-required="true" inputmode="email" spellcheck="false">
+                {{ message('email')|raw }}
+            </div>            
+
+            <!-- Password -->
+            <div class="mb-3">
+                <label for="senha" class="form-label">Senha
+                    <span class="text-danger">*</span>
+                </label>
+                <div class="password-group">
+                    <input type="password" class="form-control border border-dark" id="password" name="password" placeholder="Digite a senha" data-rules="required|min=6|max=30" aria-required="true" spellcheck="false">
+                    <button type="button" class="toggle-password" id="togglePassword" aria-label="Mostrar ou ocultar senha">
+                        Mostrar senha
+                    </button>
+                </div>
+                {{ message('password')|raw }}
+                <div class="form-text">A senha deve conter pelo menos 6 caracteres.</div>
+            </div>
+
+            <!-- Submit button -->
+            <div>
+                <button type="Submit" class="btn btn-primary">Cadastrar</button>
+            </div>
+        </form>
+    </div>
+
+
+</body>
+<!--end::Body-->
+

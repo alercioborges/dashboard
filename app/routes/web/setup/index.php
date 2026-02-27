@@ -1,6 +1,9 @@
 <?php
 
+use App\Controllers\SetupController;
 
+$app->get('/setup', [SetupController::class, 'index'])
+    ->setName('setup.index');
 
-$app->get('/setup', [SetupController::class, 'index']);
-$app->post('/setup', [SetupController::class, 'store']);
+$app->post('/setup', [SetupController::class, 'store'])
+    ->setName('setup.store');

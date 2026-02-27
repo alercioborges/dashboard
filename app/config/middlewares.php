@@ -9,7 +9,11 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Zeuxisoo\Whoops\Slim\WhoopsMiddleware;
 
+use App\Middlewares\SetupMiddleware;
+
 return function (App $app) {
+
+    $app->add(SetupMiddleware::class);
 
     $appConfig = require __DIR__ . '/app.php';
 

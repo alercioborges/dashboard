@@ -14,31 +14,34 @@ class Validator extends Validation
 
     public function validate($rules)
     {
-        foreach ($rules as $field => $validation) {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            // Primeiro, processa validações com parâmetros
-            $validation = $this->validateWithParameter($field, $validation);
+            foreach ($rules as $field => $validation) {
 
-            // Separa as validações e garante que 'required' venha primeiro
-            $validations = $this->orderValidations($validation);
+                // Primeiro, processa validações com parâmetros
+                $validation = $this->validateWithParameter($field, $validation);
 
+                // Separa as validações e garante que 'required' venha primeiro
+                $validations = $this->orderValidations($validation);
 
+                foreach ($validations as $validationRule) {
 
-            foreach ($validations as $validationRule) {
+                    // Remone spaces in string
+                    if ($validationRule === 'onlyLetter') {
+                        $_POST[$field] = $this->removeSpaces($_POST[$field]);
+                    }
 
-                // Remone spaces in string
-                if ($validationRule === 'onlyLetter') {
-                    $_POST[$field] = $this->removeSpaces($_POST[$field]);
-                }
-
-                // Execute the validations in correct order
-                if (method_exists($this, $validationRule)) {
-                    $this->$validationRule($field);
+                    // Execute the validations in correct order
+                    if (method_exists($this, $validationRule)) {
+                        $this->$validationRule($field);
+                    }
                 }
             }
+
+            return $this->sanitize();
         }
 
-        return $this->sanitize();
+        return [];
     }
 
     /**

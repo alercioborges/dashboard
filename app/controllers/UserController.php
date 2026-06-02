@@ -196,8 +196,7 @@ class UserController extends Controller
             $data = $this->validator->validate([
                 'firstname' => 'required:max@30:min@2:onlyLetter:uppercase',
                 'lastname'  => 'required:max@30:min@2:onlyLetter:uppercase',
-                'email'     => 'required:email:max@60',
-                'role_id'   => 'required'
+                'email'     => 'required:email:max@60'
             ]);
 
             if ($this->userService->emailExists($data['email'], (int) $arg['id'])) {

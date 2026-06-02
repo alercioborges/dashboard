@@ -2,6 +2,9 @@
 
 use Psr\Container\ContainerInterface;
 use Slim\App;
+use Slim\Views\Twig;
+use Slim\Csrf\Guard;
+use App\Middlewares\CsrfMiddleware;
 
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\PermissionMiddleware;
@@ -10,6 +13,20 @@ use App\Middlewares\SetupMiddleware;
 use App\Interfaces\UserRepositoryInterface;
 
 return [
+
+    // -------------------------------------------------------
+    // CSRF GUARD
+    // -------------------------------------------------------
+
+    Guard::class => function (ContainerInterface $c): Guard {
+        $responseFactory = $c->get(App::class)->getResponseFactory();
+
+        $guard = new Guard($responseFactory);
+        $guard->setPersistentTokenMode(true);
+
+        return $guard;
+    },
+
 
     // -------------------------------------------------------
     // HTTP MIDDLEWARE LAYER
@@ -26,6 +43,15 @@ return [
             $c->get(AuthServiceInterface::class)
         );
     },
+
+    CsrfMiddleware::class => function (ContainerInterface $c): CsrfMiddleware {
+        return new CsrfMiddleware(
+            $c->get(Twig::class),
+            $c->get(Guard::class)
+        );
+    },
+
+
 
     SetupMiddleware::class => function (ContainerInterface $c): SetupMiddleware {
         return new SetupMiddleware(
@@ -50,7 +76,6 @@ return [
                 $c->get(AuthServiceInterface::class),
                 $permission
             );
-
         };
     },
 

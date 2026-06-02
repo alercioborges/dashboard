@@ -1,6 +1,8 @@
 <?php
 
 use Slim\App;
+use Slim\Csrf\Guard;
+use App\Middlewares\CsrfMiddleware;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Middlewares\TrailingSlash;
@@ -20,7 +22,11 @@ return function (App $app) {
     // Remove barra final das URLs
     $app->add(new TrailingSlash(false));
 
-    // Middleware do Twig
+    // CSRF protection
+    $app->add(CsrfMiddleware::class);
+    $app->add(Guard::class);
+
+    // Middleware Twig
     $twig = $app->getContainer()->get(Twig::class);
     $app->add(TwigMiddleware::create($app, $twig));
 

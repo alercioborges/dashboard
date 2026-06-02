@@ -116,6 +116,12 @@ class RoleController extends Controller
                 ]
             );
         }
+
+        Usar a função '9n_array' para validação do input via tag 'select'
+
+        If(!in_array($opcoes, $rules)) {
+            exho 'opção invalida';
+        }
         
         */
 

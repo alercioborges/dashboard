@@ -98,6 +98,9 @@
             <div class="card-body login-card-body">
                 <!-- begin::Login Form -->
                 <form action="{{ route_redirect('login') }}" method="POST">
+                
+                 {{ csrf_input() }}
+
                     <!-- begin::Email Input Group -->
                     <div class="input-group mb-1">
                         {{ message('error')|raw }}

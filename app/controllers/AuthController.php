@@ -56,7 +56,7 @@ class AuthController extends Controller
             );
 
         } catch (\Exception $e) {
-
+            
             $this->logger->error('[AUTH_ERROR]: ' . $e);
 
             return $this->twig->render(

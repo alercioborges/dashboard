@@ -5,6 +5,7 @@ use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Slim\App;
 use App\Views\ExtensionTwig;
+use Slim\Csrf\Guard;
 
 return [
 
@@ -51,6 +52,7 @@ return [
 
         return new ExtensionTwig(
             $routeParser,
+            $c->get(Guard::class),
             $appConfig['current_route'],
             $appConfig['baseDir']
         );

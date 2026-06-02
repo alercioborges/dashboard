@@ -114,8 +114,7 @@ class User extends Model implements UserRepositoryInterface
             [
                 'firstname'   => $data['firstname'],
                 'lastname'    => $data['lastname'],
-                'email'       => $data['email'],
-                'role_id'     => $data['role_id']
+                'email'       => $data['email']
             ],
             ['id' => $id]
         );
@@ -140,7 +139,7 @@ class User extends Model implements UserRepositoryInterface
     /**
      * Get specific users data
      */
-    public function findFieldExists($field, $value, $key, $id): ?array
+    public function findFieldExists(string $field, string $value, string $key, int $id): ?array
     {
         return $this->fieldExists($field, $value, $key, $id);
     }

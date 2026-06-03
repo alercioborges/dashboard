@@ -5,6 +5,8 @@ use Slim\App;
 use Slim\Views\Twig;
 use Slim\Csrf\Guard;
 use App\Middlewares\CsrfMiddleware;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\PermissionMiddleware;
@@ -23,6 +25,21 @@ return [
 
         $guard = new Guard($responseFactory);
         $guard->setPersistentTokenMode(true);
+
+        $guard->setFailureHandler(
+            function (
+                ServerRequestInterface $request,
+                RequestHandlerInterface $handler
+            ) use ($responseFactory) {
+
+                flash(
+                    'error',
+                    error('Sua sessão expirou. Tente novamente.')
+                );
+
+                return redirect('/login');
+            }
+        );
 
         return $guard;
     },
@@ -43,15 +60,7 @@ return [
             $c->get(AuthServiceInterface::class)
         );
     },
-
-    CsrfMiddleware::class => function (ContainerInterface $c): CsrfMiddleware {
-        return new CsrfMiddleware(
-            $c->get(Twig::class),
-            $c->get(Guard::class)
-        );
-    },
-
-
+    
 
     SetupMiddleware::class => function (ContainerInterface $c): SetupMiddleware {
         return new SetupMiddleware(

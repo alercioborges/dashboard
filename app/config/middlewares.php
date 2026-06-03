@@ -2,7 +2,6 @@
 
 use Slim\App;
 use Slim\Csrf\Guard;
-use App\Middlewares\CsrfMiddleware;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Middlewares\TrailingSlash;
@@ -10,7 +9,6 @@ use Slim\Exception\HttpNotFoundException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Zeuxisoo\Whoops\Slim\WhoopsMiddleware;
-
 use App\Middlewares\SetupMiddleware;
 
 return function (App $app) {
@@ -23,7 +21,6 @@ return function (App $app) {
     $app->add(new TrailingSlash(false));
 
     // CSRF protection
-    $app->add(CsrfMiddleware::class);
     $app->add(Guard::class);
 
     // Middleware Twig

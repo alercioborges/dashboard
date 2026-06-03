@@ -35,7 +35,6 @@ class ExtensionTwig extends AbstractExtension
             new TwigFunction('is_active_route', [$this, 'isActiveRoute']),
             new TwigFunction('has_active_child', [$this, 'hasActiveChild']),
             new TwigFunction('csrf_input', [$this, 'csrfInput'], ['is_safe' => ['html']])
-
         ];
     }
 

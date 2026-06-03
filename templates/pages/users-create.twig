@@ -7,6 +7,10 @@
 	<div class="col-md-8 mx-auto border border-dark p-3 rounded">
 		<form
 			id="userForm" method="post" action="{{ route_redirect('users.store') }}">
+
+			{{ csrf_input() }}
+			{{ dump(csrf) }}
+
 			<!-- firstname -->
 			<div class="form-group mb-3">
 				<label for="firstname" class="form-label">Nome

@@ -46,11 +46,12 @@ function redirect(string $target): Slim\Psr7\Response
 
 function back(): void
 {
-    \App\Services\RedirectService::back();    
+    \App\Services\RedirectService::back();
     exit;
 }
 
-function currentRoutte() {
+function currentRoutte()
+{
     return \App\Services\LoadFileService::file('/app/config/app.php')['current_route'];
 }
 

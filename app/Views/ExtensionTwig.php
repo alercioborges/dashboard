@@ -115,10 +115,10 @@ class ExtensionTwig extends AbstractExtension
         return sprintf(
             '<input type="hidden" name="%s" value="%s">' .
                 '<input type="hidden" name="%s" value="%s">',
-            htmlspecialchars($nameKey,  ENT_QUOTES, 'UTF-8'),
-            htmlspecialchars($name,  ENT_QUOTES, 'UTF-8'),
-            htmlspecialchars($valueKey,  ENT_QUOTES, 'UTF-8'),
-            htmlspecialchars($value,  ENT_QUOTES, 'UTF-8')
+            $nameKey,
+            $name,
+            $valueKey,
+            $value,
         );
     }
 }

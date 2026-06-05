@@ -2,9 +2,8 @@
 
 use Psr\Container\ContainerInterface;
 use Slim\App;
-use Slim\Views\Twig;
 use Slim\Csrf\Guard;
-use App\Middlewares\CsrfMiddleware;
+use Slim\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -13,6 +12,7 @@ use App\Middlewares\PermissionMiddleware;
 use App\Interfaces\AuthServiceInterface;
 use App\Middlewares\SetupMiddleware;
 use App\Interfaces\UserRepositoryInterface;
+use App\Services\AuthService;
 
 return [
 
@@ -21,7 +21,9 @@ return [
     // -------------------------------------------------------
 
     Guard::class => function (ContainerInterface $c): Guard {
+
         $responseFactory = $c->get(App::class)->getResponseFactory();
+        $auth = $c->get(AuthService::class);
 
         $guard = new Guard($responseFactory);
         $guard->setPersistentTokenMode(true);
@@ -30,7 +32,20 @@ return [
             function (
                 ServerRequestInterface $request,
                 RequestHandlerInterface $handler
-            ) use ($responseFactory) {
+            ) use ($auth, $responseFactory) {
+
+                if (isset($_SESSION['user'])) {
+                    unset($_SESSION['user']);
+                }
+
+                if (isset($_SESSION['csrf'])) {
+                    unset($_SESSION['csrf']);
+                }
+
+                if (isset($_COOKIE['remember_me'])) {
+                    setcookie('remember_me', '', time() - 3600, '/');
+                    unset($_COOKIE['remember_me']);
+                }
 
                 flash(
                     'error',
@@ -60,7 +75,7 @@ return [
             $c->get(AuthServiceInterface::class)
         );
     },
-    
+
 
     SetupMiddleware::class => function (ContainerInterface $c): SetupMiddleware {
         return new SetupMiddleware(

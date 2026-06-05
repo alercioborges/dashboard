@@ -12,7 +12,7 @@ class Validator extends Validation
         parent::__construct($container);
     }
 
-    public function validate($rules)
+    public function validate(array $rules): array
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -47,7 +47,7 @@ class Validator extends Validation
     /**
      * Sort validations
      * */
-    private function orderValidations($validation)
+    private function orderValidations(string $validation): array
     {
         // Se há apenas uma validação
         if ($this->hasOneValidation($validation)) {
@@ -82,7 +82,7 @@ class Validator extends Validation
         return [];
     }
 
-    private function validateWithParameter($field, $validation)
+    private function validateWithParameter(string $field, string $validation): String
     {
         $validations = [];
 
@@ -105,7 +105,7 @@ class Validator extends Validation
         return $validation;
     }
 
-    private function removeSpaces(string $value)
+    private function removeSpaces(string $value): string
     {
         $value = trim($value);
         $value = rtrim($value);
@@ -114,12 +114,12 @@ class Validator extends Validation
         return $value;
     }
 
-    private function hasOneValidation($validate)
+    private function hasOneValidation(string $validate): string
     {
         return substr_count($validate, ':') == 0;
     }
 
-    private function hasTwoOrMoreValidation($validate)
+    private function hasTwoOrMoreValidation(string $validate): string
     {
         return substr_count($validate, ':') >= 1;
     }

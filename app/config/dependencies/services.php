@@ -35,36 +35,36 @@ use App\Models\Permission;
 return [
 
     QueryBuilderService::class =>
-        fn(ContainerInterface $c) => new QueryBuilderService(
-            $c->get(Doctrine\DBAL\Connection::class)
-        ),
+    fn(ContainerInterface $c) => new QueryBuilderService(
+        $c->get(Doctrine\DBAL\Connection::class)
+    ),
 
     UserService::class =>
-        fn(ContainerInterface $c) => new UserService(
-            $c->get(UserRepositoryInterface::class)
-        ),
+    fn(ContainerInterface $c) => new UserService(
+        $c->get(UserRepositoryInterface::class)
+    ),
 
     RoleService::class =>
-        fn(ContainerInterface $c) => new RoleService(
-            $c->get(RoleRepositoryInterface::class)
-        ),
+    fn(ContainerInterface $c) => new RoleService(
+        $c->get(RoleRepositoryInterface::class)
+    ),
 
     AuthServiceInterface::class =>
-        fn(ContainerInterface $c) => new AuthService(
-            $c->get(UserRepositoryInterface::class),
-            $c->get(RememberMeRepositoryInterface::class),
-            $c->get(PermissionRepositoryInterface::class)
-        ),
+    fn(ContainerInterface $c) => new AuthService(
+        $c->get(UserRepositoryInterface::class),
+        $c->get(RememberMeRepositoryInterface::class),
+        $c->get(PermissionRepositoryInterface::class)
+    ),
 
     ForgotPasswordServiceInterface::class =>
-        fn(ContainerInterface $c) => new ForgotPasswordService(
-            $c->get(UserRepositoryInterface::class),
-            $c->get(MailerService::class),
-            $c->get(LoggerInterface::class)
-        ),
+    fn(ContainerInterface $c) => new ForgotPasswordService(
+        $c->get(UserRepositoryInterface::class),
+        $c->get(MailerService::class),
+        $c->get(LoggerInterface::class)
+    ),
 
     PasswordService::class =>
-        fn() => new PasswordService(12),
+    fn() => new PasswordService(12),
 
     LoggerInterface::class => function (ContainerInterface $c): LoggerInterface {
         $logger = new Logger('app');
@@ -79,11 +79,15 @@ return [
     },
 
     MailerService::class => function (ContainerInterface $c): MailerService {
+
+        $appConfig = $c->get('appConfig');
+
         return new MailerService(
             $c->get('smtpConfig'),
             $c->get(LoggerInterface::class),
             $c->get(Twig::class),
-            $c->get(PHPMailer::class)
+            $c->get(PHPMailer::class),
+            $appConfig['env'] === 'development'
         );
     },
 

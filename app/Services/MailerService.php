@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 use Psr\Log\LoggerInterface;
 use Slim\Views\Twig;
@@ -11,25 +12,39 @@ class MailerService
 {
     private array $config;
     private LoggerInterface $logger;
-    private Twig $twig;    
+    private Twig $twig;
     private PHPMailer $mail;
+    private bool $isDevelopment;
 
-    public function __construct(array $config, LoggerInterface $logger, Twig $twig, PHPMailer $mail)
-    {
+    public function __construct(
+        array $config,
+        LoggerInterface $logger,
+        Twig $twig,
+        PHPMailer $mail,
+        bool $isDevelopment = false
+    ) {
         $this->config = $config;
         $this->logger = $logger;
         $this->twig = $twig;
         $this->mail = $mail;
+        $this->isDevelopment = $isDevelopment;
 
-        $this->mail = new PHPMailer(true);
+        $this->configure(); // Self method configuration
+    }
 
+    /**
+     * Setting injection instance PHPMailer.
+     */
+    private function configure(): void
+    {
         $this->mail->isSMTP();
-        $this->mail->Host       = $config['host'];
-        $this->mail->SMTPAuth   = $config['auth'];
-        $this->mail->Username   = $config['username'];
-        $this->mail->Password   = $config['password'];
-        $this->mail->Port       = $config['port'];
-        $this->mail->SMTPSecure = $config['encryption'];
+
+        $this->mail->Host       = $this->config['host'];
+        $this->mail->SMTPAuth   = $this->config['auth'];
+        $this->mail->Username   = $this->config['username'];
+        $this->mail->Password   = $this->config['password'];
+        $this->mail->Port       = $this->config['port'];
+        $this->mail->SMTPSecure = $this->config['encryption'];
 
         $this->mail->Timeout = 5;
         $this->mail->SMTPKeepAlive = false;
@@ -38,21 +53,27 @@ class MailerService
         $this->mail->isHTML(true);
 
         $this->mail->setFrom(
-            $config['from_email'],
-            $config['from_name']
+            $this->config['from_email'],
+            $this->config['from_name']
         );
 
-        // 🔍 DEBUG (ATIVAR TEMPORARIAMENTE)
-        $this->mail->SMTPDebug = 2;
-        $this->mail->Debugoutput = 'error_log';
+        // Debug SMTP only in development.
+        if ($this->isDevelopment) {
+            $this->mail->SMTPDebug   = SMTP::DEBUG_SERVER;
+            $this->mail->Debugoutput = function (string $str, int $level): void {
+                $this->logger->debug('[SMTP] ' . trim($str));
+            };
+        } else {
+            $this->mail->SMTPDebug = SMTP::DEBUG_OFF;
+        }
     }
 
     public function send(
         string $to,
         string $subject,
-         string $template,
-         array $data = [],
-         ?string $textBody = null
+        string $template,
+        array $data = [],
+        ?string $textBody = null
     ): bool {
 
         try {
@@ -69,9 +90,22 @@ class MailerService
 
             return $this->mail->send();
 
-        } catch (Exception $e) {
+            // Log without exposing body content or credentials.
+            $this->logger->info('[MAIL] E-mail sent', [
+                'to'       => $to,
+                'subject'  => $subject,
+                'template' => $template,
+            ]);
+
+            return $sent;
             
-            $this->logger->error('[MAIL ERROR] ' . $e->getMessage());
+        } catch (Exception $e) {
+
+            $this->logger->error('[MAIL ERROR] ' . $e->getMessage(), [
+                'to'       => $to,
+                'subject'  => $subject,
+                'template' => $template,
+            ]);
 
             return false;
         }

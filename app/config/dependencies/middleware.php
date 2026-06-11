@@ -6,6 +6,7 @@ use Slim\Csrf\Guard;
 use Slim\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
 
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\PermissionMiddleware;
@@ -24,6 +25,7 @@ return [
 
         $responseFactory = $c->get(App::class)->getResponseFactory();
         $auth = $c->get(AuthService::class);
+        $logger = $c->get(LoggerInterface::class);
 
         $guard = new Guard($responseFactory);
         $guard->setPersistentTokenMode(true);
@@ -32,26 +34,35 @@ return [
             function (
                 ServerRequestInterface $request,
                 RequestHandlerInterface $handler
-            ) use ($auth, $responseFactory) {
+            ) use ($auth, $responseFactory, $logger) {
 
-                if (isset($_SESSION['user'])) {
-                    unset($_SESSION['user']);
+                $path = explode(getDir(), $request->getUri()->getPath());
+
+                $logger->warning('[CSRF] Token validation failed.', [
+                    'method'      => $request->getMethod(),
+                    'uri'         => $path[1],
+                    'had_session' => isset($_SESSION['user']),
+                ]);
+
+                if (!isset($_SESSION['user'])) {
+
+                    if (isset($_SESSION['csrf'])) {
+                        unset($_SESSION['csrf']);
+                    }
+
+                    flash('error', error('Formulário expirado. Recarregue a página e tente novamente.'));
+                    return redirect($path[1]);
                 }
 
-                if (isset($_SESSION['csrf'])) {
-                    unset($_SESSION['csrf']);
-                }
+                unset($_SESSION['csrf']);
+                unset($_SESSION['user']);
 
                 if (isset($_COOKIE['remember_me'])) {
                     setcookie('remember_me', '', time() - 3600, '/');
                     unset($_COOKIE['remember_me']);
                 }
 
-                flash(
-                    'error',
-                    error('Sua sessão expirou. Tente novamente.')
-                );
-
+                flash('error', error('Sua sessão expirou. Tente novamente.'));
                 return redirect('/login');
             }
         );

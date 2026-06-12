@@ -2,13 +2,24 @@
 
 namespace App\Services;
 
-use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Psr7\Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class RedirectService
 {
-    public static function redirect(string $target): \Slim\Psr7\Response
+    private Response $response;
+
+    public function __construct(Response $response)
     {
-        $response = new \Slim\Psr7\Response();
+        $this->response = $response;
+    }
+
+
+
+
+    public static function redirect(string $target): Response
+    {
+        $response = new Response;
         return $response
             ->withHeader('Location', getUrl() . $target)
             ->withStatus(302);
@@ -23,5 +34,15 @@ class RedirectService
         }
 
         return header("Location: {$previus}");
+    }
+
+    public static function getRequestPath(Request $request): string
+    {
+        $path = explode(
+            getDir(),
+            $request->getUri()->getPath()
+        );
+
+        return $path[1];
     }
 }

@@ -30,7 +30,6 @@ use App\Interfaces\{
     ForgotPasswordServiceInterface,
     PermissionRepositoryInterface
 };
-use App\Models\Permission;
 
 return [
 

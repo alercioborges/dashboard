@@ -19,11 +19,10 @@ class AuthMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (!$this->authService->isAuthenticated()) {
+        if (!$this->authService->isAuthenticated()) {          
+           
+            $_SESSION['redirect'] = getRequestPath($request);
 
-            $path = explode(getDir(), $request->getUri()->getPath());
-            $_SESSION['redirect'] = $path[1];
-            
             return redirect('/login');
         }
 

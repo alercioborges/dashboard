@@ -13,7 +13,7 @@ interface AuthServiceInterface
     /**
      * Authenticate user with email and password
      */
-    public function authenticate(string $email, string $password): bool;
+    public function authenticate(string $email, string $password, bool $remember = false): bool;
 
     /**
      * Check if user is authenticated

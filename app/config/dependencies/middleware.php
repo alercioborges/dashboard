@@ -36,11 +36,9 @@ return [
                 RequestHandlerInterface $handler
             ) use ($auth, $responseFactory, $logger) {
 
-                $path = explode(getDir(), $request->getUri()->getPath());
-
                 $logger->warning('[CSRF] Token validation failed.', [
                     'method'      => $request->getMethod(),
-                    'uri'         => $path[1],
+                    'uri'         => getRequestPath($request),
                     'had_session' => isset($_SESSION['user']),
                 ]);
 
@@ -51,7 +49,7 @@ return [
                     }
 
                     flash('error', error('Formulário expirado. Recarregue a página e tente novamente.'));
-                    return redirect($path[1]);
+                    return redirect(getRequestPath($request));
                 }
 
                 unset($_SESSION['csrf']);

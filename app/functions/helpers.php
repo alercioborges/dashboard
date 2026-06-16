@@ -50,7 +50,7 @@ function back(): void
     exit;
 }
 
-function currentRoutte()
+function currentRoute()
 {
     return \App\Services\LoadFileService::file('/app/config/app.php')['current_route'];
 }

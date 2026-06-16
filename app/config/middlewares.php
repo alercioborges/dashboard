@@ -13,8 +13,6 @@ use App\Middlewares\SetupMiddleware;
 
 return function (App $app) {
 
-    $app->add(SetupMiddleware::class);
-
     $appConfig = require __DIR__ . '/app.php';
 
     // Remove barra final das URLs
@@ -26,6 +24,8 @@ return function (App $app) {
     // Middleware Twig
     $twig = $app->getContainer()->get(Twig::class);
     $app->add(TwigMiddleware::create($app, $twig));
+
+    $app->add(SetupMiddleware::class);
 
     // Error middleware    
     if ($appConfig['env'] === 'development') {

@@ -77,8 +77,8 @@ class AuthController extends Controller
                 'email'     => 'required:email',
                 'password'  => 'required'
             ]);
-            
-            if ($this->validator->hasErrors($data)) {
+
+            if ($this->validator->hasErrors()) {
                 $this->setOldInput($data);
                 back();
             }
@@ -86,7 +86,7 @@ class AuthController extends Controller
             $remember = (bool) ($data['remember'] ?? false);
             
             $logged = $this->authService->authenticate($data['email'], $data['password'], $remember);
-
+            
             if ($logged) {
 
                 if (isset($_SESSION['redirect'])) {

@@ -38,8 +38,8 @@ class AuthService implements AuthServiceInterface
         if (!$user || $user['is_active'] === 0 || !password_verify($password, $user['password'])) {
             return false;
         }
-
-        $this->createSessionUser($user['id'], $user['role_id']);
+        
+        $this->createSessionUser($user['id'], $user['firstname'], $user['lastname'], $user['role_id']);
 
         if ($remember) {
             $this->createRememberMeToken($user['id']);
@@ -105,17 +105,19 @@ class AuthService implements AuthServiceInterface
             return false;
         }
 
-        $this->createSessionUser($user['id'], $user['role_id']);
+        $this->createSessionUser($user['id'], $user['firstname'], $user['lastname'], $user['role_id']);
 
         return true;
     }
 
-    private function createSessionUser(int $userid, int $roleId): array
+    private function createSessionUser(int $id, string $firstname, string $lastname, int $roleId): array
     {
         return $_SESSION['user'] = [
-            'id'      => $userid,
-            'role_id' => $roleId,
-            'logged'  => true
+            'id'        => $id,
+            'firstname' => $firstname,
+            'lastname' => $lastname,
+            'role_id'   => $roleId,
+            'logged'    => true
         ];
     }
 

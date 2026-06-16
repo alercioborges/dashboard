@@ -62,6 +62,7 @@ class ForgotPasswordController extends Controller
                     'REDEFINED' => $redefined
                 ]
             );
+            
         } catch (\Exception $e) {
 
             return $this->twig->render(

@@ -39,7 +39,7 @@ class User extends Model implements UserRepositoryInterface
             ['m.id' => $id]
         );
 
-        return $userData[0];
+        return $userData[0] ?? NULL;
     }
 
     /**
@@ -51,6 +51,8 @@ class User extends Model implements UserRepositoryInterface
             $this->table,
             [
                 'id',
+                'firstname',
+                'lastname',
                 'email',
                 'password',
                 'is_active',

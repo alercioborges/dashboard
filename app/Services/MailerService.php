@@ -88,8 +88,6 @@ class MailerService
             $this->mail->Body    = $html;
             $this->mail->AltBody = $textBody ?? strip_tags($html);
 
-            return $this->mail->send();
-
             // Log without exposing body content or credentials.
             $this->logger->info('[MAIL] E-mail sent', [
                 'to'       => $to,
@@ -97,7 +95,7 @@ class MailerService
                 'template' => $template,
             ]);
 
-            return $sent;
+            return $this->mail->send();
             
         } catch (Exception $e) {
 

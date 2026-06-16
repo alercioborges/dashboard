@@ -13,9 +13,9 @@ require __DIR__ . '/vendor/autoload.php';
 // Load environment variables
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
-$dotenv->safeLoad();
 
-$container = require_once __DIR__ . '/app/config/container.php';
+$container = require __DIR__ . '/app/config/container.php';
+$appConfig = require __DIR__ . '/app/config/app.php';
 
 // Create aplication
 AppFactory::setContainer($container);

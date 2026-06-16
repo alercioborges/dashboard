@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Services\Validators;
+
+use PDO;
+use DateTimeInterface;
 
 class RememberToken
 {

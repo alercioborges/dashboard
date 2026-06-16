@@ -8,11 +8,33 @@ $group->group('/users', function (Slim\Routing\RouteCollectorProxy $group) use (
     ->setName('users.show')
      ->add($permission('users.view'));
 
-    $group->get('/create', [UserController::class, 'create'])->setName('users.create');
-    $group->post('/create', [UserController::class, 'store'])->setName('users.store');
-    $group->get('/{id:[0-9]+}/profile', [UserController::class, 'profile'])->setName('users.profile');    
-    $group->get('/{id:[0-9]+}/edit', [UserController::class, 'edit'])->setName('users.edit');
-    $group->put('/{id:[0-9]+}', [UserController::class, 'update'])->setName('users.update');    
-    $group->get('/{id:[0-9]+}/delete', [UserController::class, 'delete'])->setName('users.delete');
-    $group->delete('/{id:[0-9]+}', [UserController::class, 'destroy'])->setName('users.destroy');
+    $group->get('/create', [UserController::class, 'create'])
+    ->setName('users.create')
+    ->add($permission('users.view'));
+
+    $group->post('/create', [UserController::class, 'store'])
+    ->setName('users.store')
+    ->add($permission('users.view'));;
+
+    $group->get('/{id:[0-9]+}/profile', [UserController::class, 'profile'])
+    ->setName('users.profile')
+    ->add($permission('users.view'));
+   
+    $group->get('/{id:[0-9]+}/edit', [UserController::class, 'edit'])
+    ->setName('users.edit')
+    ->add($permission('users.view'));
+
+
+    $group->put('/{id:[0-9]+}', [UserController::class, 'update'])
+    ->setName('users.update')
+    ->add($permission('users.view'));
+
+    $group->get('/{id:[0-9]+}/delete', [UserController::class, 'delete'])
+    ->setName('users.delete')
+    ->add($permission('users.view'));
+
+    $group->delete('/{id:[0-9]+}', [UserController::class, 'destroy'])
+    ->setName('users.destroy')
+    ->add($permission('users.view'));
+    
 });

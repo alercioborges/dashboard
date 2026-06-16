@@ -9,7 +9,6 @@
 			id="userForm" method="post" action="{{ route_redirect('users.store') }}">
 
 			{{ csrf_input() }}
-			{{ dump(csrf) }}
 
 			<!-- firstname -->
 			<div class="form-group mb-3">
@@ -40,7 +39,7 @@
 			
 			<!-- Password -->
 			<div class="mb-3">
-				<label for="senha" class="form-label">Senha
+				<label for="password" class="form-label">Senha
 					<span class="text-danger">*</span>
 				</label>
 				<div class="password-group">

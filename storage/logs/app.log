@@ -840,3 +840,4 @@
 [2026-06-15T16:42:40.110492-03:00] app.INFO: Password reset email sent {"email":"alercio.borges@gmail.com"} []
 [2026-06-16T10:08:40.634357-03:00] app.WARNING: [CSRF] Token validation failed. {"method":"POST","uri":"/admin/roles/create","had_session":true} []
 [2026-06-16T10:27:40.048136-03:00] app.WARNING: [CSRF] Token validation failed. {"method":"POST","uri":"/admin/roles/create","had_session":true} []
+[2026-06-26T15:52:31.055805-03:00] app.WARNING: [CSRF] Token validation failed. {"method":"POST","uri":"/admin/roles/create","had_session":true} []

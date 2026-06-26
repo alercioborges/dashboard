@@ -24,7 +24,10 @@ class Role extends Model implements RoleRepositoryInterface
             $this->table,
             [
                 'id',
-                'name'
+                'name',
+                'description',
+                'created_at',
+                'updated_at'
             ],
             ['id' => $id]
         );
@@ -39,28 +42,34 @@ class Role extends Model implements RoleRepositoryInterface
     {
         $roleData = $this->queryBuilder->select(
             $this->table,
-            ['name'],
-            ['name LIKE' => '%' . $name . '%']
+            [
+                'id',
+                'name',
+                'description',
+                'created_at',
+                'updated_at'
+            ],
+            ['name' => $name]
         );
 
-        return $roleData ?? NULL;
+        return $roleData[0] ?? NULL;
     }
 
 
     /**
      * Get all user roles with pagination
      */
-    public function getAll(int $limit = 10, int $offset = 1): array
+    public function getAll(int $limit = 10, int $offset = 0): array
     {
         return $this->queryBuilder->select(
             $this->table,
             [
                 'id',
-                'name'
+                'name',
+                'description',
+                'created_at'
             ],
-            [
-                'id NOT IN' => [1, 2]
-            ],
+            [],
             [],
             $limit,
             $offset
@@ -76,8 +85,8 @@ class Role extends Model implements RoleRepositoryInterface
             $this->table,
             [
                 'id'          => NULL,
-                'name'   => $data['name'],
-                'description'    => $data['description'],
+                'name'        => $data['name'],
+                'description' => $data['description'],
                 'created_at'  => date('Y-m-d H:i:s'),
                 'updated_at'  => NULL
             ]
@@ -85,15 +94,15 @@ class Role extends Model implements RoleRepositoryInterface
     }
 
     /**
-     * Update user
+     * Update user role
      */
     public function update(int $id, array $data): bool
     {
         $result = $this->queryBuilder->update(
             $this->table,
             [
-                'name'   => $data['firstname'],
-                'description'    => $data['lastname'],
+                'name'        => $data['name'],
+                'description' => $data['description'],
                 'updated_at'  => date('Y-m-d H:i:s')
             ],
             ['id' => $id]
@@ -105,21 +114,24 @@ class Role extends Model implements RoleRepositoryInterface
     /**
      * Get specific users data
      */
-    public function findFieldExists($field, $value, $key, $id): ?array
+    public function findFieldExists(string $field, string $value, string $key, int $id): ?array
     {
         return $this->fieldExists($field, $value, $key, $id);
     }
 
     /**
-     * Delete user
+     * Delete user role
      */
     public function delete(int $id): bool
     {
-        return true;
+        return $this->queryBuilder->delete(
+            $this->table,
+            ['id' => $id]
+        );
     }
 
     /**
-     * Get number of active users
+     * Get total number of user roles
      */
     public function countAll(): int
     {
@@ -127,7 +139,7 @@ class Role extends Model implements RoleRepositoryInterface
             $this->table,
             [
                 'COUNT(*) AS total'
-            ],
+            ]
         );
 
         return (int) $result[0]['total'];

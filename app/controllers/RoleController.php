@@ -31,7 +31,7 @@ class RoleController extends Controller
         try {
 
             $pagination = $this->roleService->getPaginatedRole($page, $perPage);
-
+            
             return $this->twig->render(
                 $response,
                 'pages/roles-user.twig',
@@ -43,7 +43,7 @@ class RoleController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-
+            
             return $this->twig->render(
                 $response,
                 'pages/roles-user.twig',
@@ -82,14 +82,12 @@ class RoleController extends Controller
 
     public function store(Request $request, Response $response): Response
     {
-        /*
-
         try {
 
             $data = $this->validator->validate([
-                'name'       => 'required:max@30:min@2:onlyLetter:uppercase',
-                'description' => 'required:max@30:min@6'
-            ]);            
+                'name'        => 'required:max@30:min@2:onlyLetter:uppercase',
+                'description' => 'required:max@255:min@6'
+            ]);
 
             if ($this->roleService->getRoleByName($data['name'])) {
                 $this->validator->setError('name', 'Esse nome já existe');
@@ -100,31 +98,107 @@ class RoleController extends Controller
                 back();
             }
 
-            $this->userService->createUser($data);
+            $this->roleService->createUser($data);
 
-            flash('message', success('Usuário criado com sucesso'));
+            flash('message', success('Perfil criado com sucesso'));
 
-            return redirect('/admin/users');
+            return redirect('/admin/roles');
         } catch (\Exception $e) {
 
             return $this->twig->render(
                 $response,
-                'pages/users-create.twig',
+                'pages/roles-create.twig',
                 [
-                    'TITLE' => 'Cadastrar novo usuário',
-                    'ERROR' => 'Ocorreu um erro ao tentar cadastrar novo usuário'
+                    'TITLE' => 'Criar novo perfil de usuário',
+                    'ERROR' => 'Ocorreu um erro ao tentar criar novo perfil de usuário'
                 ]
             );
         }
+    }
 
-        Usar a função '9n_array' para validação do input via tag 'select'
+    public function edit(Request $request, Response $response, array $arg): Response
+    {
+        try {
 
-        If(!in_array($opcoes, $rules)) {
-            exho 'opção invalida';
+            $roleData = $this->roleService->getUserById((int) $arg['id']);
+
+            return $this->twig->render(
+                $response,
+                'pages/roles-create.twig',
+                [
+                    'TITLE'     => 'Editar perfil de usuário',
+                    'ROLE_DATA' => $roleData,
+                    'OLD_INPUT' => $this->getOldInput()
+                ]
+            );
+        } catch (\Exception $e) {
+
+            return $this->twig->render(
+                $response,
+                'pages/roles-user.twig',
+                [
+                    'TITLE' => 'Lista de perfis de usuários',
+                    'ERROR' => 'Ocorreu um erro ao tentar carregar perfil de usuário'
+                ]
+            );
         }
-        
-        */
+    }
 
-        return $response;
+    public function update(Request $request, Response $response, array $arg): Response
+    {
+        try {
+
+            $data = $this->validator->validate([
+                'name'        => 'required:max@30:min@2:onlyLetter:uppercase',
+                'description' => 'required:max@255:min@6'
+            ]);
+
+            if ($this->roleService->nameExists($data['name'], (int) $arg['id'])) {
+                $this->validator->setError('name', 'Esse nome já existe');
+            }
+
+            if ($this->validator->hasErrors($data)) {
+                $this->setOldInput($data);
+                back();
+            }
+
+            $this->roleService->updateUserRole((int) $arg['id'], $data);
+
+            flash('message', success('Perfil atualizado com sucesso'));
+
+            return redirect('/admin/roles');
+        } catch (\Exception $e) {
+
+            return $this->twig->render(
+                $response,
+                'pages/roles-create.twig',
+                [
+                    'TITLE' => 'Editar perfil de usuário',
+                    'ERROR' => 'Ocorreu um erro ao tentar atualizar perfil de usuário'
+                ]
+            );
+        }
+    }
+
+    public function destroy(Request $request, Response $response, array $arg): Response
+    {
+        try {
+
+            $this->roleService->deleteRole((int) $arg['id']);
+
+            flash('message', success('Perfil excluído com sucesso'));
+
+            return redirect('/admin/roles');
+        } catch (\Exception $e) {
+
+            return $this->twig->render(
+                $response,
+                'pages/roles-user.twig',
+                [
+                    'TITLE' => 'Lista de perfis de usuários',
+                    'ERROR' => 'Ocorreu um erro ao tentar excluir perfil de usuário'
+                ]
+            );
+        }
     }
 }

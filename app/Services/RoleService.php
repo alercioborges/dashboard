@@ -40,29 +40,30 @@ class RoleService
      */
     public function getUserById(int $id): ?array
     {
-        //return $this->userRepository->findById($id);
-        return [];
+        return $this->roleRepository->findById($id);
     }
 
     /**
-     * Get user by name
+     * Get role by name
      */
-    public function getUserByName(string $name): ?array
+    public function getRoleByName(string $name): ?array
     {
-        return $this->roleRepository->findByEmail($email);
-        return [];
+        return $this->roleRepository->findByName($name);
     }
 
     public function updateUserRole(int $id, array $data): bool
     {
-        //return $this->userRepository->update($id, $data);
-        return true;
+        return $this->roleRepository->update($id, $data);
     }
 
     public function nameExists(string $name, int $id): ?array
     {
-        //return $this->userRepository->findFieldExists('email', $email, 'id', $id);
-        return [];
+        return $this->roleRepository->findFieldExists('name', $name, 'id', $id);
+    }
+
+    public function deleteRole(int $id): bool
+    {
+        return $this->roleRepository->delete($id);
     }
 
     public function countUsers(): ?int

@@ -6,26 +6,35 @@
 
 	<div class="col-md-8 mx-auto border border-dark p-3 rounded">
 		<form
-		id="userForm" method="POST" action="{{ route_redirect('roles-user.store') }}">
+		id="userForm" method="POST" action="{% if ROLE_DATA is defined %}{{ route_redirect('roles-user.update', {'id': ROLE_DATA.id}) }}{% else %}{{ route_redirect('roles-user.store') }}{% endif %}">
+
+		{% if ROLE_DATA is defined %}
+			{{ csrf_input() }}
+			<input type="hidden" name="_METHOD" value="PUT">
+		{% endif %}
+
 		<!-- Name -->
 		<div class="form-group mb-3">
 			<label for="name" class="form-label">Nome
 				<span class="text-danger">*</span>
 			</label>
-			<input type="text" value="{{ OLD_INPUT['name'] }}" class="form-control border border-dark" id="name" name="name" autofocus data-rules="required|min=2|max=30|onlyLetter" placeholder="Digite seu nome" onkeyup="this.value = this.value.toUpperCase()" autocomplete="given-name" aria-required="true" spellcheck="false">
-			{{ message('firstname')|raw }}
+			<input type="text" value="{{ OLD_INPUT['name']|default(ROLE_DATA['name'] ?? '') }}" class="form-control border border-dark" id="name" name="name" autofocus data-rules="required|min=2|max=30|onlyLetter" placeholder="Digite o nome do perfil" onkeyup="this.value = this.value.toUpperCase()" autocomplete="off" aria-required="true" spellcheck="false">
+			{{ message('name')|raw }}
 		</div>
 
 		<!-- Description -->
 		<div class="form-group mb-3">
 			<label for="description" class="form-label">Descrição</label>
-			<textarea class="col-12" id="description" name="description" rows="4" placeholder="Descrição"></textarea>
+			<textarea class="col-12" id="description" name="description" rows="4" placeholder="Descrição do perfil">{{ OLD_INPUT['description']|default(ROLE_DATA['description'] ?? '') }}</textarea>
+			{{ message('description')|raw }}
 		</div>
 
 
 		<!-- Submit button -->
 		<div>
-			<button type="Submit" class="btn btn-primary">Cadastrar</button>
+			<button type="Submit" class="btn btn-primary">
+				{% if ROLE_DATA is defined %}Atualizar{% else %}Cadastrar{% endif %}
+			</button>
 		</div>
 	</form>
 </div>

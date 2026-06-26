@@ -38,7 +38,7 @@ interface RoleRepositoryInterface
     /**
      * find user role by field
      */
-    public function findFieldExists($field, $value, $key, $id): ?array;
+    public function findFieldExists(string $field, string $value, string $key, int $id): ?array;
 
     /**
      * Delete user role

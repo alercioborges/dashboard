@@ -1,75 +1,82 @@
 {% extends "pages/base.twig" %}
 
 {% block content %}
-    {{ message('message')|raw }}
+	{{ message('message')|raw }}
 
-    {% if ROLES is not empty %}
-        <div class="card-body table-responsive p-0">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Nome</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody class="table-group-divider">
-                    {% for data in ROLES %}
-                        <tr class="align-middle">
-                            <td>{{ data.id }}</td>
-                            <td>
-                                <a href="{{ route_redirect('roles.edit', {'id': data.id}) }}">{{ data.name }}</a>
-                            </td>
-                            <td>
-                                {# Botão Editar #}
-                                <a href="{{ route_redirect('roles.edit', {'id': data.id}) }}" class="btn btn-primary btn-xs m-1">
-                                    <i class="fa fa-edit"></i> Editar
-                                </a>
+	{% if ROLES is not empty %}
+		<div class="card-body table-responsive p-0">
+			<table class="table table-striped table-hover">
+				<thead>
+					<tr>
+						<th scope="col">#</th>
+						<th scope="col">Nome</th>
+						<th scope="col">Ações</th>
+					</tr>
+				</thead>
+				<tbody class="table-group-divider">
 
-                                {# Botão que abre o modal de exclusão #}
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#confirm-delete-{{ data.id }}" class="btn btn-danger btn-xs m-1">
-                                    <i class="fa fa-trash"></i> Excluir
-                                </a>
 
-                                {# Modal de confirmação de exclusão #}
-                                <div class="modal fade" id="confirm-delete-{{ data.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ data.id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h3 id="modalLabel-{{ data.id }}" class="mb-0">
-                                                    <b>Exclusão de perfil</b>
-                                                </h3>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <h6>
-                                                    Deseja realmente excluir o perfil
-                                                    <strong>{{ data.name }}</strong>?
-                                                </h6>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+					{% for data in ROLES %}
+						<tr class="align-middle">
+							<td>{{ data.id }}</td>
+							<td>
+								<a href="{{ route_redirect('roles-user.edit', {'id': data.id}) }}">{{ data.name }}</a>
+							</td>
+							<td>
+								{# Botão Editar #}
+								<a href="{{ route_redirect('roles-user.edit', {'id': data.id}) }}" class="btn btn-primary btn-xs m-1">
+									<i class="fa fa-edit"></i>
+									Editar
+								</a>
 
-                                                <form method="POST" action="{{ route_redirect('roles.destroy', {'id': data.id}) }}" enctype="application/x-www-form-urlencoded">
-                                                    {{ csrf_input() }}
-                                                    <input type="hidden" name="_METHOD" value="DELETE">
-                                                    <button type="submit" class="btn btn-danger">Excluir</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+								{# Botão que abre o modal de exclusão #}
+								<a href="#" data-bs-toggle="modal" data-bs-target="#confirm-delete-{{ data.id }}" class="btn btn-danger btn-xs m-1">
+									<i class="fa fa-trash"></i>
+									Excluir
+								</a>
 
-            {{ pagination(NUM_PAGES, CURRENT_PAGE) }}
-        </div>
-    {% else %}
-        <div class="alert alert-danger mt-1" role="alert">
-            <strong>Nenhum perfil de usuário encontrado</strong>
-        </div>
-    {% endif %}
+								{# Modal de confirmação de exclusão #}
+								<div class="modal fade" id="confirm-delete-{{ data.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ data.id }}" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered modal-lg">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h3 id="modalLabel-{{ data.id }}" class="mb-0">
+													<b>Exclusão de perfil</b>
+												</h3>
+												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+											</div>
+											<div class="modal-body">
+												<h6>
+													Deseja realmente excluir o perfil
+													<strong>{{ data.name }}</strong>?
+												</h6>
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+												<form method="POST" action="{{ route_redirect('roles-user.destroy', {'id': data.id}) }}" enctype="application/x-www-form-urlencoded">
+													{{ csrf_input() }}
+													<input type="hidden" name="_METHOD" value="DELETE">
+													<button type="submit" class="btn btn-danger">Excluir</button>
+												</form>
+											</div>
+										</div>
+									</div>
+								</div>
+							</td>
+						</tr>
+					{% endfor %}
+					}}
+
+
+				</tbody>
+			</table>
+
+			{{ pagination(NUM_PAGES, CURRENT_PAGE) }}
+		</div>
+	{% else %}
+		<div class="alert alert-danger mt-1" role="alert">
+			<strong>Nenhum perfil de usuário encontrado</strong>
+		</div>
+	{% endif %}
 {% endblock %}

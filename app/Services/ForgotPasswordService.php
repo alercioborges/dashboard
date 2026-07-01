@@ -13,12 +13,14 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
     private UserRepositoryInterface $userRepository;
     private MailerService $mailer;
     private LoggerInterface $logger;
+    private TokenGenerator $tokenGenerator;
 
-    public function __construct(UserRepositoryInterface $userRepository, MailerService $mailer, LoggerInterface $logger)
+    public function __construct(UserRepositoryInterface $userRepository, MailerService $mailer, LoggerInterface $logger, TokenGenerator $tokenGenerator)
     {
         $this->userRepository = $userRepository;
         $this->mailer = $mailer;
         $this->logger = $logger;
+        $this->tokenGenerator = $tokenGenerator;
     }
 
 
@@ -30,9 +32,11 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
             return;
         }
 
-        $token = bin2hex(random_bytes(32));
+        $token = $this->tokenGenerator->generate();
 
         $expiresAt = new \DateTimeImmutable('+1 hour');
+
+        $forgotId = null;
 
         try {
 
@@ -40,16 +44,21 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
                 (int) $user['id'],
                 password_hash($token, PASSWORD_DEFAULT),
                 $expiresAt
-            );            
-            
+            );
         } catch (\Exception $e) {
 
             $this->logger->error('Error while trying to save password reset token: ' . $e->getMessage());
         }
 
-        $resetLink = getUrl() . '/forgot/reset-password?id=' . $forgotId . '&token=' . $token;
+        if ($forgotId === null) {
+            return;
+        }
 
         try {
+
+            $resetLink = getUrl() . '/forgot/reset-password?id=' . $forgotId . '&token=' . $token;
+
+
 
             $this->mailer->send(
                 $email,
@@ -66,7 +75,6 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
                 'Password reset email sent',
                 ['email' => $email]
             );
-
         } catch (\Throwable $e) {
 
             $this->logger->error(

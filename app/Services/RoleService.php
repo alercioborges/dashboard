@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Interfaces\RoleRepositoryInterface;
+use App\Services\PaginationService;
 
 /**
  * User Role Service
@@ -13,10 +14,12 @@ use App\Interfaces\RoleRepositoryInterface;
 class RoleService
 {
     private RoleRepositoryInterface $roleRepository;
+    private PaginationService $pagination;
 
-    public function __construct(RoleRepositoryInterface $roleRepository)
+    public function __construct(RoleRepositoryInterface $roleRepository, PaginationService $pagination)
     {
         $this->roleRepository = $roleRepository;
+        $this->pagination = $pagination;
     }
 
     /**
@@ -73,19 +76,14 @@ class RoleService
 
     public function getPaginatedRole(int $page, int $limit): array
     {
-        $total    = $this->countUsers();
-        $numPages = (int) ceil($total / $limit);
-        $offset   = ($page - 1) * $limit;
-
-        $data = $this->roleRepository->getAll($limit, $offset);
+        $pagination = $this->pagination->paginate($page, $limit, $this->countUsers());
+        $data =  $this->roleRepository->getAll($limit, $pagination['offset']);
 
         return [
-            'data' => $data,
-            'numPages' => $numPages,
+            'data'        => $data,
+            'numPages'    => $pagination['numPages'],
             'currentPage' => $page,
-            'total' => $total
+            'total'       => $this->countUsers()
         ];
     }
-
-    
 }

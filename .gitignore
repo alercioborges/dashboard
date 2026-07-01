@@ -3,3 +3,6 @@
 
 # Variavais de ambiente
 .env
+
+# OpenCode config file
+opencode.json

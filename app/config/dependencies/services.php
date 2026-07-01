@@ -16,10 +16,11 @@ use App\Services\{
     UserService,
     RoleService,
     AuthService,
-    RememberMeService,
     ForgotPasswordService,
     MailerService,
-    PasswordService
+    PasswordService,
+    PaginationService,
+    TokenGenerator
 };
 
 use App\Interfaces\{
@@ -38,28 +39,40 @@ return [
         $c->get(Doctrine\DBAL\Connection::class)
     ),
 
+    PaginationService::class => function (): PaginationService {
+        return new PaginationService();
+    },
+
     UserService::class =>
     fn(ContainerInterface $c) => new UserService(
-        $c->get(UserRepositoryInterface::class)
-    ),
+        $c->get(UserRepositoryInterface::class),
+        $c->get(PaginationService::class)
+    ),    
 
     RoleService::class =>
     fn(ContainerInterface $c) => new RoleService(
-        $c->get(RoleRepositoryInterface::class)
+        $c->get(RoleRepositoryInterface::class),
+        $c->get(PaginationService::class)
     ),
+
+    TokenGenerator::class => function(): TokenGenerator {
+        return new TokenGenerator();
+    },
 
     AuthServiceInterface::class =>
     fn(ContainerInterface $c) => new AuthService(
         $c->get(UserRepositoryInterface::class),
         $c->get(RememberMeRepositoryInterface::class),
-        $c->get(PermissionRepositoryInterface::class)
+        $c->get(PermissionRepositoryInterface::class),
+        $c->get(TokenGenerator::class)
     ),
 
     ForgotPasswordServiceInterface::class =>
     fn(ContainerInterface $c) => new ForgotPasswordService(
         $c->get(UserRepositoryInterface::class),
         $c->get(MailerService::class),
-        $c->get(LoggerInterface::class)
+        $c->get(LoggerInterface::class),
+        $c->get(TokenGenerator::class)
     ),
 
     PasswordService::class =>

@@ -6,7 +6,7 @@ use App\Interfaces\AuthServiceInterface;
 use App\Interfaces\PermissionRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\RememberMeRepositoryInterface;
-use App\Models\Permission;
+use App\Services\TokenGenerator;
 
 /**
  * Authentication Service
@@ -19,12 +19,18 @@ class AuthService implements AuthServiceInterface
     private UserRepositoryInterface $userRepository;
     private RememberMeRepositoryInterface $rememberMeRepository;
     private PermissionRepositoryInterface $permissionRepository;
+    private TokenGenerator $tokenGenerator;
 
-    public function __construct(UserRepositoryInterface $userRepository, RememberMeRepositoryInterface $rememberMeRepository, PermissionRepositoryInterface $permissionRepository)
-    {
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        RememberMeRepositoryInterface $rememberMeRepository,
+        PermissionRepositoryInterface $permissionRepository,
+        TokenGenerator $tokenGenerator
+    ) {
         $this->userRepository = $userRepository;
         $this->rememberMeRepository = $rememberMeRepository;
         $this->permissionRepository = $permissionRepository;
+        $this->tokenGenerator = $tokenGenerator;
     }
 
     /**
@@ -38,7 +44,7 @@ class AuthService implements AuthServiceInterface
         if (!$user || $user['is_active'] === 0 || !password_verify($password, $user['password'])) {
             return false;
         }
-        
+
         $this->createSessionUser($user['id'], $user['firstname'], $user['lastname'], $user['role_id']);
 
         if ($remember) {
@@ -51,7 +57,7 @@ class AuthService implements AuthServiceInterface
 
     private function createRememberMeToken(int $userId): void
     {
-        $token = bin2hex(random_bytes(32));
+        $token = $this->tokenGenerator->generate();
         $hash  = hash('sha256', $token);
 
         $expiresAt = new \DateTime('7 days');
@@ -170,16 +176,16 @@ class AuthService implements AuthServiceInterface
     public function hasPermission(string $permission): bool
     {
         $user = $this->getCurrentUser();
-        
+
         if (!$user) {
             return false;
         }
-       
+
         if (!isset($_SESSION['user']['permissions'])) {
-            
+
             $permissions = $this->permissionRepository
                 ->getPermissionsByRoleId($user['role_id']);
-            
+
             $_SESSION['user']['permissions'] = $permissions;
         }
 

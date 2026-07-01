@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Interfaces\UserRepositoryInterface;
+use App\Services\PaginationService;
 
 /**
  * User Service
@@ -13,10 +14,12 @@ use App\Interfaces\UserRepositoryInterface;
 class UserService
 {
     private UserRepositoryInterface $userRepository;
+    private PaginationService $pagination;
 
-    public function __construct(UserRepositoryInterface $userRepository)
+    public function __construct(UserRepositoryInterface $userRepository, PaginationService $pagination)
     {
         $this->userRepository = $userRepository;
+        $this->pagination = $pagination;
     }
 
     /**
@@ -64,7 +67,6 @@ class UserService
     public function changeUserRole(int $userId, int $roleId): bool
     {
         return $this->userRepository->changeRole($userId, $roleId);
-
     }
 
     public function emailExists(string $email, int $id): ?array
@@ -79,17 +81,14 @@ class UserService
 
     public function getPaginatedUsers(int $page, int $limit): array
     {
-        $total    = $this->countUsers();
-        $numPages = (int) ceil($total / $limit);
-        $offset   = ($page - 1) * $limit;
-
-        $data =  $this->userRepository->getAll($limit, $offset);
+        $pagination = $this->pagination->paginate($page, $limit, $this->countUsers());
+        $data =  $this->userRepository->getAll($limit, $pagination['offset']);
 
         return [
             'data'        => $data,
-            'numPages'    => $numPages,
+            'numPages'    => $pagination['numPages'],
             'currentPage' => $page,
-            'total'       => $total
+            'total'       => $this->countUsers()
         ];
     }
 }

@@ -58,7 +58,7 @@ interface UserRepositoryInterface
         \DateTimeImmutable $expiresAt
     ): ?int;
 
-    public function findValidPasswordReset(string $token): ?array;
+    public function findValidPasswordReset(int $forgotId, string $token): ?array;
 
      public function updatePassword(int $forgotId, int $userId, string $password): bool;
 

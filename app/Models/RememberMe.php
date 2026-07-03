@@ -38,6 +38,8 @@ class RememberMe extends Model implements RememberMeRepositoryInterface
             ],
             [
                 'u.id',
+                'u.firstname',
+                'u.lastname',
                 'u.role_id'
             ],
             [

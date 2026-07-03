@@ -14,7 +14,10 @@ use App\Middlewares\SetupMiddleware;
 return function (App $app) {
 
     $appConfig = require __DIR__ . '/app.php';
-
+    
+    dd($app->getContainer()->get('app') );
+    
+    
     // Remove barra final das URLs
     $app->add(new TrailingSlash(false));
 

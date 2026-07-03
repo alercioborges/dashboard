@@ -20,7 +20,7 @@ use App\Services\{
     MailerService,
     PasswordService,
     PaginationService,
-    TokenGenerator
+    TokenService
 };
 
 use App\Interfaces\{
@@ -55,8 +55,8 @@ return [
         $c->get(PaginationService::class)
     ),
 
-    TokenGenerator::class => function(): TokenGenerator {
-        return new TokenGenerator();
+    TokenService::class => function(): TokenService {
+        return new TokenService();
     },
 
     AuthServiceInterface::class =>
@@ -64,7 +64,7 @@ return [
         $c->get(UserRepositoryInterface::class),
         $c->get(RememberMeRepositoryInterface::class),
         $c->get(PermissionRepositoryInterface::class),
-        $c->get(TokenGenerator::class)
+        $c->get(TokenService::class)
     ),
 
     ForgotPasswordServiceInterface::class =>
@@ -72,7 +72,7 @@ return [
         $c->get(UserRepositoryInterface::class),
         $c->get(MailerService::class),
         $c->get(LoggerInterface::class),
-        $c->get(TokenGenerator::class)
+        $c->get(TokenService::class)
     ),
 
     PasswordService::class =>

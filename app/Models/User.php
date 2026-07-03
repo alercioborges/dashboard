@@ -199,20 +199,21 @@ class User extends Model implements UserRepositoryInterface
     }
 
 
-    public function findValidPasswordReset(string $token): ?array
+    public function findValidPasswordReset(int $forgotId, string $token): ?array
     {
         $resets = $this->queryBuilder->select(
             'tbl_password_resets',
             ['token_hash', 'user_id'],
             [
+                'id'           => $forgotId,
                 'expires_at >' => (new \DateTime())->format('Y-m-d H:i:s')
             ]
         );
 
-        foreach ($resets as $reset) {
-            if ($this->passwordService->verify($token, $reset['token_hash'])) {
-                return $reset;
-            }
+        $reset = $resets[0] ?? null;
+
+        if ($reset && $this->passwordService->verify($token, $reset['token_hash'])) {
+            return $reset;
         }
 
         return NULL;

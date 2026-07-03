@@ -118,7 +118,7 @@ class ForgotPasswordController extends Controller
             return redirect('/forgot');
         }
 
-        $reset = $this->forgotService->validateToken($token);
+        $reset = $this->forgotService->validateToken((int) $forgotId, $token);
 
         if (!$reset) {
             flash('message', error('Token inválido ou expirado.'));
@@ -156,7 +156,7 @@ class ForgotPasswordController extends Controller
             back();
         }
 
-        $reset = $this->forgotService->validateToken($data['token']);
+        $reset = $this->forgotService->validateToken((int) $data['id'], $data['token']);
 
         if (!$reset) {
             flash('message', error('Token inválido ou expirado.'));

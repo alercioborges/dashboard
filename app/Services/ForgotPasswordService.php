@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Interfaces\ForgotPasswordServiceInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Services\MailerService;
+use App\Services\TokenService;
 
 use Psr\Log\LoggerInterface;
 
@@ -13,14 +14,18 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
     private UserRepositoryInterface $userRepository;
     private MailerService $mailer;
     private LoggerInterface $logger;
-    private TokenGenerator $tokenGenerator;
+    private TokenService $tokenService;
 
-    public function __construct(UserRepositoryInterface $userRepository, MailerService $mailer, LoggerInterface $logger, TokenGenerator $tokenGenerator)
-    {
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        MailerService $mailer,
+        LoggerInterface $logger,
+        TokenService $tokenService
+    ) {
         $this->userRepository = $userRepository;
         $this->mailer = $mailer;
         $this->logger = $logger;
-        $this->tokenGenerator = $tokenGenerator;
+        $this->tokenService = $tokenService;
     }
 
 
@@ -32,7 +37,7 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
             return;
         }
 
-        $token = $this->tokenGenerator->generate();
+        $token = $this->tokenService->generateToken();
 
         $expiresAt = new \DateTimeImmutable('+1 hour');
 
@@ -88,9 +93,9 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
     }
 
 
-    public function validateToken(string $token): ?array
+    public function validateToken(int $forgotId, string $token): ?array
     {
-        return $this->userRepository->findValidPasswordReset($token);
+        return $this->userRepository->findValidPasswordReset($forgotId, $token);
     }
 
 

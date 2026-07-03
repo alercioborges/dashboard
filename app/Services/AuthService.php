@@ -6,7 +6,7 @@ use App\Interfaces\AuthServiceInterface;
 use App\Interfaces\PermissionRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\RememberMeRepositoryInterface;
-use App\Services\TokenGenerator;
+use App\Services\TokenService;
 
 /**
  * Authentication Service
@@ -19,18 +19,18 @@ class AuthService implements AuthServiceInterface
     private UserRepositoryInterface $userRepository;
     private RememberMeRepositoryInterface $rememberMeRepository;
     private PermissionRepositoryInterface $permissionRepository;
-    private TokenGenerator $tokenGenerator;
+    private TokenService $tokenService;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
         RememberMeRepositoryInterface $rememberMeRepository,
         PermissionRepositoryInterface $permissionRepository,
-        TokenGenerator $tokenGenerator
+        TokenService $tokenService
     ) {
         $this->userRepository = $userRepository;
         $this->rememberMeRepository = $rememberMeRepository;
         $this->permissionRepository = $permissionRepository;
-        $this->tokenGenerator = $tokenGenerator;
+        $this->tokenService = $tokenService;
     }
 
     /**
@@ -57,8 +57,8 @@ class AuthService implements AuthServiceInterface
 
     private function createRememberMeToken(int $userId): void
     {
-        $token = $this->tokenGenerator->generate();
-        $hash  = hash('sha256', $token);
+        $token = $this->tokenService->generateToken();
+        $hash  = $this->tokenService->hashToken($token);
 
         $expiresAt = new \DateTime('7 days');
 
@@ -103,10 +103,10 @@ class AuthService implements AuthServiceInterface
 
     private function loginViaRememberMe(string $token): bool
     {
-        $hash = hash('sha256', $token);
+        $hash = $this->tokenService->hashToken($token);
 
         $user = $this->rememberMeRepository->findValidUserByToken($hash);
-
+        
         if (!$user) {
             return false;
         }
@@ -121,7 +121,7 @@ class AuthService implements AuthServiceInterface
         return $_SESSION['user'] = [
             'id'        => $id,
             'firstname' => $firstname,
-            'lastname' => $lastname,
+            'lastname'  => $lastname,
             'role_id'   => $roleId,
             'logged'    => true
         ];

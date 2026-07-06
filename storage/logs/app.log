@@ -2101,3 +2101,6 @@
 [2026-07-03T16:30:09.291782-03:00] app.DEBUG: [SMTP] CLIENT -> SERVER: QUIT [] []
 [2026-07-03T16:30:09.458833-03:00] app.DEBUG: [SMTP] SERVER -> CLIENT: 221 2.0.0 closing connection 5a478bee46e88-30f0b7bb8fasm22703331eec.1 - gsmtp [] []
 [2026-07-03T16:30:09.460361-03:00] app.INFO: Password reset email sent {"email":"alercio.borges@gmail.com"} []
+[2026-07-06T11:07:48.973079-03:00] app.WARNING: [CSRF] Token validation failed. {"method":"POST","uri":"/admin/roles/create","had_session":true} []
+[2026-07-06T11:08:28.106945-03:00] app.WARNING: [CSRF] Token validation failed. {"method":"POST","uri":"/admin/roles/create","had_session":true} []
+[2026-07-06T15:15:24.562824-03:00] app.WARNING: [CSRF] Token validation failed. {"method":"POST","uri":"/admin/roles/create","had_session":true} []

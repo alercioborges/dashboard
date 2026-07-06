@@ -31,12 +31,12 @@ function success(string $message): string
 
 function getUrl(): string
 {
-    return \App\Services\LoadFileService::file('/app/config/app.php')['url'];
+    return $GLOBALS['app_config']['url'];
 }
 
 function getDir(): string
 {
-    return \App\Services\LoadFileService::file('/app/config/app.php')['baseDir'];
+    return $GLOBALS['app_config']['baseDir'];
 }
 
 function redirect(string $target): Slim\Psr7\Response
@@ -52,7 +52,7 @@ function back(): void
 
 function currentRoute()
 {
-    return \App\Services\LoadFileService::file('/app/config/app.php')['current_route'];
+    return $GLOBALS['app_config']['current_route'];
 }
 
 function loader(string $file): mixed

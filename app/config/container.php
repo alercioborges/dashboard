@@ -1,17 +1,10 @@
 <?php
 
 use DI\ContainerBuilder;
-use Dotenv\Dotenv;
-
-// Load vendor
-require __DIR__ . '/../../vendor/autoload.php';
-
-// ENSURE .env IS LOADED (WEB + CLI)
-$dotenv = Dotenv::createImmutable(dirname(__DIR__, 2));
-$dotenv->safeLoad();
 
 // Load app config
 $appConfig = require __DIR__ . '/../config/app.php';
+$GLOBALS['app_config'] = $appConfig;
 
 // Setting container DI
 $containerBuilder = new ContainerBuilder();

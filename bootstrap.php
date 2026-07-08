@@ -3,6 +3,7 @@
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
 
+// Session initialization
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
@@ -14,8 +15,11 @@ require __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
+// Load global variables
+require __DIR__ . '/app/config/global-vars.php';
+
+// Load container
 $container = require __DIR__ . '/app/config/container.php';
-$appConfig = require __DIR__ . '/app/config/app.php';
 
 // Create aplication
 AppFactory::setContainer($container);
@@ -25,8 +29,8 @@ $app = AppFactory::create();
 $container->set(Slim\App::class, $app);
 
 // Add  directory if exist
-if (!empty($appConfig['baseDir'])) {
-    $app->setBasePath($appConfig['baseDir']);
+if (!empty($GLOBALS['app_config']['baseDir'])) {
+    $app->setBasePath($GLOBALS['app_config']['baseDir']);
 }
 
 // Body Parsing to ready POST data

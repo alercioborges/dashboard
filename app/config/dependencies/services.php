@@ -20,7 +20,8 @@ use App\Services\{
     MailerService,
     PasswordService,
     PaginationService,
-    TokenService
+    TokenService,
+    CookieService
 };
 
 use App\Interfaces\{
@@ -64,7 +65,9 @@ return [
         $c->get(UserRepositoryInterface::class),
         $c->get(RememberMeRepositoryInterface::class),
         $c->get(PermissionRepositoryInterface::class),
-        $c->get(TokenService::class)
+        $c->get(TokenService::class),
+        $c->get(CookieService::class)
+
     ),
 
     ForgotPasswordServiceInterface::class =>

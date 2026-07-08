@@ -7,6 +7,7 @@ use App\Interfaces\PermissionRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\RememberMeRepositoryInterface;
 use App\Services\TokenService;
+use App\Services\CookieService;
 
 /**
  * Authentication Service
@@ -20,17 +21,20 @@ class AuthService implements AuthServiceInterface
     private RememberMeRepositoryInterface $rememberMeRepository;
     private PermissionRepositoryInterface $permissionRepository;
     private TokenService $tokenService;
+    private CookieService $cookieService;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
         RememberMeRepositoryInterface $rememberMeRepository,
         PermissionRepositoryInterface $permissionRepository,
-        TokenService $tokenService
+        TokenService $tokenService,
+        CookieService $cookieService
     ) {
         $this->userRepository = $userRepository;
         $this->rememberMeRepository = $rememberMeRepository;
         $this->permissionRepository = $permissionRepository;
         $this->tokenService = $tokenService;
+        $this->cookieService = $cookieService;
     }
 
     /**

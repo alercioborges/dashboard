@@ -2,10 +2,6 @@
 
 use DI\ContainerBuilder;
 
-// Load app config
-$appConfig = require __DIR__ . '/../config/app.php';
-$GLOBALS['app_config'] = $appConfig;
-
 // Setting container DI
 $containerBuilder = new ContainerBuilder();
 
@@ -19,7 +15,7 @@ $containerBuilder->addDefinitions(__DIR__ . '/dependencies/middleware.php');
 $containerBuilder->addDefinitions(__DIR__ . '/dependencies/cli.php');
 
 // Compile container in production
-if ($appConfig['env'] === 'production') {
+if ($GLOBALS['app_config']['env'] === 'production') {
     $containerBuilder->enableCompilation(__DIR__ . '/../../storage/cache');
 }
 

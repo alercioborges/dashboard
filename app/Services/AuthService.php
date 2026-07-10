@@ -69,16 +69,12 @@ class AuthService implements AuthServiceInterface
         $this->rememberMeRepository->store($userId, $hash, $expiresAt);
 
         if (!isset($_COOKIE['remember_me'])) {
-            setcookie(
+
+            $this->cookieService->setCookie(
                 'remember_me',
                 $token,
-                [
-                    'expires'  => $expiresAt->getTimestamp(),
-                    'path'     => '/',
-                    'secure'   => isset($_SERVER['HTTPS']),
-                    'httponly' => true,
-                    'samesite' => 'Lax'
-                ]
+                $expiresAt->getTimestamp(),
+                '/'
             );
         }
     }
@@ -110,7 +106,7 @@ class AuthService implements AuthServiceInterface
         $hash = $this->tokenService->hashToken($token);
 
         $user = $this->rememberMeRepository->findValidUserByToken($hash);
-        
+
         if (!$user) {
             return false;
         }
@@ -146,10 +142,12 @@ class AuthService implements AuthServiceInterface
     {
         if (!empty($_COOKIE['remember_me'])) {
 
-            $hash = hash('sha256', $_COOKIE['remember_me']);
+            $hash = $this->tokenService->hashToken($_COOKIE['remember_me']);
             $this->rememberMeRepository->delete($hash);
 
-            setcookie('remember_me', '', time() - 3600, '/');
+            $this->cookieService->deleteCookie('remember_me', '/');
+
+            //setcookie('remember_me', '', time() - 3600, '/');
         }
 
         if (session_status() === PHP_SESSION_ACTIVE) {

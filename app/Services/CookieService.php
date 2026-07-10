@@ -41,20 +41,13 @@ class CookieService
     public function setCookie(
         string $name,
         string $value,
-        int $duration = 3600,
+        int $duration = 3000,
         string $path = '/'
     ): bool {
+
         // Validação do nome.
         if ($name === '' || preg_match('/[=,; \t\r\n\013\014]/', $name)) {
             throw new InvalidArgumentException("Nome de cookie inválido: '{$name}'.");
-        }
-
-        // Detecção automática de HTTPS quando não informado.
-        $secure = $secure ?? self::isSecureConnection();
-
-        // SameSite=None exige obrigatoriamente secure=true (regra dos navegadores).
-        if ($samesite === 'None' && !$secure) {
-            throw new InvalidArgumentException('SameSite=None requer conexão segura (secure=true).');
         }
 
         // Não permite enviar cookie após o output já ter começado.
@@ -62,16 +55,18 @@ class CookieService
             throw new RuntimeException("Headers já enviados em {$file}:{$line}.");
         }
 
-        $expires = $duration > 0 ? time() + $duration : 0;
-
-        return setcookie($name, $value, [
-            'expires'  => $expires,
-            'path'     => $path,
-            'domain'   => $domain,
-            'secure'   => $secure,
-            'httponly' => $httponly,
-            'samesite' => $samesite,
-        ]);
+        return setcookie(
+            $name,
+            $value,
+            [
+                'expires'  => $duration,
+                'path'     => $path,
+                'domain'   => '',
+                'secure'   => self::isSecureConnection(),
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]
+        );
     }
 
     /**
@@ -85,17 +80,17 @@ class CookieService
     /**
      * Remove um cookie definindo expiração no passado.
      */
-    public function deleteCookie(string $name, string $path = '/', string $domain = ''): bool
+    public function deleteCookie(string $name, string $path = '/'): bool
     {
         unset($_COOKIE[$name]);
 
         return setcookie($name, '', [
             'expires'  => time() - 3600,
             'path'     => $path,
-            'domain'   => $domain,
+            'domain'   => '',
             'secure'   => self::isSecureConnection(),
             'httponly' => true,
-            'samesite' => 'Lax',
+            'samesite' => 'Lax'
         ]);
     }
 }

@@ -65,7 +65,7 @@ class SetupController extends Controller
             'password'  => 'required:max@30:min@6'
         ]);
 
-        if ($this->validator->hasErrors($data)) {
+        if ($this->validator->hasErrors()) {
             $this->setOldInput($data);
             back();
         }

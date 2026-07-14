@@ -50,6 +50,8 @@ class UserController extends Controller
             );
         } catch (\Exception $e) {
 
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+
             return $this->twig->render(
                 $response,
                 'pages/users.twig',
@@ -106,7 +108,7 @@ class UserController extends Controller
                 $this->validator->setError('email', 'Esse e-mail já existe');
             }
 
-            if ($this->validator->hasErrors($data)) {
+            if ($this->validator->hasErrors()) {
                 $this->setOldInput($data);
                 back();
             }
@@ -203,7 +205,7 @@ class UserController extends Controller
                 $this->validator->setError('email', 'Esse e-mail já existe');
             }
 
-            if ($this->validator->hasErrors($data)) {
+            if ($this->validator->hasErrors()) {
                 $this->setOldInput($data);
                 back();
             }

@@ -14,9 +14,6 @@ class RedirectService
         $this->response = $response;
     }
 
-
-
-
     public static function redirect(string $target): Response
     {
         $response = new Response;
@@ -39,7 +36,7 @@ class RedirectService
     public static function getRequestPath(Request $request): string
     {
         $path = explode(
-            getDir(),
+            \getDir(),
             $request->getUri()->getPath()
         );
 

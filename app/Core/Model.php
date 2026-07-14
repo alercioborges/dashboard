@@ -18,7 +18,7 @@ abstract class Model
      * Método genérico para buscar por qualquer campo
      * Pode ser sobrescrito nas classes filhas se necessário
      */
-    protected function findByField(string $field, $value): ?array
+    protected function findByField(string $field, mixed $value): ?array
     {
         if (!isset($this->table)) {
             throw new \Exception("Propriedade 'table' não definida no modelo " . get_class($this));
@@ -33,7 +33,12 @@ abstract class Model
         return !empty($result) ? $result[0] : null;
     }
 
-    protected function fieldExists($field, $value, $key, $id)
+    /**
+     * Verifica se já existe um registro com determinado valor num campo,
+     * excluindo um ID específico (usado em validações de unicidade,
+     * ex.: "esse e-mail já existe" ao editar o próprio usuário).
+     */
+    protected function fieldExists(string $field, string $value, string $key, int $id): array
     {
         return $this->queryBuilder->select(
             $this->table,

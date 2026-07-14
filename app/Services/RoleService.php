@@ -76,14 +76,15 @@ class RoleService
 
     public function getPaginatedRole(int $page, int $limit): array
     {
-        $pagination = $this->pagination->paginate($page, $limit, $this->countUsers());
+        $total = $this->countUsers();
+        $pagination = $this->pagination->paginate($page, $limit, $total);
         $data =  $this->roleRepository->getAll($limit, $pagination['offset']);
 
         return [
             'data'        => $data,
             'numPages'    => $pagination['numPages'],
             'currentPage' => $page,
-            'total'       => $this->countUsers()
+            'total'       => $total
         ];
     }
 }

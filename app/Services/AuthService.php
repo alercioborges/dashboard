@@ -118,13 +118,17 @@ class AuthService implements AuthServiceInterface
 
     private function createSessionUser(int $id, string $firstname, string $lastname, int $roleId): array
     {
-        return $_SESSION['user'] = [
+        $userSession = $_SESSION['user'] = [
             'id'        => $id,
             'firstname' => $firstname,
             'lastname'  => $lastname,
             'role_id'   => $roleId,
             'logged'    => true
         ];
+
+        session_regenerate_id(true);
+
+        return $userSession;
     }
 
     /**
@@ -146,8 +150,6 @@ class AuthService implements AuthServiceInterface
             $this->rememberMeRepository->delete($hash);
 
             $this->cookieService->deleteCookie('remember_me', '/');
-
-            //setcookie('remember_me', '', time() - 3600, '/');
         }
 
         if (session_status() === PHP_SESSION_ACTIVE) {

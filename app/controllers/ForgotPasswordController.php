@@ -83,7 +83,7 @@ class ForgotPasswordController extends Controller
                 'email' => 'required:email'
             ]);
 
-            if ($this->validator->hasErrors($data)) {
+            if ($this->validator->hasErrors()) {
                 $this->setOldInput($data);
                 back();
             }
@@ -151,7 +151,7 @@ class ForgotPasswordController extends Controller
             $this->validator->setError('password-confirm', 'Estas senhas não são iguais');
         }
 
-        if ($this->validator->hasErrors($data)) {
+        if ($this->validator->hasErrors()) {
             $this->setOldInput($data);
             back();
         }

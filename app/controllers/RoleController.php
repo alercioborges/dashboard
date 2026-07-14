@@ -93,7 +93,7 @@ class RoleController extends Controller
                 $this->validator->setError('name', 'Esse nome já existe');
             }
 
-            if ($this->validator->hasErrors($data)) {
+            if ($this->validator->hasErrors()) {
                 $this->setOldInput($data);
                 back();
             }
@@ -157,7 +157,7 @@ class RoleController extends Controller
                 $this->validator->setError('name', 'Esse nome já existe');
             }
 
-            if ($this->validator->hasErrors($data)) {
+            if ($this->validator->hasErrors()) {
                 $this->setOldInput($data);
                 back();
             }

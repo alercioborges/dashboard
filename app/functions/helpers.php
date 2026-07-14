@@ -21,12 +21,12 @@ function flash(string $index, string $message): string
 
 function error(string $message): string
 {
-    return '<div class="alert alert-danger" role="alert"><strong>' . $message . '</strong></div>';
+    return '<div class="alert alert-danger" role="alert"><strong>' . htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</strong></div>';
 }
 
 function success(string $message): string
 {
-    return '<div class="alert alert-success alert-dismissible fade show" role="alert"><strong>' . $message . '</strong><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+    return '<div class="alert alert-success alert-dismissible fade show" role="alert"><strong>' . htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</strong><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
 }
 
 function getUrl(): string

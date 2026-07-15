@@ -6,32 +6,29 @@ use Doctrine\DBAL\Connection as DBALConn;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\ArrayParameterType;
+
 use Exception;
 use InvalidArgumentException;
+
+use App\Services\RawExpression;
 
 class QueryBuilderService
 {
     private DBALConn $connection;
 
     /**
-     * Operadores aceitos ao final de uma chave de condição, ex.: "idade >=", "nome LIKE"
+     * Comparison operators allowed at the end of a condition key.
+     * This is NOT a column allowlist: operators are a finite, immutable set,
+     * so validating them is safe and requires no maintenance.
      */
-    private const ALLOWED_OPERATORS = ['=', '<>', '>', '<', '>=', '<=', 'LIKE', 'IN', 'NOT IN'];
+    private const ALLOWED_OPERATORS = ['=', '<>', '!=', '>', '<', '>=', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN'];
 
     /**
-     * Formato aceito para nome de coluna: letras, números, underscore,
-     * opcionalmente qualificado com alias ("m.nome").
+     * Strict identifier format: a simple name, optionally qualified by one alias.
+     * Accepts "id", "m.id", "r.name". Rejects spaces, parentheses, quotes,
+     * semicolons, comments and anything else that could carry an injection.
      */
     private const IDENTIFIER_PATTERN = '/^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)?$/';
-
-
-    /**
-     * Expressões de agregação aceitas na lista de colunas do SELECT,
-     * ex.: "COUNT(*) AS total", "SUM(valor) AS soma", "MAX(m.criado_em)".
-     */
-    private const AGGREGATE_PATTERN =
-    '/^(COUNT|SUM|AVG|MIN|MAX)\(\s*(\*|[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)?)\s*\)(\s+AS\s+[a-zA-Z_][a-zA-Z0-9_]*)?$/i';
-
 
     public function __construct(DBALConn $connection)
     {
@@ -39,13 +36,194 @@ class QueryBuilderService
     }
 
     /**
-     * Basic SELECT
+     * Creates a trusted raw SQL expression (e.g. CONCAT, CASE, COUNT, aliases).
      *
-     * @param array $allowedColumns Allowlist opcional. Se informado, qualquer coluna em
-     *                              $columns, $conditions ou $orderBy fora dessa lista
-     *                              lança exceção. Use sempre que $columns/$conditions/$orderBy
-     *                              puderem conter algo vindo de input do usuário
-     *                              (ex.: ordenação escolhida em uma querystring).
+     * Use this for expressions written by you in code. NEVER pass user input here,
+     * as RawExpression bypasses all identifier validation and quoting.
+     */
+    public function raw(string $expression): RawExpression
+    {
+        return new RawExpression($expression);
+    }
+
+    // -----------------------------------------------------------------
+    // Security helpers
+    // -----------------------------------------------------------------
+
+    /**
+     * Validates a pure string identifier against the strict pattern and
+     * quotes it with the driver-aware Doctrine quoter. Qualified names
+     * ("m.id") are split and each part is quoted individually -> `m`.`id`.
+     *
+     * RawExpression instances are trusted and returned as-is.
+     */
+    private function quoteIdentifier(RawExpression|string $identifier): string
+    {
+        if ($identifier instanceof RawExpression) {
+            return (string) $identifier;
+        }
+
+        $identifier = trim($identifier);
+
+        if (!preg_match(self::IDENTIFIER_PATTERN, $identifier)) {
+            // Walk the stack to find the first frame outside this class (the real caller).
+            $caller = $this->findCaller();
+
+            throw new InvalidArgumentException(
+                "Invalid SQL identifier: '{$identifier}'. " .
+                    "For expressions/functions/aliases use QueryBuilderService::raw(). " .
+                    "Called from {$caller['file']}:{$caller['line']}."
+            );
+        }
+
+        $parts = array_map(
+            fn(string $part) => $this->connection->quoteIdentifier($part),
+            explode('.', $identifier)
+        );
+
+        return implode('.', $parts);
+    }
+
+    /**
+     * Finds the first stack frame outside this file/class,
+     * i.e. the code that actually passed the invalid identifier.
+     */
+    private function findCaller(): array
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $selfFile = __FILE__;
+
+        foreach ($trace as $frame) {
+            $file = $frame['file'] ?? null;
+
+            // Skip any frame that lives inside this same file
+            // (methods AND closures like the array_map callback).
+            if ($file !== null && $file !== $selfFile) {
+                return [
+                    'file' => $file,
+                    'line' => $frame['line'] ?? 0,
+                ];
+            }
+        }
+
+        return ['file' => 'unknown', 'line' => 0];
+    }
+
+
+    /**
+     * Validates a table name (single identifier, no alias) and quotes it.
+     */
+    private function quoteTable(string $table): string
+    {
+        $table = trim($table);
+
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $table)) {
+            throw new InvalidArgumentException("Invalid table name: '{$table}'");
+        }
+
+        return $this->connection->quoteIdentifier($table);
+    }
+
+    /**
+     * Splits a condition key into [identifier, operator].
+     * "expires_at >" -> ["expires_at", ">"]; "email" -> ["email", "="].
+     * The identifier is validated/quoted; the operator is checked against
+     * the fixed ALLOWED_OPERATORS set.
+     */
+    private function parseCondition(string $key): array
+    {
+        $key = trim($key);
+        $operatorPattern = implode('|', array_map(
+            fn($op) => preg_quote($op, '/'),
+            self::ALLOWED_OPERATORS
+        ));
+
+        if (preg_match('/^(.+?)\s+(' . $operatorPattern . ')$/i', $key, $m)) {
+            return [$this->quoteIdentifier($m[1]), strtoupper($m[2])];
+        }
+
+        return [$this->quoteIdentifier($key), '='];
+    }
+
+    /**
+     * Builds a unique, safe parameter placeholder name from a raw key.
+     */
+    private function paramName(string $key, string $prefix = ''): string
+    {
+        return $prefix . preg_replace('/\W/', '_', $key) . '_' . substr(md5($key), 0, 6);
+    }
+
+    /**
+     * Applies WHERE conditions safely for any QueryBuilder.
+     * Handles IS NULL / IS NOT NULL, IN / NOT IN and scalar operators.
+     */
+    private function applyConditions(QueryBuilder $qb, array $conditions, string $paramPrefix = ''): void
+    {
+        foreach ($conditions as $rawKey => $value) {
+
+            // NULL handling via sentinel string values.
+            if (is_string($value) && strtoupper($value) === 'IS NULL') {
+                [$column] = $this->parseCondition($rawKey);
+                $qb->andWhere($column . ' IS NULL');
+                continue;
+            }
+            if (is_string($value) && strtoupper($value) === 'NOT NULL') {
+                [$column] = $this->parseCondition($rawKey);
+                $qb->andWhere($column . ' IS NOT NULL');
+                continue;
+            }
+
+            [$column, $operator] = $this->parseCondition($rawKey);
+            $param = $this->paramName($rawKey, $paramPrefix);
+
+            // IN / NOT IN with array value.
+            if (is_array($value)) {
+                $op = in_array($operator, ['IN', 'NOT IN'], true) ? $operator : 'IN';
+                $qb->andWhere($column . ' ' . $op . ' (:' . $param . ')')
+                    ->setParameter($param, $value, ArrayParameterType::STRING);
+                continue;
+            }
+
+            // Scalar comparison (=, <>, >, <, >=, <=, LIKE...).
+            $qb->andWhere($column . ' ' . $operator . ' :' . $param)
+                ->setParameter($param, $value);
+        }
+    }
+
+    /**
+     * Validates/quotes each SELECT column. RawExpression passes untouched.
+     */
+    private function prepareColumns(array $columns): array
+    {
+        return array_map(function ($column) {
+            if ($column instanceof RawExpression) {
+                return (string) $column;
+            }
+            if ($column === '*') {
+                return '*';
+            }
+            return $this->quoteIdentifier($column);
+        }, $columns);
+    }
+
+    /**
+     * Applies ORDER BY, validating the column and restricting direction to ASC/DESC.
+     */
+    private function applyOrderBy(QueryBuilder $qb, array $orderBy): void
+    {
+        foreach ($orderBy as $column => $direction) {
+            $safeColumn = $this->quoteIdentifier($column);
+            $safeDir = strtoupper((string) $direction) === 'DESC' ? 'DESC' : 'ASC';
+            $qb->addOrderBy($safeColumn, $safeDir);
+        }
+    }
+
+    // -----------------------------------------------------------------
+    // Public query methods
+    // -----------------------------------------------------------------
+
+    /**
+     * Basic SELECT
      */
     public function select(
         string $table,
@@ -53,27 +231,26 @@ class QueryBuilderService
         array $conditions = [],
         array $orderBy = [],
         ?int $limit = null,
-        ?int $offset = null,
-        array $allowedColumns = []
+        ?int $offset = null
     ): array {
         try {
             $qb = $this->connection->createQueryBuilder();
-            $qb->select(...$this->prepareSelectColumns($columns, $allowedColumns))->from($table);
+            $qb->select(...$this->prepareColumns($columns))
+                ->from($this->quoteTable($table));
 
-            $this->applyConditions($qb, $conditions, $allowedColumns);
-            $this->applyOrderBy($qb, $orderBy, $allowedColumns);
+            $this->applyConditions($qb, $conditions);
+            $this->applyOrderBy($qb, $orderBy);
 
             if ($limit !== null) {
                 $qb->setMaxResults($limit);
             }
-
             if ($offset !== null) {
                 $qb->setFirstResult($offset);
             }
 
             return $qb->executeQuery()->fetchAllAssociative();
         } catch (DBALException $e) {
-            throw new Exception("Erro no SELECT: " . $e->getMessage(), 0, $e);
+            throw new Exception("SELECT error: " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -87,22 +264,27 @@ class QueryBuilderService
         array $conditions = [],
         array $orderBy = [],
         ?int $limit = null,
-        ?int $offset = null,
-        array $allowedColumns = []
+        ?int $offset = null
     ): array {
         try {
             $qb = $this->connection->createQueryBuilder();
-            $qb->select(...$this->prepareSelectColumns($columns, $allowedColumns))->from($mainTable, 'm');
+            $qb->select(...$this->prepareColumns($columns))
+                ->from($this->quoteTable($mainTable), 'm');
 
+            // Build the JOINs. The ON condition is trusted (hardcoded by dev),
+            // but table/alias are validated.
             foreach ($joins as $alias => [$type, $condition]) {
-                [$table, $joinAlias] = explode(' ', $alias);
-                $type = strtoupper($type);
-                $method = $type === 'INNER' ? 'innerJoin' : 'leftJoin';
+                [$table, $joinAlias] = explode(' ', trim($alias));
+                $this->quoteTable($table);   // validate table name
+                if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $joinAlias)) {
+                    throw new InvalidArgumentException("Invalid join alias: '{$joinAlias}'");
+                }
+                $method = strtoupper($type) === 'INNER' ? 'innerJoin' : 'leftJoin';
                 $qb->$method('m', $table, $joinAlias, $condition);
             }
 
-            $this->applyConditions($qb, $conditions, $allowedColumns);
-            $this->applyOrderBy($qb, $orderBy, $allowedColumns);
+            $this->applyConditions($qb, $conditions);
+            $this->applyOrderBy($qb, $orderBy);
 
             if ($limit !== null) {
                 $qb->setMaxResults($limit);
@@ -113,82 +295,82 @@ class QueryBuilderService
 
             return $qb->executeQuery()->fetchAllAssociative();
         } catch (DBALException $e) {
-            throw new Exception("Erro no SELECT com JOIN: " . $e->getMessage(), 0, $e);
+            throw new Exception("SELECT with JOIN error: " . $e->getMessage(), 0, $e);
         }
     }
 
     /**
      * INSERT
      */
-    public function insert(string $table, array $data, array $allowedColumns = []): int
+    public function insert(string $table, array $data): int
     {
         try {
             $qb = $this->connection->createQueryBuilder();
-            $qb->insert($table);
+            $qb->insert($this->quoteTable($table));
 
             foreach ($data as $col => $val) {
-                $col = $this->assertValidColumn($col, $allowedColumns);
-                $qb->setValue($this->quote($col), ':' . $this->paramName($col))
-                    ->setParameter($this->paramName($col), $val);
+                $safeCol = $this->quoteIdentifier($col);
+                $param = $this->paramName($col);
+                $qb->setValue($safeCol, ':' . $param)->setParameter($param, $val);
             }
 
             $qb->executeStatement();
             return (int) $this->connection->lastInsertId();
         } catch (DBALException $e) {
-            throw new Exception("Error at INSERT: " . $e->getMessage(), 0, $e);
+            throw new Exception("INSERT error: " . $e->getMessage(), 0, $e);
         }
     }
 
     /**
      * UPDATE
      */
-    public function update(string $table, array $data, array $conditions, array $allowedColumns = []): int
+    public function update(string $table, array $data, array $conditions): int
     {
         try {
             if (empty($conditions)) {
-                throw new Exception("UPDATE sem WHERE não permitido.");
+                throw new Exception("UPDATE without WHERE is not allowed.");
             }
 
             $qb = $this->connection->createQueryBuilder();
-            $qb->update($table);
+            $qb->update($this->quoteTable($table));
 
             foreach ($data as $col => $val) {
-                $col = $this->assertValidColumn($col, $allowedColumns);
-                $qb->set($this->quote($col), ':set_' . $this->paramName($col))
-                    ->setParameter('set_' . $this->paramName($col), $val);
+                $safeCol = $this->quoteIdentifier($col);
+                $param = $this->paramName($col, 'set_');
+                $qb->set($safeCol, ':' . $param)->setParameter($param, $val);
             }
 
-            $this->applyConditions($qb, $conditions, $allowedColumns, 'where_');
+            $this->applyConditions($qb, $conditions, 'where_');
 
             return $qb->executeStatement();
         } catch (DBALException $e) {
-            throw new Exception("Erro no UPDATE: " . $e->getMessage(), 0, $e);
+            throw new Exception("UPDATE error: " . $e->getMessage(), 0, $e);
         }
     }
 
     /**
      * DELETE
      */
-    public function delete(string $table, array $conditions, array $allowedColumns = []): bool
+    public function delete(string $table, array $conditions): bool
     {
         try {
             if (empty($conditions)) {
-                throw new Exception("DELETE sem WHERE não permitido.");
+                throw new Exception("DELETE without WHERE is not allowed.");
             }
 
             $qb = $this->connection->createQueryBuilder();
-            $qb->delete($table);
+            $qb->delete($this->quoteTable($table));
 
-            $this->applyConditions($qb, $conditions, $allowedColumns);
+            $this->applyConditions($qb, $conditions);
 
             return (bool) $qb->executeStatement();
         } catch (DBALException $e) {
-            throw new Exception("Erro no DELETE: " . $e->getMessage(), 0, $e);
+            throw new Exception("DELETE error: " . $e->getMessage(), 0, $e);
         }
     }
 
     /**
-     * Query customizada
+     * Custom query (developer is fully responsible for the SQL string).
      */
     public function query(string $sql, array $params = []): array
     {
@@ -199,155 +381,38 @@ class QueryBuilderService
             }
             return $stmt->executeQuery()->fetchAllAssociative();
         } catch (DBALException $e) {
-            throw new Exception("Erro na query customizada: " . $e->getMessage(), 0, $e);
+            throw new Exception("Custom query error: " . $e->getMessage(), 0, $e);
         }
     }
 
+    /**
+     * Transactions
+     */
     public function beginTransaction(): void
     {
         $this->connection->beginTransaction();
     }
+
     public function commit(): void
     {
         $this->connection->commit();
     }
+
     public function rollback(): void
     {
         $this->connection->rollBack();
     }
+
+    /**
+     * Helpers
+     */
     public function createQueryBuilder(): QueryBuilder
     {
         return $this->connection->createQueryBuilder();
     }
+
     public function getConnection(): DBALConn
     {
         return $this->connection;
-    }
-
-    // -----------------------------------------------------------------
-    // Helpers de segurança (allowlist + parsing seguro de identificadores)
-    // -----------------------------------------------------------------
-
-    /**
-     * Aplica as condições WHERE de forma segura: separa coluna/operador,
-     * valida o nome da coluna contra o allowlist (se informado) e
-     * quota o identificador antes de montar o SQL.
-     */
-    private function applyConditions(QueryBuilder $qb, array $conditions, array $allowedColumns, string $paramPrefix = ''): void
-    {
-        foreach ($conditions as $rawColumn => $value) {
-
-            if ($value === 'IS NULL') {
-                [$column] = $this->parseColumn($rawColumn, $allowedColumns);
-                $qb->andWhere($this->quote($column) . ' IS NULL');
-                continue;
-            }
-
-            if ($value === 'NOT NULL') {
-                [$column] = $this->parseColumn($rawColumn, $allowedColumns);
-                $qb->andWhere($this->quote($column) . ' IS NOT NULL');
-                continue;
-            }
-
-            [$column, $operator] = $this->parseColumn($rawColumn, $allowedColumns);
-            $param = $paramPrefix . $this->paramName($column) . '_' . substr(md5($rawColumn), 0, 6);
-
-            if (is_array($value) && in_array($operator, ['IN', 'NOT IN'], true)) {
-                $qb->andWhere($this->quote($column) . ' ' . $operator . ' (:' . $param . ')')
-                    ->setParameter($param, $value, ArrayParameterType::STRING);
-                continue;
-            }
-
-            $qb->andWhere($this->quote($column) . ' ' . $operator . ' :' . $param)
-                ->setParameter($param, $value);
-        }
-    }
-
-    /**
-     * Aplica ORDER BY validando coluna e restringindo direção a ASC/DESC.
-     */
-    private function applyOrderBy(QueryBuilder $qb, array $orderBy, array $allowedColumns): void
-    {
-        foreach ($orderBy as $column => $direction) {
-            $column = $this->assertValidColumn($column, $allowedColumns);
-            $direction = strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC';
-            $qb->addOrderBy($this->quote($column), $direction);
-        }
-    }
-
-
-    /**
-     * Valida colunas do SELECT. Aceita:
-     *  - '*'                          (todas as colunas)
-     *  - identificador simples         (validado e quotado)
-     *  - expressão de agregação        (ex.: "COUNT(*) AS total", passada como está)
-     */
-    private function prepareSelectColumns(array $columns, array $allowedColumns): array
-    {
-        return array_map(function ($column) use ($allowedColumns) {
-
-            if ($column === '*') {
-                return $column;
-            }
-
-            if (preg_match(self::AGGREGATE_PATTERN, trim($column), $matches)) {
-                // Se um allowlist foi passado, ainda valida a coluna interna (ex.: o "valor" de SUM(valor))
-                if (!empty($allowedColumns) && $matches[2] !== '*') {
-                    $this->assertValidColumn($matches[2], $allowedColumns);
-                }
-                return trim($column); // expressão já validada pelo formato, não precisa (e não deve) ser quotada
-            }
-
-            return $this->quote($this->assertValidColumn($column, $allowedColumns));
-        }, $columns);
-    }
-
-
-    /**
-     * Separa "coluna" de "coluna OPERADOR" (ex.: "idade >=" -> ['idade', '>=']).
-     * Assume '=' quando nenhum operador é informado.
-     */
-    private function parseColumn(string $rawColumn, array $allowedColumns): array
-    {
-        $operatorPattern = implode('|', array_map(fn($op) => preg_quote($op, '/'), self::ALLOWED_OPERATORS));
-
-        if (preg_match('/^(.+?)\s+(' . $operatorPattern . ')$/i', trim($rawColumn), $matches)) {
-            $column = $this->assertValidColumn(trim($matches[1]), $allowedColumns);
-            $operator = strtoupper($matches[2]);
-            return [$column, $operator];
-        }
-
-        return [$this->assertValidColumn(trim($rawColumn), $allowedColumns), '='];
-    }
-
-    /**
-     * Garante que o nome da coluna tem formato de identificador válido e,
-     * se um allowlist foi passado, que a coluna está nele.
-     */
-    private function assertValidColumn(string $column, array $allowedColumns = []): string
-    {
-        if (!preg_match(self::IDENTIFIER_PATTERN, $column)) {
-            throw new InvalidArgumentException("Nome de coluna inválido: '{$column}'");
-        }
-
-        if (!empty($allowedColumns) && !in_array($column, $allowedColumns, true)) {
-            throw new InvalidArgumentException("Coluna '{$column}' não permitida nesta consulta.");
-        }
-
-        return $column;
-    }
-
-
-    /**
-     * Quota o identificador (lida com "alias.coluna" automaticamente).
-     */
-    private function quote(string $column): string
-    {
-        return $this->connection->quoteIdentifier($column);
-    }
-
-    private function paramName(string $column): string
-    {
-        return preg_replace('/\W/', '_', $column);
     }
 }

@@ -33,7 +33,7 @@ class User extends Model implements UserRepositoryInterface
                 "m.firstname",
                 "m.lastname",
                 "m.email",
-                "r.name AS role",
+                $this->queryBuilder->raw("r.name AS role"),
                 "m.created_at"
             ],
             ['m.id' => $id]
@@ -77,9 +77,9 @@ class User extends Model implements UserRepositoryInterface
             ],
             [
                 "m.id",
-                "CONCAT(m.firstname, ' ', m.lastname) AS name",
+                $this->queryBuilder->raw("CONCAT(m.firstname, ' ', m.lastname) AS name"),
                 "m.email",
-                "r.name AS role"
+                $this->queryBuilder->raw("r.name AS role")
             ],
             ['m.is_active' => 1],
             ['m.id' => 'ASC'],
@@ -173,7 +173,7 @@ class User extends Model implements UserRepositoryInterface
         $result = $this->queryBuilder->select(
             $this->table,
             [
-                'COUNT(*) AS total'
+                $this->queryBuilder->raw('COUNT(*) AS total')
             ],
             ['is_active' => 1]
         );

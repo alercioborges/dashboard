@@ -116,9 +116,9 @@ class AuthService implements AuthServiceInterface
         return true;
     }
 
-    private function createSessionUser(int $id, string $firstname, string $lastname, int $roleId): array
+    private function createSessionUser(int $id, string $firstname, string $lastname, int $roleId): void
     {
-        $userSession = $_SESSION['user'] = [
+        $_SESSION['user'] = [
             'id'        => $id,
             'firstname' => $firstname,
             'lastname'  => $lastname,
@@ -127,8 +127,6 @@ class AuthService implements AuthServiceInterface
         ];
 
         session_regenerate_id(true);
-
-        return $userSession;
     }
 
     /**

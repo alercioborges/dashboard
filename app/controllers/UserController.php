@@ -81,6 +81,8 @@ class UserController extends Controller
             );
             
         } catch (\Exception $e) {
+            
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
 
             return $this->twig->render(
                 $response,
@@ -120,7 +122,10 @@ class UserController extends Controller
             return redirect('/admin/users');
 
         } catch (\Exception $e) {
-                                    
+
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+
+
             $this->logger->error('Error while trying to save new user: ' . $e->getMessage() ."-". $e->getFile() ."-". $e->getLine());
 
             return $this->twig->render(
@@ -149,6 +154,8 @@ class UserController extends Controller
                 ]
             );
         } catch (\Exception $e) {
+
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
 
             return $this->twig->render(
                 $response,
@@ -179,6 +186,9 @@ class UserController extends Controller
                 ]
             );
         } catch (\Exception $e) {
+
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+
 
             return $this->twig->render(
                 $response,
@@ -217,6 +227,8 @@ class UserController extends Controller
             return redirect('/admin/users');
         } catch (\Exception $e) {
 
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+
             return $this->twig->render(
                 $response,
                 'pages/user-edit.twig',
@@ -245,6 +257,8 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
 
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+
             return $this->twig->render(
                 $response,
                 'pages/users-delete.twig',
@@ -267,6 +281,9 @@ class UserController extends Controller
             return redirect('/admin/users');
 
         } catch (\Exception $e) {
+
+                        dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+
 
             return $this->twig->render(
                 $response,

@@ -138,7 +138,7 @@ class Role extends Model implements RoleRepositoryInterface
         $result = $this->queryBuilder->select(
             $this->table,
             [
-                'COUNT(*) AS total'
+                $this->queryBuilder->raw('COUNT(*) AS total')
             ]
         );
 

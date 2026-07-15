@@ -48,7 +48,7 @@ return [
     fn(ContainerInterface $c) => new UserService(
         $c->get(UserRepositoryInterface::class),
         $c->get(PaginationService::class)
-    ),    
+    ),
 
     RoleService::class =>
     fn(ContainerInterface $c) => new RoleService(
@@ -56,7 +56,7 @@ return [
         $c->get(PaginationService::class)
     ),
 
-    TokenService::class => function(): TokenService {
+    TokenService::class => function (): TokenService {
         return new TokenService();
     },
 

@@ -47,7 +47,7 @@ class RememberToken
     public function delete(string $hash): void
     {
         $stmt = $this->pdo->prepare("
-            DELETE FROM user_remember_tokens WHERE token_hash = :hash
+            DELETE FROM tbl_user_remember_tokens WHERE token_hash = :hash
         ");
         $stmt->execute(['hash' => $hash]);
     }

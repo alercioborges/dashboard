@@ -93,14 +93,38 @@ return [
         return new PHPMailer(true);
     },
 
-    MailerService::class => function (ContainerInterface $c): MailerService {
+    // -------------------------------------------------------
+    // TWIG DEDICADO A E-MAILS
+    // -------------------------------------------------------
+    // Aponta para a MESMA pasta de templates usada pela view web
+    // (templates/emails/*.twig continua no mesmo lugar, nada muda
+    // no send() do MailerService nem nos arquivos .twig existentes),
+    // mas sem a ExtensionTwig — e-mails não usam CSRF, rotas nomeadas
+    // ou o menu do dashboard, então não há motivo pra essa instância
+    // depender do Guard/sessão.
+    'mailer_twig' => function (ContainerInterface $c): Twig {
+        $appConfig = $c->get('appConfig');
 
+        $twig = Twig::create(__DIR__ . '/../../../templates/', [
+            'cache'       => false,            
+            'debug'       => $appConfig['debug'],
+            'auto_reload' => $appConfig['debug'],
+        ]);
+
+        // Só o que pode ser útil em e-mails (ex.: link de logo, "ver no navegador").
+        // Nada de menu_items, session, cookies ou a extensão de CSRF/rotas aqui.
+        $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
+
+        return $twig;
+    },
+
+    MailerService::class => function (ContainerInterface $c): MailerService {
         $appConfig = $c->get('appConfig');
 
         return new MailerService(
             $c->get('smtpConfig'),
             $c->get(LoggerInterface::class),
-            $c->get(Twig::class),
+            $c->get('mailer_twig'),
             $c->get(PHPMailer::class),
             $appConfig['env'] === 'development'
         );

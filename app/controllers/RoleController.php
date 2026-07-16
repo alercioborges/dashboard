@@ -31,7 +31,7 @@ class RoleController extends Controller
         try {
 
             $pagination = $this->roleService->getPaginatedRole($page, $perPage);
-            
+
             return $this->twig->render(
                 $response,
                 'pages/roles-user.twig',
@@ -43,7 +43,7 @@ class RoleController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-            
+
             return $this->twig->render(
                 $response,
                 'pages/roles-user.twig',
@@ -124,7 +124,7 @@ class RoleController extends Controller
 
             return $this->twig->render(
                 $response,
-                'pages/roles-create.twig',
+                'pages/roles-user-edit.twig',
                 [
                     'TITLE'     => 'Editar perfil de usuário',
                     'ROLE_DATA' => $roleData,
@@ -152,6 +152,8 @@ class RoleController extends Controller
                 'name'        => 'required:max@30:min@2:onlyLetter:uppercase',
                 'description' => 'required:max@255:min@6'
             ]);
+
+            dd($_POST);
 
             if ($this->roleService->nameExists($data['name'], (int) $arg['id'])) {
                 $this->validator->setError('name', 'Esse nome já existe');

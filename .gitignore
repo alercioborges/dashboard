@@ -6,3 +6,8 @@
 
 # OpenCode config file
 opencode.json
+
+# Cache files
+storage/cache/*
+storage/localcache/*
+storage/log/*

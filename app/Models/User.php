@@ -33,7 +33,7 @@ class User extends Model implements UserRepositoryInterface
                 "m.firstname",
                 "m.lastname",
                 "m.email",
-                $this->queryBuilder->raw("r.name AS role"),
+                "r.name AS role",
                 "m.created_at"
             ],
             ['m.id' => $id]
@@ -79,7 +79,7 @@ class User extends Model implements UserRepositoryInterface
                 "m.id",
                 $this->queryBuilder->raw("CONCAT(m.firstname, ' ', m.lastname) AS name"),
                 "m.email",
-                $this->queryBuilder->raw("r.name AS role")
+                "r.name AS role"
             ],
             ['m.is_active' => 1],
             ['m.id' => 'ASC'],

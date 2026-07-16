@@ -85,6 +85,35 @@ class QueryBuilderService
     }
 
     /**
+     * Identifier that optionally has a simple "AS alias".
+     * Accepts "m.id", "r.name AS role". The base and the alias are both
+     * validated as strict identifiers and quoted independently.
+     * Rejects functions, subqueries or anything outside the identifier grammar.
+     */
+    private function quoteSelectIdentifier(RawExpression|string $column): string
+    {
+        if ($column instanceof RawExpression) {
+            return (string) $column; // trusted
+        }
+
+        $column = trim($column);
+
+        if ($column === '*') {
+            return '*';
+        }
+
+        // Split on a single, case-insensitive " AS " (surrounded by spaces).
+        if (preg_match('/^(.+?)\s+AS\s+([a-zA-Z_][a-zA-Z0-9_]*)$/i', $column, $m)) {
+            $base  = $this->quoteIdentifier($m[1]); // validates "r.name"
+            $alias = $this->connection->quoteIdentifier($m[2]);
+            return $base . ' AS ' . $alias;
+        }
+
+        // No alias: fall back to the strict identifier rule.
+        return $this->quoteIdentifier($column);
+    }
+
+    /**
      * Finds the first stack frame outside this file/class,
      * i.e. the code that actually passed the invalid identifier.
      */
@@ -195,15 +224,10 @@ class QueryBuilderService
      */
     private function prepareColumns(array $columns): array
     {
-        return array_map(function ($column) {
-            if ($column instanceof RawExpression) {
-                return (string) $column;
-            }
-            if ($column === '*') {
-                return '*';
-            }
-            return $this->quoteIdentifier($column);
-        }, $columns);
+        return array_map(
+            fn($column) => $this->quoteSelectIdentifier($column),
+            $columns
+        );
     }
 
     /**

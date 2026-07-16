@@ -2,9 +2,9 @@
 
 use App\Services\ForgotPasswordService;
 
-$container = require __DIR__ . '/../config/container.php';
+$container = require __DIR__ . '/bootstrap.php';
 
 $forgotPasswordService = $container->get(ForgotPasswordService::class);
 $forgotPasswordService->deleteToken();
 
-echo "Tokens expirados removidos com sucesso\n";
+echo "Expired tokens successfully removed\n";

@@ -2,9 +2,9 @@
 
 use App\Services\RememberMeService;
 
-$container = require __DIR__ . '/../config/container.php';
+$container = require __DIR__ . '/bootstrap.php';
 
 $rememberMeService = $container->get(RememberMeService::class);
 $rememberMeService->deleteRememberMe();
 
-echo "Tokens expirados removidos com sucesso.\n";
+echo "Expired tokens successfully removed.\n";

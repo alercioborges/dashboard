@@ -153,8 +153,6 @@ class RoleController extends Controller
                 'description' => 'required:max@255:min@6'
             ]);
 
-            dd($_POST);
-
             if ($this->roleService->nameExists($data['name'], (int) $arg['id'])) {
                 $this->validator->setError('name', 'Esse nome já existe');
             }

@@ -4,7 +4,16 @@
     {{ message('message')|raw }}
 
     {% if USERS is not empty %}
-        <div class="card-body table-responsive p-0">
+
+        <form action="{{ route_redirect('users.show') }}" method="GET">
+            <input type="text" name="search[nome]" placeholder="Nome do usuário">
+            <input type="text" name="search[email]" placeholder="E-mail do usuário">
+            <button type="submit">Filtrar</button>
+        </form>
+            
+        </form>
+
+        <div class="card-body table-responsive p-0">            
             <table class="table table-striped table-hover">
                 <thead>
                     <tr>

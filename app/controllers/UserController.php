@@ -33,10 +33,15 @@ class UserController extends Controller
     {
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
         $perPage = 10;
+        $search = (array) ($request->getQueryParams()['search'] ?? NULL);
+
+        if(!empty($search)) {
+            \dd($search);
+        }
 
         try {
 
-            $pagination = $this->userService->getPaginatedUsers($page, $perPage);
+            $pagination = $this->userService->getPaginatedUsers($page, $perPage, );
 
             return $this->twig->render(
                 $response,
@@ -45,7 +50,8 @@ class UserController extends Controller
                     'TITLE'        => 'Lista de usuários',
                     'USERS'        => $pagination['data'],
                     'NUM_PAGES'    => $pagination['numPages'],
-                    'CURRENT_PAGE' => $pagination['currentPage']
+                    'CURRENT_PAGE' => $pagination['currentPage'],
+                    //'SEARCH'       => $search     
                 ]
             );
         } catch (\Exception $e) {

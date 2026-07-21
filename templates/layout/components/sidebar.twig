@@ -35,21 +35,21 @@
 
     .nav-link.active {
         background-color: rgba(255, 255, 255, 0.1) !important;
-        color: #ffffff !important !important;
+        color: #ffffff !important;
         font-weight: 500 !important;
     }
 
     .app-sidebar[data-bs-theme="dark"] .nav-link.active {
-        background-color: rgba(255, 255, 255, 0.1) !important !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
         color: #ffffff !important;
     }
 
     .nav-item.menu-open > .nav-link {
-        background-color: rgba(255, 255, 255, 0.05) !important !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
     }
 
     .nav-treeview .nav-link.active {
-        background-color: rgba(255, 255, 255, 0.15) !important !important;
+        background-color: rgba(255, 255, 255, 0.15) !important;
         padding-left: 2rem !important;
     }
 
@@ -79,7 +79,7 @@
 			<ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="false">
 
 
-				{% for item in menu_itens %}
+				{% for item in menu_items %}
 					{{ macros.render_menu_item(item) }}
 				{% endfor %}
 

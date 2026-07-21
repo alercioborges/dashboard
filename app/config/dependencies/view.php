@@ -24,7 +24,7 @@ return [
             'auto_reload' => $appConfig['debug']
         ]);
 
-        $menu_items = loader('/templates/layout/components/config/menu-itens.php');
+        $menu_items = loader('/templates/layout/components/config/menu-items.php');
 
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);

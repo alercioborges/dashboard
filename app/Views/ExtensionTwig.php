@@ -96,11 +96,12 @@ class ExtensionTwig extends AbstractExtension
         return $twig;
     }
 
-    public function pagination(int $numPages, int $currentPage): string
+    public function pagination(int $numPages, int $currentPage, array $searchParams = []): string
     {
         return $this->loadTwig()->render('pagination.twig', [
-            'numPages'    => $numPages,
-            'currentPage' => $currentPage
+            'numPages'     => $numPages,
+            'currentPage'  => $currentPage,
+            'searchParams' => $searchParams,
         ]);
     }
 

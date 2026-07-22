@@ -33,30 +33,28 @@ class UserController extends Controller
     {
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
         $perPage = 10;
-        $search = (array) ($request->getQueryParams()['search'] ?? NULL);
-
-        if(!empty($search)) {
-            \dd($search);
-        }
+        $search = (array) ($request->getQueryParams()['search'] ?? []);
 
         try {
 
-            $pagination = $this->userService->getPaginatedUsers($page, $perPage, );
+            $pagination = $this->userService->getPaginatedUsers($page, $perPage, $search);
 
             return $this->twig->render(
                 $response,
                 'pages/users.twig',
                 [
-                    'TITLE'        => 'Lista de usuários',
-                    'USERS'        => $pagination['data'],
-                    'NUM_PAGES'    => $pagination['numPages'],
-                    'CURRENT_PAGE' => $pagination['currentPage'],
-                    //'SEARCH'       => $search     
+                    'TITLE'         => 'Lista de usuários',
+                    'USERS'         => $pagination['data'],
+                    'NUM_PAGES'     => $pagination['numPages'],
+                    'CURRENT_PAGE'  => $pagination['currentPage'],
+                    'SEARCH_PARAMS' => $this->getSearchUrlParams($search),
+                    'SEARCH_VALUES' => $this->buildSearchValues($search)
                 ]
             );
+            
         } catch (\Exception $e) {
 
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
 
             return $this->twig->render(
                 $response,
@@ -85,10 +83,9 @@ class UserController extends Controller
                     'ROLES'     => $userRoles
                 ]
             );
-            
         } catch (\Exception $e) {
-            
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
 
             return $this->twig->render(
                 $response,
@@ -108,7 +105,7 @@ class UserController extends Controller
             $data = $this->validator->validate([
                 'firstname' => 'required:max@30:min@2:onlyLetter:uppercase',
                 'lastname'  => 'required:max@30:min@2:onlyLetter:uppercase',
-                'email'     => 'required:email:max@60',                
+                'email'     => 'required:email:max@60',
                 'password'  => 'required:max@30:min@6'
             ]);
 
@@ -126,13 +123,12 @@ class UserController extends Controller
             flash('message', success('Usuário criado com sucesso'));
 
             return redirect('/admin/users');
-
         } catch (\Exception $e) {
 
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
 
 
-            $this->logger->error('Error while trying to save new user: ' . $e->getMessage() ."-". $e->getFile() ."-". $e->getLine());
+            $this->logger->error('Error while trying to save new user: ' . $e->getMessage() . "-" . $e->getFile() . "-" . $e->getLine());
 
             return $this->twig->render(
                 $response,
@@ -161,7 +157,7 @@ class UserController extends Controller
             );
         } catch (\Exception $e) {
 
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
 
             return $this->twig->render(
                 $response,
@@ -193,7 +189,7 @@ class UserController extends Controller
             );
         } catch (\Exception $e) {
 
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
 
 
             return $this->twig->render(
@@ -233,7 +229,7 @@ class UserController extends Controller
             return redirect('/admin/users');
         } catch (\Exception $e) {
 
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
 
             return $this->twig->render(
                 $response,
@@ -260,10 +256,9 @@ class UserController extends Controller
                     'USER_DATA' => $userData
                 ]
             );
-
         } catch (\Exception $e) {
 
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
 
             return $this->twig->render(
                 $response,
@@ -285,10 +280,9 @@ class UserController extends Controller
             flash('message', success('Usuário excluído com sucesso'));
 
             return redirect('/admin/users');
-
         } catch (\Exception $e) {
 
-                        dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage() );
+            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
 
 
             return $this->twig->render(

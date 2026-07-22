@@ -79,12 +79,12 @@ class UserService
         return $this->userRepository->countAll();
     }
 
-    public function getPaginatedUsers(int $page, int $limit): array
+    public function getPaginatedUsers(int $page, int $limit, array $search = []): array
     {
-        $total = $this->countUsers();
-        
+        $total = $this->userRepository->countFiltered($search);
+
         $pagination = $this->pagination->paginate($page, $limit, $total);
-        $data =  $this->userRepository->getAll($limit, $pagination['offset']);
+        $data =  $this->userRepository->getAll($limit, $pagination['offset'], $search);
 
         return [
             'data'        => $data,

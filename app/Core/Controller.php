@@ -30,9 +30,26 @@ abstract class Controller
 
         if (empty($_SESSION['old_input']) && isset($_SESSION['old_input'])) {
             unset($_SESSION['old_input']);
-            return null;
+            return NULL;
         }
 
         return $_SESSION['old_input'];
+    }
+
+    protected function getSearchUrlParams(array $searchData)
+    {
+        $filtered = array_filter($searchData, fn($v) => $v !== '');
+        return $filtered ? ['search' => $filtered] : [];
+    }
+    
+
+    protected function buildSearchValues(array $search): array
+    {
+        $values = [];
+        foreach ($search as $key => $value) {
+            $values[$key] = $value ?? '';
+        }
+
+        return $values;
     }
 }

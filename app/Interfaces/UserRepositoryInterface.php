@@ -23,7 +23,7 @@ interface UserRepositoryInterface
     /**
      * Get all active users with pagination
      */
-    public function getAll(int $limit = 10, int $offset = 0): array;
+    public function getAll(int $limit = 10, int $offset = 0, array $search = []): array;
 
     /**
      * Create new user
@@ -51,6 +51,11 @@ interface UserRepositoryInterface
      * Get number of active users
      */
     public function countAll(): int;
+
+    /**
+     * Get number of active users matching search filter
+     */
+    public function countFiltered(array $search = []): int;
 
     public function storePasswordReset(
         int $userId,

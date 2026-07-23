@@ -33,7 +33,7 @@ class UserController extends Controller
     {
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
         $perPage = 10;
-        $search = (array) ($request->getQueryParams()['search'] ?? []);
+        $search = (array) $this->buildSearchValues(($request->getQueryParams()['search'] ?? []));
 
         try {
 
@@ -48,7 +48,7 @@ class UserController extends Controller
                     'NUM_PAGES'     => $pagination['numPages'],
                     'CURRENT_PAGE'  => $pagination['currentPage'],
                     'SEARCH_PARAMS' => $this->getSearchUrlParams($search),
-                    'SEARCH_VALUES' => $this->buildSearchValues($search)
+                    'SEARCH_VALUES' => $search
                 ]
             );
             

@@ -38,16 +38,15 @@ abstract class Controller
 
     protected function getSearchUrlParams(array $searchData)
     {
-        $filtered = array_filter($searchData, fn($v) => $v !== '');
+        $filtered = array_filter($searchData, fn($v) => is_string($v) && trim($v) !== '');
         return $filtered ? ['search' => $filtered] : [];
     }
-    
 
     protected function buildSearchValues(array $search): array
     {
         $values = [];
         foreach ($search as $key => $value) {
-            $values[$key] = $value ?? '';
+            $values[$key] = trim($value) ?? '';
         }
 
         return $values;

@@ -46,6 +46,19 @@ class QueryBuilderService
         return new RawExpression($expression);
     }
 
+    /**
+     * Creates a trusted raw condition fragment paired with a bound value.
+     *
+     */
+    public function rawCondition(string $fragment, mixed $value): array
+    {
+        return [
+            '__raw'    => true,
+            'fragment' => trim($fragment),
+            'value'    => $value,
+        ];
+    }
+
     // -----------------------------------------------------------------
     // Security helpers
     // -----------------------------------------------------------------
@@ -189,6 +202,14 @@ class QueryBuilderService
     private function applyConditions(QueryBuilder $qb, array $conditions, string $paramPrefix = ''): void
     {
         foreach ($conditions as $rawKey => $value) {
+
+            // 0. rawCondition(): trusted fragment + bound value.
+            if (is_array($value) && ($value['__raw'] ?? false) === true) {
+                $param = $this->paramName($rawKey, $paramPrefix . 'raw_');
+                $qb->andWhere($value['fragment'] . ' :' . $param)
+                    ->setParameter($param, $value['value']);
+                continue;
+            }
 
             // NULL handling via sentinel string values.
             if (is_string($value) && strtoupper($value) === 'IS NULL') {

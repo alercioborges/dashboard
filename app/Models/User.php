@@ -65,63 +65,46 @@ class User extends Model implements UserRepositoryInterface
     }
 
 
-    /**
-     * Build base SELECT query and params for filtered user search.
-     */
-    private function getUserQuery(array $search): array
+    private function buildConditions(array $search): array
     {
-        $sql = "SELECT m.id, CONCAT(m.firstname, ' ', m.lastname) AS name, m.email, r.name AS role
-                FROM tbl_users m
-                INNER JOIN tbl_roles r ON r.id = m.role_id
-                WHERE m.is_active = 1";
-        $params = [];
+        $conditions = ['m.is_active' => 1];
 
-        $name = trim($search['name'] ?? '');
-        if ($name !== '') {
-            $sql .= " AND CONCAT(m.firstname, ' ', m.lastname) LIKE :search_name";
-            $params[':search_name'] = '%' . $name . '%';
+        if ($search['name'] !== '') {
+            $conditions['name_search'] = $this->queryBuilder->rawCondition(
+                "CONCAT(m.firstname, ' ', m.lastname) LIKE",
+                '%' . $search['name'] . '%'
+            );
         }
 
-        $email = trim($search['email'] ?? '');
-        if ($email !== '') {
-            $sql .= " AND m.email LIKE :search_email";
-            $params[':search_email'] = '%' . $email . '%';
+        if ($search['email'] !== '') {
+            $conditions['m.email LIKE'] = '%' . $search['email'] . '%';
         }
-
-        $sql .= " ORDER BY m.id ASC";
-
-        return [$sql, $params];
+        dd($conditions);
+        return $conditions;
     }
+
 
     /**
      * Get all active users with pagination
      */
     public function getAll(int $limit = 10, int $offset = 0, array $search = []): array
     {
-        $name = trim($search['name'] ?? '');
-        $email = trim($search['email'] ?? '');
-
-        if ($name === '' && $email === '') {
-            return $this->queryBuilder->selectWithJoin(
-                $this->table,
-                ['tbl_roles r' => ['INNER', 'r.id = m.role_id']],
-                [
-                    "m.id",
-                    $this->queryBuilder->raw("CONCAT(m.firstname, ' ', m.lastname) AS name"),
-                    "m.email",
-                    "r.name AS role"
-                ],
-                ['m.is_active' => 1],
-                ['m.id' => 'ASC'],
-                $limit,
-                $offset
-            );
-        }
-
-        [$sql, $params] = $this->getUserQuery($search);
-        $sql .= sprintf(" LIMIT %d OFFSET %d", $limit, $offset);
-
-        return $this->queryBuilder->query($sql, $params);
+        return $this->queryBuilder->selectWithJoin(
+            $this->table,
+            ['tbl_roles r' => ['INNER', 'r.id = m.role_id']],
+            [
+                "m.id",
+                $this->queryBuilder->raw("CONCAT(m.firstname, ' ', m.lastname) AS name"),
+                "m.email",
+                "r.name AS role"
+            ],
+            [
+                //$this->buildConditions($search)
+            ],
+            ['m.id' => 'ASC'],
+            $limit,
+            $offset
+        );
     }
 
     /**
@@ -161,7 +144,7 @@ class User extends Model implements UserRepositoryInterface
     }
 
 
-    public function changeRole(int $userId, int $roleId):bool
+    public function changeRole(int $userId, int $roleId): bool
     {
         $result = $this->queryBuilder->update(
             $this->table,
@@ -222,18 +205,21 @@ class User extends Model implements UserRepositoryInterface
      */
     public function countFiltered(array $search = []): int
     {
-        $name = trim($search['name'] ?? '');
+        $name  = trim($search['name'] ?? '');
         $email = trim($search['email'] ?? '');
 
         if ($name === '' && $email === '') {
             return $this->countAll();
         }
 
-        [$sql, $params] = $this->getUserQuery($search);
-        $sql = "SELECT COUNT(*) AS total FROM ($sql) AS filtered";
+        $result = $this->queryBuilder->selectWithJoin(
+            $this->table,
+            ['tbl_roles r' => ['INNER', 'r.id = m.role_id']],
+            [$this->queryBuilder->raw('COUNT(*) AS total')],
+            $this->buildConditions($search)
+        );
 
-        $result = $this->queryBuilder->query($sql, $params);
-        return (int) $result[0]['total'];
+        return (int) ($result[0]['total'] ?? 0);
     }
 
 
@@ -273,7 +259,7 @@ class User extends Model implements UserRepositoryInterface
 
         return NULL;
     }
-    
+
 
     public function updatePassword(int $forgotId, int $userId, string $password): bool
     {
@@ -291,8 +277,8 @@ class User extends Model implements UserRepositoryInterface
 
         return $result > 0;
     }
-    
-    
+
+
     public function deleteExpiredToken(): bool
     {
         return $this->queryBuilder->delete(

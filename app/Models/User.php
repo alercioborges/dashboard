@@ -69,17 +69,26 @@ class User extends Model implements UserRepositoryInterface
     {
         $conditions = ['m.is_active' => 1];
 
-        if ($search['name'] !== '') {
-            $conditions['name_search'] = $this->queryBuilder->rawCondition(
-                "CONCAT(m.firstname, ' ', m.lastname) LIKE",
-                '%' . $search['name'] . '%'
-            );
+        if (!empty($search)) {
+
+            $filterField = [];
+
+            foreach ($search as $key => $value) {
+                $filterField[$key] = trim($value ?? '');
+            }
+
+            if ($filterField['name'] !== '') {
+                $conditions['name_search'] = $this->queryBuilder->rawCondition(
+                    "CONCAT(m.firstname, ' ', m.lastname) LIKE",
+                    '%' . $filterField['name'] . '%'
+                );
+            }
+
+            if ($filterField['email'] !== '') {
+                $conditions['m.email LIKE'] = '%' . $filterField['email'] . '%';
+            }
         }
 
-        if ($search['email'] !== '') {
-            $conditions['m.email LIKE'] = '%' . $search['email'] . '%';
-        }
-        dd($conditions);
         return $conditions;
     }
 
@@ -98,9 +107,7 @@ class User extends Model implements UserRepositoryInterface
                 "m.email",
                 "r.name AS role"
             ],
-            [
-                //$this->buildConditions($search)
-            ],
+            $this->buildConditions($search),
             ['m.id' => 'ASC'],
             $limit,
             $offset

@@ -10,10 +10,10 @@ return [
     ],
 
     'migrations_paths' => [
-        'App\Migrations' => __DIR__ . '/app/Migrations',
+        'App\Migrations' => __DIR__ . '/../Migrations',
     ],
 
-    'all_or_nothing' => true,
+    'all_or_nothing' => false,
     'transactional' => true,
     'check_database_platform' => true,
 ];

@@ -22,7 +22,8 @@
         "slim/twig-view": "^3.3",
         "doctrine/dbal": "^4.3",
         "slim/csrf": "^1.5",
-        "doctrine/migrations": "^3.9"
+        "doctrine/migrations": "^3.9",
+        "doctrine/sql-formatter": "^1.5"
     },
     "autoload": {
         "psr-4": {
@@ -30,6 +31,11 @@
         },
         "files": [
             "app/functions/helpers.php"
+        ]
+    },
+    "scripts": {
+        "db-setup": [
+            "doctrine-migrations migrate --no-interaction"
         ]
     }
 }

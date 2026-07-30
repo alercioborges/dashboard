@@ -1,0 +1,15 @@
+// Se já existir arquivo de migration - exclui-los
+
+# Remova o arquivo da migration vazia
+rm App/Migrations/{bome do arquivo}.php
+
+# Remover registro se existir
+vendor/bin/doctrine-migrations version 'App\Migrations\{nome da classe}' --delete
+
+__________________________
+
+// Instalar dependencia se necess[ario]
+composer require doctrine/sql-formatter
+
+// Excexutar dump do schema do bd
+vendor/bin/doctrine-migrations dump-schema --formatted

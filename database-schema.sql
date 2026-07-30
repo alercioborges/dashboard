@@ -3,6 +3,7 @@
 CREATE TABLE tbl_roles (
   id int(11) NOT NULL AUTO_INCREMENT,
   name varchar(50) NOT NULL,
+  shortname VARCHAR(50) NOT NULL COLLATE 'utf8mb4_unicode_ci',
   description text,
   created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp ON UPDATE CURRENT_TIMESTAMP,

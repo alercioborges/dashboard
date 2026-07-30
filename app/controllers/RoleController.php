@@ -86,7 +86,8 @@ class RoleController extends Controller
 
             $data = $this->validator->validate([
                 'name'        => 'required:max@30:min@2:onlyLetter:uppercase',
-                'description' => 'required:max@255:min@6'
+                'shortname'   => 'required:max@30:min@2',
+                'description' => 'required:max@255:min@5'
             ]);
 
             if ($this->roleService->getRoleByName($data['name'])) {
@@ -150,6 +151,7 @@ class RoleController extends Controller
 
             $data = $this->validator->validate([
                 'name'        => 'required:max@30:min@2:onlyLetter:uppercase',
+                'shortname'   => 'required:max@30:min@2',
                 'description' => 'required:max@255:min@6'
             ]);
 

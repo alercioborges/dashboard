@@ -20,6 +20,17 @@
 			{{ message('name')|raw }}
 		</div>
 
+		<!-- Shortname -->
+		<div class="form-group mb-3">
+			<label for="shortname" class="form-label">Nome breve
+				<span class="text-danger">*</span>
+			</label>
+			<input type="text" value="{{ OLD_INPUT['shortname'] }}" class="form-control border border-dark" id="shortname" name="shortname" autofocus data-rules="required|min=2|max=30|onlyLetter" placeholder="Digite o nome breve de identificação do perfil" autocomplete="off" aria-required="true" spellcheck="false">
+			{{ message('shortname')|raw }}
+		</div>
+
+
+
 		<!-- Description -->
 		<div class="form-group mb-3">
 			<label for="description" class="form-label">Descrição</label>

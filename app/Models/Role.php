@@ -25,6 +25,7 @@ class Role extends Model implements RoleRepositoryInterface
             [
                 'id',
                 'name',
+                'shortname',
                 'description',
                 'created_at',
                 'updated_at'
@@ -45,6 +46,7 @@ class Role extends Model implements RoleRepositoryInterface
             [
                 'id',
                 'name',
+                'shortname',
                 'description',
                 'created_at',
                 'updated_at'
@@ -86,6 +88,7 @@ class Role extends Model implements RoleRepositoryInterface
             [
                 'id'          => NULL,
                 'name'        => $data['name'],
+                'shortname'   => $data['shortname'],
                 'description' => $data['description'],
                 'created_at'  => date('Y-m-d H:i:s'),
                 'updated_at'  => NULL
@@ -102,6 +105,7 @@ class Role extends Model implements RoleRepositoryInterface
             $this->table,
             [
                 'name'        => $data['name'],
+                'shortname'   => $data['shortname'],
                 'description' => $data['description'],
                 'updated_at'  => date('Y-m-d H:i:s')
             ],

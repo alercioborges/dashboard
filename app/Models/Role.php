@@ -57,6 +57,27 @@ class Role extends Model implements RoleRepositoryInterface
         return $roleData[0] ?? NULL;
     }
 
+    /**
+     * Find user role by shortname
+     */
+    public function findByShortname(string $shortname): ?array
+    {
+        $roleData = $this->queryBuilder->select(
+            $this->table,
+            [
+                'id',
+                'name',
+                'shortname',
+                'description',
+                'created_at',
+                'updated_at'
+            ],
+            ['shortname' => $shortname]
+        );
+
+        return $roleData[0] ?? NULL;
+    }
+
 
     /**
      * Get all user roles with pagination
@@ -71,7 +92,9 @@ class Role extends Model implements RoleRepositoryInterface
                 'description',
                 'created_at'
             ],
-            [],
+            [
+                'shortname NOT IN' => ['readonly', 'admin']
+            ],
             [],
             $limit,
             $offset
@@ -109,7 +132,10 @@ class Role extends Model implements RoleRepositoryInterface
                 'description' => $data['description'],
                 'updated_at'  => date('Y-m-d H:i:s')
             ],
-            ['id' => $id]
+            [
+                'shortname NOT IN' => ['readonly', 'admin'],
+                'id' => $id
+            ]
         );
 
         return $result > 0;
@@ -130,7 +156,10 @@ class Role extends Model implements RoleRepositoryInterface
     {
         return $this->queryBuilder->delete(
             $this->table,
-            ['id' => $id]
+            [
+                'shortname NOT IN' => ['readonly', 'admin'],
+                'id' => $id
+            ]
         );
     }
 

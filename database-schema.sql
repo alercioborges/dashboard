@@ -8,7 +8,8 @@ CREATE TABLE tbl_roles (
   created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  UNIQUE KEY name (name)
+  UNIQUE KEY name (name),
+  UNIQUE KEY shortname (shortname)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 _____________________________________________________________________

@@ -119,6 +119,12 @@ class User extends Model implements UserRepositoryInterface
      */
     public function create(array $data): int
     {
+        $readOnlyId = $this->queryBuilder->select(
+            'tbl_roles',
+            ['id'],
+            ['shortname' => 'readonly']
+        );
+
         return $this->queryBuilder->insert(
             $this->table,
             [
@@ -126,7 +132,7 @@ class User extends Model implements UserRepositoryInterface
                 'lastname'    => $data['lastname'],
                 'email'       => $data['email'],
                 'password'    => $this->passwordService->make($data['password']),
-                'role_id'     => 1,
+                'role_id'     => $readOnlyId[0]['id'],
                 'is_active'   => 1
             ]
         );

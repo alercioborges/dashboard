@@ -7,8 +7,8 @@ use Doctrine\DBAL\DriverManager;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$config     = new PhpFile(__DIR__ . '/app/config/migrations.php');
-$dbParams   = require __DIR__ . '/app/config/migrations-db.php';
+$config     = new PhpFile(__DIR__ . '/app/config/migrations/migrations.php');
+$dbParams   = require __DIR__ . '/app/config/migrations/migrations-db.php';
 $connection = DriverManager::getConnection($dbParams);
 
 return DependencyFactory::fromConnection($config, new ExistingConnection($connection));

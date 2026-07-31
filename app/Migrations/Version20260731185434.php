@@ -1,25 +1,37 @@
-<?php
-
-declare(strict_types=1);
-
-namespace App\Migrations;
-
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\AbstractMigration;
-
-/**
- * Auto-generated Migration: Please modify to your needs!
- */
-final class Version20260730202523 extends AbstractMigration
+final class Version20260731185434 extends AbstractMigration
 {
+    public function isTransactional(): bool
+    {
+        return false;
+    }
+
+    public function preUp(Schema $schema): void
+    {
+        $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+    }
+
+    public function postUp(Schema $schema): void
+    {
+        $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+    }
+
+    public function preDown(Schema $schema): void
+    {
+        $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+    }
+
+    public function postDown(Schema $schema): void
+    {
+        $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+    }
+
     public function getDescription(): string
     {
-        return '';
+        return '<description>';
     }
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf(
             !$this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\MySQL84Platform,
             "Migration can only be executed safely on '\Doctrine\DBAL\Platforms\MySQL84Platform'."
@@ -88,6 +100,7 @@ final class Version20260730202523 extends AbstractMigration
               created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
               updated_at DATETIME DEFAULT NULL,
               UNIQUE INDEX name (name),
+              UNIQUE INDEX shortname (shortname),
               PRIMARY KEY (id)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB COMMENT = ''
         SQL);
@@ -153,7 +166,6 @@ final class Version20260730202523 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf(
             !$this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\MySQL84Platform,
             "Migration can only be executed safely on '\Doctrine\DBAL\Platforms\MySQL84Platform'."

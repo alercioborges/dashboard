@@ -94,6 +94,10 @@ class RoleController extends Controller
                 $this->validator->setError('name', 'Esse nome já existe');
             }
 
+            if ($this->roleService->getRoleByShortname($data['shortname'])) {
+                $this->validator->setError('shortname', 'Esse nome breve já existe');
+            }
+
             if ($this->validator->hasErrors()) {
                 $this->setOldInput($data);
                 back();
@@ -157,6 +161,10 @@ class RoleController extends Controller
 
             if ($this->roleService->nameExists($data['name'], (int) $arg['id'])) {
                 $this->validator->setError('name', 'Esse nome já existe');
+            }
+
+            if ($this->roleService->shortnameExists($data['shortname'], (int) $arg['id'])) {
+                $this->validator->setError('shortname', 'Esse nome breve já existe');
             }
 
             if ($this->validator->hasErrors()) {

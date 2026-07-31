@@ -21,6 +21,11 @@ interface RoleRepositoryInterface
     public function findByName(string $name): ?array;
 
     /**
+     * Find user role by shortname
+     */
+    public function findByShortname(string $shortname): ?array;
+
+    /**
      * Get all user roles with pagination
      */
     public function getAll(int $limit = 10, int $offset = 1): array;

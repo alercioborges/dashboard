@@ -54,6 +54,11 @@ class RoleService
         return $this->roleRepository->findByName($name);
     }
 
+     public function getRoleByShortname(string $shortname): ?array
+    {
+        return $this->roleRepository->findByShortname($shortname);
+    }
+
     public function updateUserRole(int $id, array $data): bool
     {
         return $this->roleRepository->update($id, $data);
@@ -62,6 +67,11 @@ class RoleService
     public function nameExists(string $name, int $id): ?array
     {
         return $this->roleRepository->findFieldExists('name', $name, 'id', $id);
+    }
+
+    public function shortnameExists(string $shortname, int $id): ?array
+    {
+        return $this->roleRepository->findFieldExists('shortname', $shortname, 'id', $id);
     }
 
     public function deleteRole(int $id): bool

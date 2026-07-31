@@ -1,7 +1,7 @@
 <?php
 // app/config/migrations-db.php
 
-$dbConfig = require __DIR__ . '/database.php';
+$dbConfig = require __DIR__ . '/../database.php';
 
 return [
     'dbname'         => $dbConfig['database'],

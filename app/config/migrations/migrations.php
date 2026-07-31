@@ -10,8 +10,10 @@ return [
     ],
 
     'migrations_paths' => [
-        'App\Migrations' => __DIR__ . '/../Migrations',
+        'App\Migrations' => __DIR__ . '/../../Migrations',
     ],
+
+    'custom_template' => __DIR__ . '/migration.tpl',
 
     'all_or_nothing' => false,
     'transactional' => true,

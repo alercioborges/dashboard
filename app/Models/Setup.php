@@ -12,5 +12,8 @@ class Setup extends Model
     parent::__construct($queryBuilder);
   }
 
-  public function initialDataInsert() {}
+  public function initialDataInsert()
+  {
+    
+  }
 }

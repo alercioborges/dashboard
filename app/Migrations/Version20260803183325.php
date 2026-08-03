@@ -1,4 +1,13 @@
-final class Version20260731185434 extends AbstractMigration
+<?php
+
+declare(strict_types=1);
+
+namespace App\Migrations;
+
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+
+final class Version20260803183325 extends AbstractMigration
 {
     public function isTransactional(): bool
     {
@@ -71,7 +80,7 @@ final class Version20260731185434 extends AbstractMigration
               description VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT NULL COLLATE `utf8mb4_unicode_ci`,
               UNIQUE INDEX slug (slug),
               PRIMARY KEY (id)
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = MyISAM COMMENT = ''
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB COMMENT = ''
         SQL);
         $this->abortIf(
             !$this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\MySQL84Platform,
@@ -84,7 +93,7 @@ final class Version20260731185434 extends AbstractMigration
               permission_id INT NOT NULL,
               INDEX permission_id (permission_id),
               PRIMARY KEY (role_id, permission_id)
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = MyISAM COMMENT = ''
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB COMMENT = ''
         SQL);
         $this->abortIf(
             !$this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\MySQL84Platform,

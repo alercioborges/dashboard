@@ -14,6 +14,29 @@ class Setup extends Model
 
   public function initialDataInsert()
   {
-    
+
+    if (!$this->queryBuilder->exists('tbl_roles', ['shortname' => 'readonly'])) {
+
+      $this->queryBuilder->insert(
+        'tbl_roles',
+        [
+          'name'        => 'Somente Leitura',
+          'shortname'   => 'readonly',
+          'description' => 'Apenas vizualixação das informações.'
+        ]
+      );
+    }
+
+    if (!$this->queryBuilder->exists('tbl_roles', ['shortname' => 'admin'])) {
+
+      $this->queryBuilder->insert(
+        'tbl_roles',
+        [
+          'name'        => 'Administrador',
+          'shortname'   => 'admin',
+          'description' => 'Todos os acesso.'
+        ]
+      );
+    }
   }
 }

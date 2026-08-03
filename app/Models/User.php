@@ -157,12 +157,19 @@ class User extends Model implements UserRepositoryInterface
     }
 
 
-    public function changeRole(int $userId, int $roleId): bool
+    public function changeRole(int $userId, int $shortname_role): bool
     {
+        $role_id = $this->queryBuilder->select(
+            'tbl_roles',
+            ['id'],
+            ['shortname' => $shortname_role]
+        )[0];
+
+
         $result = $this->queryBuilder->update(
             $this->table,
             [
-                'role_id' => $roleId
+                'role_id' => $role_id
             ],
             ['id' => $userId]
         );

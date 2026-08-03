@@ -345,6 +345,29 @@ class QueryBuilderService
     }
 
     /**
+     * Verify data exists
+     */
+    public function exists(string $table, array $conditions): bool
+    {
+        if (empty($conditions)) {
+            throw new InvalidArgumentException('exists() requires at least one condition.');
+        }
+
+        try {
+            $qb = $this->connection->createQueryBuilder();
+            $qb->select('1')
+                ->from($this->quoteTable($table))
+                ->setMaxResults(1);
+
+            $this->applyConditions($qb, $conditions);
+
+            return (bool) $qb->executeQuery()->fetchOne();
+        } catch (DBALException $e) {
+            throw new Exception('EXISTS error: ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
      * INSERT
      */
     public function insert(string $table, array $data): int

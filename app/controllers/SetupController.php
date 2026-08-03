@@ -8,10 +8,11 @@ use Slim\Views\Twig;
 use Psr\Log\LoggerInterface;
 
 use App\Core\Controller;
+use App\Models\Setup;
+
 use App\Services\UserService;
 use App\Services\Validators\Validator;
 use App\Services\AuthService;
-use Dom\Attr;
 
 class SetupController extends Controller
 {
@@ -19,14 +20,22 @@ class SetupController extends Controller
     private Validator $validator;
     private LoggerInterface $logger;
     private AuthService $authService;
+    private Setup $setup;
 
-    public function __construct(Twig $twig, UserService $userService, Validator $validator, LoggerInterface $logger, AuthService $authService)
-    {
+    public function __construct(
+        Twig $twig,
+        UserService $userService,
+        Validator $validator,
+        LoggerInterface $logger,
+        AuthService $authService,
+        Setup $setup
+    ) {
         parent::__construct($twig);
         $this->userService = $userService;
         $this->validator   = $validator;
         $this->logger      = $logger;
         $this->authService = $authService;
+        $this->setup = $setup;
     }
 
     public function index(Request $request, Response $response): Response
@@ -69,11 +78,16 @@ class SetupController extends Controller
             $this->setOldInput($data);
             back();
         }
-
+        
+        $this->setup->initialDataInsert();
+        
         $user = $this->userService->createUser($data);
+
+        dd($user);
+
         $this->userService->changeUserRole($user['user_id'], 2);
 
-         $logged = $this->authService->authenticate($data['email'], $data['password'], true);
+        $logged = $this->authService->authenticate($data['email'], $data['password'], true);
 
         return redirect('/');
     }

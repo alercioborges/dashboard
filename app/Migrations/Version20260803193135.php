@@ -7,7 +7,7 @@ namespace App\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-final class Version20260803183325 extends AbstractMigration
+final class Version20260803193135 extends AbstractMigration
 {
     public function isTransactional(): bool
     {

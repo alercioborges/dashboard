@@ -6,6 +6,9 @@ rm App/Migrations/{bome do arquivo}.php
 # Remover registro se existir
 vendor/bin/doctrine-migrations version 'App\Migrations\{nome da classe}' --delete
 
+# Limpando registro
+vendor/bin/doctrine-migrations version App\\Migrations\\{nome da classe} --delete --no-interaction
+
 __________________________
 
 // Instalar dependencia se necess[ario]

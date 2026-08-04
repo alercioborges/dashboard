@@ -40,5 +40,47 @@ class Setup implements SetupRepositoryInterface
         ]
       );
     }
+
+    $permissions = [
+      ['slug' => 'users.view',   'description' => 'Visualizar usuários'],
+      ['slug' => 'users.create', 'description' => 'Criar usuários'],
+      ['slug' => 'users.edit',   'description' => 'Editar usuários'],
+      ['slug' => 'users.delete', 'description' => 'Excluir usuários'],
+    ];
+
+    foreach ($permissions as $permission) {
+      if (!$this->queryBuilder->exists('tbl_permissions', ['slug' => $permission['slug']])) {
+        $this->queryBuilder->insert('tbl_permissions', $permission);
+      }
+    }
+
+    // role <-> permissions (admin get all)
+    $role = $this->queryBuilder->select(
+      'tbl_roles',
+      ['id'],
+      ['shortname' => 'admin'],
+      [],
+      1
+    );
+
+    if (!empty($role)) {
+      $roleId = (int) $role[0]['id'];
+
+      $rows = $this->queryBuilder->select(
+        'tbl_permissions',
+        ['id'],
+        ['slug' => array_column($permissions, 'slug')] // make IN (...)
+      );
+
+      foreach ($rows as $row) {
+        $permissionId = (int) $row['id'];
+
+        $link = ['role_id' => $roleId, 'permission_id' => $permissionId];
+
+        if (!$this->queryBuilder->exists('tbl_role_permissions', $link)) {
+          $this->queryBuilder->insert('tbl_role_permissions', $link);
+        }
+      }
+    }
   }
 }

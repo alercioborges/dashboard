@@ -1,7 +1,9 @@
 # Ignorar o diretório de dependências do Composer
 /vendor/
 
-# Variavais de ambiente
+composer.lock
+
+# Variáveis de ambiente
 .env
 
 # OpenCode config file
@@ -9,5 +11,8 @@ opencode.json
 
 # Cache files
 storage/cache/*
+!storage/cache/.gitkeep
 storage/localcache/*
+!storage/localcache/.gitkeep
 storage/log/*
+!storage/log/.gitkeep

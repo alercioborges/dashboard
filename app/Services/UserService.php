@@ -64,9 +64,9 @@ class UserService
         return $this->userRepository->update($id, $data);
     }
 
-    public function changeUserRole(int $userId, int $roleId): bool
+    public function changeUserRole(int $userId, string $shortname_role): bool
     {
-        return $this->userRepository->changeRole($userId, $roleId);
+        return $this->userRepository->changeRole($userId, $shortname_role);
     }
 
     public function emailExists(string $email, int $id): ?array

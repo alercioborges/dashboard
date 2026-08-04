@@ -84,9 +84,7 @@ class SetupController extends Controller
         
         $user = $this->userService->createUser($data);
 
-        dd($user);
-
-        $this->userService->changeUserRole($user['user_id'], 2);
+        $this->userService->changeUserRole($user['user_id'], 'admin');
 
         $logged = $this->authService->authenticate($data['email'], $data['password'], true);
 

@@ -15,7 +15,8 @@ use App\Controllers\{
 use App\Services\{
     UserService,
     RoleService,
-    ForgotPasswordService
+    ForgotPasswordService,
+    SetupService
 };
 
 use App\Interfaces\AuthServiceInterface;
@@ -88,7 +89,8 @@ return [
             $c->get(UserService::class),
             $c->get(Validator::class),
             $c->get(LoggerInterface::class),
-            $c->get(AuthServiceInterface::class)
+            $c->get(AuthServiceInterface::class),
+            $c->get(SetupService::class)            
         );
     }
 

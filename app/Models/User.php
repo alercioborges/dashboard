@@ -123,7 +123,7 @@ class User extends Model implements UserRepositoryInterface
             'tbl_roles',
             ['id'],
             ['shortname' => 'readonly']
-        );
+        )[0];
 
         return $this->queryBuilder->insert(
             $this->table,
@@ -132,7 +132,7 @@ class User extends Model implements UserRepositoryInterface
                 'lastname'    => $data['lastname'],
                 'email'       => $data['email'],
                 'password'    => $this->passwordService->make($data['password']),
-                'role_id'     => $readOnlyId[0]['id'],
+                'role_id'     => $readOnlyId['id'],
                 'is_active'   => 1
             ]
         );
@@ -157,19 +157,18 @@ class User extends Model implements UserRepositoryInterface
     }
 
 
-    public function changeRole(int $userId, int $shortname_role): bool
+    public function changeRole(int $userId, string $shortname_role): bool
     {
-        $role_id = $this->queryBuilder->select(
+        $role = $this->queryBuilder->select(
             'tbl_roles',
             ['id'],
             ['shortname' => $shortname_role]
         )[0];
 
-
         $result = $this->queryBuilder->update(
             $this->table,
             [
-                'role_id' => $role_id
+                'role_id' => $role['id']
             ],
             ['id' => $userId]
         );

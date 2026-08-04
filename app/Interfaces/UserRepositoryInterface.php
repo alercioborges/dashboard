@@ -35,7 +35,7 @@ interface UserRepositoryInterface
      */
     public function update(int $id, array $data): bool;
 
-    public function changeRole(int $userId, int $roleId):bool;
+    public function changeRole(int $userId, string $sgortname_role): bool;
 
     /**
      * find user by field

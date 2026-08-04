@@ -1,10 +1,14 @@
 <?php
 
 use Psr\Container\ContainerInterface;
+
+use App\Interfaces\SetupRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\PermissionRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\RememberMeRepositoryInterface;
+
+use App\Models\Setup;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Permission;
@@ -13,6 +17,11 @@ use App\Services\QueryBuilderService;
 use App\Services\PasswordService;
 
 return [
+
+    SetupRepositoryInterface::class =>
+    fn(ContainerInterface $c) => new Setup(
+        $c->get(QueryBuilderService::class)
+    ),
 
     UserRepositoryInterface::class =>
     fn(ContainerInterface $c) => new User(

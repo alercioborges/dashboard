@@ -12,6 +12,7 @@ use Monolog\Level;
 use PHPMailer\PHPMailer\PHPMailer;
 
 use App\Services\{
+    SetupService,
     QueryBuilderService,
     UserService,
     RoleService,
@@ -25,6 +26,7 @@ use App\Services\{
 };
 
 use App\Interfaces\{
+    SetupRepositoryInterface,
     UserRepositoryInterface,
     RoleRepositoryInterface,
     RememberMeRepositoryInterface,
@@ -34,6 +36,11 @@ use App\Interfaces\{
 };
 
 return [
+
+    SetupService::class =>
+    fn(ContainerInterface $c) => new SetupService(
+        $c->get(SetupRepositoryInterface::class)
+    ),
 
     QueryBuilderService::class =>
     fn(ContainerInterface $c) => new QueryBuilderService(
@@ -106,7 +113,7 @@ return [
         $appConfig = $c->get('appConfig');
 
         $twig = Twig::create(__DIR__ . '/../../../templates/', [
-            'cache'       => false,            
+            'cache'       => false,
             'debug'       => $appConfig['debug'],
             'auto_reload' => $appConfig['debug'],
         ]);

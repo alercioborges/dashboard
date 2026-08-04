@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
-use App\Core\Model;
+use App\Interfaces\SetupRepositoryInterface;
 use App\Services\QueryBuilderService;
 
-class Setup extends Model
+class Setup implements SetupRepositoryInterface
 {
+  private QueryBuilderService $queryBuilder;
+
   public function __construct(QueryBuilderService $queryBuilder)
   {
-    parent::__construct($queryBuilder);
+    $this->queryBuilder = $queryBuilder;
   }
 
-  public function initialDataInsert()
+  public function initialDataInsert(): void
   {
 
     if (!$this->queryBuilder->exists('tbl_roles', ['shortname' => 'readonly'])) {

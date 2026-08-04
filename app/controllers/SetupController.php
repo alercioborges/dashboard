@@ -8,11 +8,12 @@ use Slim\Views\Twig;
 use Psr\Log\LoggerInterface;
 
 use App\Core\Controller;
-use App\Models\Setup;
 
 use App\Services\UserService;
 use App\Services\Validators\Validator;
 use App\Services\AuthService;
+use App\Services\SetupService;
+
 
 class SetupController extends Controller
 {
@@ -20,7 +21,7 @@ class SetupController extends Controller
     private Validator $validator;
     private LoggerInterface $logger;
     private AuthService $authService;
-    private Setup $setup;
+    private SetupService $SetupService;
 
     public function __construct(
         Twig $twig,
@@ -28,14 +29,14 @@ class SetupController extends Controller
         Validator $validator,
         LoggerInterface $logger,
         AuthService $authService,
-        Setup $setup
+        SetupService $SetupService
     ) {
         parent::__construct($twig);
         $this->userService = $userService;
         $this->validator   = $validator;
         $this->logger      = $logger;
         $this->authService = $authService;
-        $this->setup = $setup;
+        $this->SetupService = $SetupService;
     }
 
     public function index(Request $request, Response $response): Response
@@ -79,7 +80,7 @@ class SetupController extends Controller
             back();
         }
         
-        $this->setup->initialDataInsert();
+        $this->SetupService->setupInitialDataInsert();
         
         $user = $this->userService->createUser($data);
 

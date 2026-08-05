@@ -378,16 +378,23 @@ class QueryBuilderService
 
             foreach ($data as $col => $val) {
                 $safeCol = $this->quoteIdentifier($col);
-                $param = $this->paramName($col);
+                $param   = $this->paramName($col);
                 $qb->setValue($safeCol, ':' . $param)->setParameter($param, $val);
             }
 
-            $qb->executeStatement();
-            return (int) $this->connection->lastInsertId();
+            $affected = $qb->executeStatement();
+
+            // Tabelas sem AUTO_INCREMENT (ex.: pivots) não geram identity value.
+            try {
+                return (int) $this->connection->lastInsertId();
+            } catch (DBALException $e) {
+                return (int) $affected;
+            }
         } catch (DBALException $e) {
             throw new Exception("INSERT error: " . $e->getMessage(), 0, $e);
         }
     }
+
 
     /**
      * UPDATE

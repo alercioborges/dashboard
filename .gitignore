@@ -1,6 +1,7 @@
 # Ignorar o diretório de dependências do Composer
 /vendor/
 
+# Register libs
 composer.lock
 
 # Variáveis de ambiente

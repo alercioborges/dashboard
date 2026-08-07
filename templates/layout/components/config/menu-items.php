@@ -22,12 +22,14 @@ return [
                             [
                                 'label' => 'Listar Usuários',
                                 'icon'  => 'nav-icon bi bi-circle',
-                                'route' => 'users.show'
+                                'route' => 'users.show',
+                                'permission' => 'users.view'
                             ],
                             [
                                 'label' => 'Adicionar usuário',
                                 'icon'  => 'nav-icon bi bi-plus-circle',
-                                'route' => 'users.create'
+                                'route' => 'users.create',
+                                'permission' => 'users.view'
                             ],
                         ],
                     ],
@@ -38,12 +40,14 @@ return [
                             [
                                 'label' => 'Papeis de usuário',
                                 'icon'  => 'nav-icon bi bi-plus-circle',
-                                'route' => 'roles-user.show'
+                                'route' => 'roles-user.show',
+                                'permission' => 'users.view'
                             ],
                             [
                                 'label' => 'Criar perfil de usuário',
                                 'icon'  => 'nav-icon bi bi-plus-circle',
-                                'route' => 'roles-user.create'
+                                'route' => 'roles-user.create',
+                                'permission' => 'users.view'
                             ],                            
                         ],
                     ],

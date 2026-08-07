@@ -6,6 +6,7 @@ use Slim\Views\TwigMiddleware;
 use Slim\App;
 use App\Views\ExtensionTwig;
 use Slim\Csrf\Guard;
+use App\Interfaces\AuthServiceInterface;
 
 return [
 
@@ -25,6 +26,31 @@ return [
         ]);
 
         $menu_items = loader('/templates/layout/components/config/menu-items.php');
+
+        $authService = $c->get(AuthServiceInterface::class);
+
+        // Filtra itens de menu sem permissão; mantém apenas pais com filhos visíveis
+        $filterMenu = function (array $items) use ($authService, &$filterMenu): array {
+            $filtered = [];
+
+            foreach ($items as $item) {
+                if (isset($item['children'])) {
+                    $item['children'] = $filterMenu($item['children']);
+
+                    if (count($item['children']) === 0) {
+                        continue;
+                    }
+                } elseif (isset($item['permission']) && !$authService->hasPermission($item['permission'])) {
+                    continue;
+                }
+
+                $filtered[] = $item;
+            }
+
+            return $filtered;
+        };
+
+        $menu_items = $filterMenu($menu_items);
 
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);

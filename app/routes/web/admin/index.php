@@ -8,7 +8,8 @@ $app->group('/admin', function (Slim\Routing\RouteCollectorProxy $group) use ($c
 
     $permission = $container->get(PermissionMiddleware::class);
 
-    $group->get('', [AdministrationController::class, 'index'])->setName('admin.index');
+    $group->get('', [AdministrationController::class, 'index'])->setName('admin.index')
+    ->add($permission('users.view'));
 
     // Users routs
     require 'users.php';

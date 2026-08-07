@@ -79,4 +79,51 @@ class RememberMe extends Model implements RememberMeRepositoryInterface
             ]
         );
     }
+
+    public function rotate(int $userId, string $oldHash, string $newHash, string $expiresAt): bool
+    {
+        $this->queryBuilder->beginTransaction();
+
+        try {
+            $consumed = $this->queryBuilder->delete(
+                $this->table,
+                [
+                    'user_id' => $userId,
+                    'token'   => $oldHash,
+                ]
+            );
+
+            if (!$consumed) {
+                $this->queryBuilder->rollback();
+                return false;
+            }
+
+            $this->queryBuilder->insert(
+                $this->table,
+                [
+                    'user_id'    => $userId,
+                    'token'      => $newHash,
+                    'expires_at' => $expiresAt,
+                ]
+            );
+
+            $this->queryBuilder->commit();
+            return true;
+
+        } catch (\Throwable $e) {
+            
+            $this->queryBuilder->rollback();
+            throw $e;
+        }
+    }
+
+    public function deleteAllByUser(int $userId): bool
+    {
+        return $this->queryBuilder->delete(
+            $this->table,
+            [
+                'user_id' => $userId
+            ]
+        );
+    }
 }

@@ -54,8 +54,6 @@ class UserController extends Controller
             
         } catch (\Exception $e) {
 
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
-
             return $this->twig->render(
                 $response,
                 'pages/users.twig',
@@ -84,8 +82,6 @@ class UserController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
 
             return $this->twig->render(
                 $response,
@@ -125,9 +121,6 @@ class UserController extends Controller
             return redirect('/admin/users');
         } catch (\Exception $e) {
 
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
-
-
             $this->logger->error('Error while trying to save new user: ' . $e->getMessage() . "-" . $e->getFile() . "-" . $e->getLine());
 
             return $this->twig->render(
@@ -156,8 +149,6 @@ class UserController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
 
             return $this->twig->render(
                 $response,
@@ -188,9 +179,6 @@ class UserController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
-
 
             return $this->twig->render(
                 $response,
@@ -229,8 +217,6 @@ class UserController extends Controller
             return redirect('/admin/users');
         } catch (\Exception $e) {
 
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
-
             return $this->twig->render(
                 $response,
                 'pages/user-edit.twig',
@@ -240,36 +226,7 @@ class UserController extends Controller
                 ]
             );
         }
-    }
-
-    public function delete(Request $request, Response $response, array $arg): Response
-    {
-        try {
-
-            $userData = $this->userService->getUserById((int) $arg['id']);
-
-            return $this->twig->render(
-                $response,
-                'pages/user-delete.twig',
-                [
-                    'TITLE'     => 'Excluir cadastro de usuário',
-                    'USER_DATA' => $userData
-                ]
-            );
-        } catch (\Exception $e) {
-
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
-
-            return $this->twig->render(
-                $response,
-                'pages/users-delete.twig',
-                [
-                    'TITLE' => 'Excluir cadastro de usuário',
-                    'ERROR' => 'Ocorreu um erro ao tentar excluir cadastro de usuário'
-                ]
-            );
-        }
-    }
+    }   
 
     public function destroy(Request $request, Response $response, array $arg): Response
     {
@@ -280,10 +237,8 @@ class UserController extends Controller
             flash('message', success('Usuário excluído com sucesso'));
 
             return redirect('/admin/users');
+
         } catch (\Exception $e) {
-
-            dd($e->getFile() . ':' . $e->getLine() . ' Message: ' . $e->getMessage());
-
 
             return $this->twig->render(
                 $response,

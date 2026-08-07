@@ -35,11 +35,10 @@ class RedirectService
 
     public static function getRequestPath(Request $request): string
     {
-        $path = explode(
-            \getDir(),
-            $request->getUri()->getPath()
-        );
-
-        return $path[1];
+        $path = $request->getUri()->getPath();
+        $dir  = \getDir();
+        return ($dir !== '' && str_starts_with($path, $dir))
+            ? (substr($path, strlen($dir)) ?: '/')
+            : $path;
     }
 }

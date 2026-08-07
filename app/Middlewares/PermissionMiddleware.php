@@ -27,7 +27,7 @@ class PermissionMiddleware implements MiddlewareInterface
     ): ResponseInterface {
 
         if (!$this->authService->hasPermission($this->permission)) {
-            flash('error', 'Acesso não autorizado');
+            flash('error', error('Acesso não autorizado'));
             return redirect('/');
         }
 

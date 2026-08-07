@@ -154,13 +154,15 @@ class Role extends Model implements RoleRepositoryInterface
      */
     public function delete(int $id): bool
     {
-        return $this->queryBuilder->delete(
+        $result = $this->queryBuilder->delete(
             $this->table,
             [
                 'shortname NOT IN' => ['readonly', 'admin'],
                 'id' => $id
             ]
         );
+
+        return $result > 0;
     }
 
     /**

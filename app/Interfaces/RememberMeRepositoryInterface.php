@@ -10,4 +10,6 @@ interface RememberMeRepositoryInterface
     public function findValidUserByToken(string $hash): ?array;
     public function delete(string $hash): bool;
     public function deleteOnLogout(int $userId): bool;
+    public function rotate(int $userId, string $oldHash, string $newHash, string $expiresAt): bool;
+    public function deleteAllByUser(int $userId): bool;
 }

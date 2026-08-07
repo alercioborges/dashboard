@@ -45,7 +45,7 @@ class AuthController extends Controller
             if (isset($_SESSION['user'])) {
                 return redirect('/');
             }
-            
+
             return $this->twig->render(
                 $response,
                 'pages/auth.html',
@@ -54,9 +54,8 @@ class AuthController extends Controller
                     'OLD_INPUT' => $this->getOldInput()
                 ]
             );
-
         } catch (\Exception $e) {
-            
+
             $this->logger->error('[AUTH_ERROR]: ' . $e);
 
             return $this->twig->render(
@@ -84,9 +83,9 @@ class AuthController extends Controller
             }
 
             $remember = (bool) ($data['remember'] ?? false);
-            
+
             $logged = $this->authService->authenticate($data['email'], $data['password'], $remember);
-            
+
             if ($logged) {
 
                 if (isset($_SESSION['redirect'])) {
@@ -102,7 +101,6 @@ class AuthController extends Controller
 
             flash('error', error("Nome de usuário e/ou senha incorreto"));
             return redirect('/login');
-            
         } catch (\Exception $e) {
 
             return redirect('/login');
@@ -115,16 +113,18 @@ class AuthController extends Controller
     public function logout(Request $request, Response $response): Response
     {
         try {
-            
-            $this->authService->logout($_SESSION['user']['id']);
+
+            if (isset($_SESSION['user']['id'])) {
+                $this->authService->logout($_SESSION['user']['id']);
+            }
 
             return redirect('/login');
-
+            
         } catch (\Exception $e) {
 
             return $this->twig->render(
                 $response,
-                'pages/dashboard.html.twig',
+                'pages/dashboard.html',
                 [
                     'TITLE' => 'Lista de usuários',
                     'ERROR' => 'Não é possível atualizar o usuários'

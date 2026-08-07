@@ -24,13 +24,8 @@ $group->group('/users', function (Slim\Routing\RouteCollectorProxy $group) use (
     ->setName('users.edit')
     ->add($permission('users.view'));
 
-
     $group->put('/{id:[0-9]+}', [UserController::class, 'update'])
     ->setName('users.update')
-    ->add($permission('users.view'));
-
-    $group->get('/{id:[0-9]+}/delete', [UserController::class, 'delete'])
-    ->setName('users.delete')
     ->add($permission('users.view'));
 
     $group->delete('/{id:[0-9]+}', [UserController::class, 'destroy'])

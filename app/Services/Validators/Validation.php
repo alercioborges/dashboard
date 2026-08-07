@@ -34,15 +34,19 @@ abstract class Validation extends Sanitize
 
     protected function max(string $field, int $max)
     {
-        if (strlen($_POST[$field]) > $max) {
-            $this->errors[$field][] = flash($field, error("O número de caracteres para este campo não pode ser maior que {$max}"));
+        if (!empty($_POST[$field]) && isset($_POST[$field])) {
+            if (strlen($_POST[$field]) > $max) {
+                $this->errors[$field][] = flash($field, error("O número de caracteres para este campo não pode ser maior que {$max}"));
+            }
         }
     }
 
     protected function min(string $field, int $min)
     {
-        if (strlen($_POST[$field]) < $min) {
-            $this->errors[$field][] = flash($field, error("O número de caracteres para este campo deve ser maior ou igual a {$min}"));
+        if (!empty($_POST[$field]) && isset($_POST[$field])) {
+            if (strlen($_POST[$field]) < $min) {
+                $this->errors[$field][] = flash($field, error("O número de caracteres para este campo deve ser maior ou igual a {$min}"));
+            }
         }
     }
 
@@ -53,10 +57,12 @@ abstract class Validation extends Sanitize
 
     protected function onlyLetter(string $field)
     {
-        $letterRegex = '/^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ\s]+$/';
+        if (!empty($_POST[$field]) && isset($_POST[$field])) {
+            $letterRegex = '/^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ\s]+$/';
 
-        if (!preg_match($letterRegex, $_POST[$field]) && !empty($_POST[$field])) {
-            $this->errors[$field][] = flash($field, error('Apenas letras são permitidas neste campo.'));
+            if (!preg_match($letterRegex, $_POST[$field]) && !empty($_POST[$field])) {
+                $this->errors[$field][] = flash($field, error('Apenas letras são permitidas neste campo.'));
+            }
         }
     }
 

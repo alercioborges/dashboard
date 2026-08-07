@@ -32,7 +32,7 @@ class CookieService
      *
      * @param string      $name     Nome do cookie.
      * @param string      $value    Valor do cookie.
-     * @param int         $duration Duração em segundos (0 = cookie de sessão).
+     * @param int         $duration de duração.
      * @param string      $path     Caminho de validade.
      *
      * @return bool  Resultado do setcookie().

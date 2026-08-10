@@ -41,7 +41,7 @@ class ForgotPasswordService implements ForgotPasswordServiceInterface
 
         $expiresAt = new \DateTimeImmutable('+1 hour');
 
-        $forgotId = null;
+        $forgotId = NULL;
 
         try {
 

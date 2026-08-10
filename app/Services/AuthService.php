@@ -45,7 +45,7 @@ class AuthService implements AuthServiceInterface
         // Find user by email
         $user = $this->userRepository->findByEmail($email);
 
-        if (!$user || (int)$user['is_active'] !== 1 || !password_verify($password, $user['password'])) {
+        if (!$user || $user['is_active'] === 0 || !password_verify($password, $user['password'])) {
             return false;
         }
 
@@ -116,17 +116,19 @@ class AuthService implements AuthServiceInterface
         return true;
     }
 
-    private function createSessionUser(int $id, string $firstname, string $lastname, int $roleId): void
+    private function createSessionUser(int $id, string $firstname, string $lastname, int $roleId): array
     {
-        session_regenerate_id(true);
-
-        $_SESSION['user'] = [
+        $userSession = $_SESSION['user'] = [
             'id'        => $id,
             'firstname' => $firstname,
             'lastname'  => $lastname,
             'role_id'   => $roleId,
             'logged'    => true
         ];
+
+        session_regenerate_id(true);
+
+        return $userSession;
     }
 
     /**
@@ -192,79 +194,5 @@ class AuthService implements AuthServiceInterface
         }
 
         return in_array($permission, $_SESSION['user']['permissions']);
-    }
-
-
-
-    public function loginFromCookie(): bool
-    {
-        $cookie = $this->cookieService->getCookie('remember_me');
-
-        if (!$cookie) {
-            return false;
-        }
-
-        $parts = explode(':', $cookie, 2);
-
-        if (count($parts) !== 2 || !ctype_digit($parts[0])) {
-            $this->forgetRemember();
-            return false;
-        }
-
-        [$userId, $token] = [(int) $parts[0], $parts[1]];
-
-        $stored = $this->rememberMeRepository->findValidByUser($userId);
-
-        if (!$stored || !hash_equals($stored['token'], $this->tokenService->hashToken($token))) {
-            // Token inválido/reutilizado: invalida TODA a família de tokens do usuário.
-            $this->rememberMeRepository->deleteAllByUser($userId);
-            $this->forgetRemember();
-            return false;
-        }
-
-        // --- ROTAÇÃO ---
-        $newToken   = $this->tokenService->generateToken();
-        $expiresAt  = date('Y-m-d', strtotime('+30 days'));
-
-        $rotated = $this->rememberMeRepository->rotate(
-            $userId,
-            $stored['token'],
-            $this->tokenService->hashToken($newToken),
-            $expiresAt
-        );
-
-        if (!$rotated) {
-            // Corrida perdida ou replay detectado.
-            $this->rememberMeRepository->deleteAllByUser($userId);
-            $this->forgetRemember();
-            return false;
-        }
-
-        $user = $this->userRepository->findById($userId);
-
-        if (!$user || (int) $user['is_active'] !== 1) {
-            $this->rememberMeRepository->deleteAllByUser($userId);
-            $this->forgetRemember();
-            return false;
-        }
-
-        $this->issueRememberCookie($userId, $newToken);
-        $this->createSessionUser($user['id'], $user['firstname'], $user['lastname'], $user['role_id']);
-
-        return true;
-    }
-
-    private function issueRememberCookie(int $userId, string $token): void
-    {
-        $this->cookie->setCookie(
-            'remember_me',
-            $userId . ':' . $token,
-            time() + self::REMEMBER_TTL
-        );
-    }
-
-    private function forgetRemember(): void
-    {
-        $this->cookie->deleteCookie('remember_me');
     }
 }

@@ -1,18 +1,18 @@
 <?php
 
-require "../bootstrap.php";
+require __DIR__ . '/../../../bootstrap.php';
 
 // Setaup route
-require 'setup/index.php';
+require __DIR__ . '/setup/index.php';
 
 // Authentication route
-require 'auth/index.php';
+require __DIR__ . '/auth/index.php';
 
 // Forgot password route
-require 'forgot/index.php';
+require __DIR__ . '/forgot/index.php';
 
 // Dashboard route
-require 'dashboard.php';
+require __DIR__ . '/dashboard.php';
 
 // Administrator route
-require 'admin/index.php';
+require __DIR__ . '/admin/index.php';

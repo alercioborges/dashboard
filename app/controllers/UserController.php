@@ -70,15 +70,12 @@ class UserController extends Controller
     {
         try {
 
-            $userRoles = $this->role->getAll($this->role->countAll(), 0);
-
             return $this->twig->render(
                 $response,
                 'pages/users-create.twig',
                 [
                     'TITLE'     => 'Cadastrar novo usuário',
-                    'OLD_INPUT' => $this->getOldInput(),
-                    'ROLES'     => $userRoles
+                    'OLD_INPUT' => $this->getOldInput()
                 ]
             );
         } catch (\Exception $e) {
@@ -166,7 +163,6 @@ class UserController extends Controller
         try {
 
             $userData = $this->userService->getUserById((int) $arg['id']);
-            $userRoles = $this->role->getAll($this->role->countAll(), 0);
 
             return $this->twig->render(
                 $response,
@@ -174,7 +170,6 @@ class UserController extends Controller
                 [
                     'TITLE' => 'Modificar perfil',
                     'USER_DATA' => $userData,
-                    'ROLES' => $userRoles,
                     'OLD_INPUT' => $this->getOldInput()
                 ]
             );

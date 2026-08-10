@@ -38,7 +38,7 @@ class Validator extends Validation
                 }
             }
 
-            return $this->sanitize();
+            return $this->sanitize($_POST);
         }
 
         return [];

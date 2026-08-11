@@ -1,19 +1,26 @@
 <?php
 
 use Psr\Container\ContainerInterface;
-use Slim\App;
-use Slim\Csrf\Guard;
-use Slim\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 
-use App\Middlewares\AuthMiddleware;
-use App\Middlewares\PermissionMiddleware;
-use App\Interfaces\AuthServiceInterface;
-use App\Middlewares\SetupMiddleware;
+use Slim\App;
+use Slim\Csrf\Guard;
+
 use App\Interfaces\UserRepositoryInterface;
+use App\Interfaces\AuthServiceInterface;
+
 use App\Services\AuthService;
+use App\Services\RequestContext;;
+
+use App\Middlewares\{
+    AuthMiddleware,
+    PermissionMiddleware,
+    SetupMiddleware,
+    RequestContextMiddleware
+};
+
 
 return [
 
@@ -132,4 +139,9 @@ return [
         };
     },
 
+    RequestContextMiddleware::class => function (ContainerInterface $c): RequestContextMiddleware {
+        return new RequestContextMiddleware(
+            $c->get(RequestContext::class)
+        );
+    },
 ];

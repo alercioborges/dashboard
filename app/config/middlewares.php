@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Zeuxisoo\Whoops\Slim\WhoopsMiddleware;
 use App\Middlewares\SetupMiddleware;
+use App\Middlewares\RequestContextMiddleware;
 
 return function (App $app) {
 
@@ -26,6 +27,8 @@ return function (App $app) {
     $app->add(TwigMiddleware::create($app, $twig));
 
     $app->add(SetupMiddleware::class);
+
+    $app->add(RequestContextMiddleware::class);
 
     // Error middleware    
     if ($appConfig['env'] === 'development') {

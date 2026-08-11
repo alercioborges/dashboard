@@ -22,7 +22,8 @@ use App\Services\{
     PasswordService,
     PaginationService,
     TokenService,
-    CookieService
+    CookieService,
+    RequestContext
 };
 
 use App\Interfaces\{
@@ -98,6 +99,10 @@ return [
 
     PHPMailer::class => function (): PHPMailer {
         return new PHPMailer(true);
+    },
+
+    RequestContext::class => function(): RequestContext {
+        return new RequestContext();
     },
 
     // -------------------------------------------------------

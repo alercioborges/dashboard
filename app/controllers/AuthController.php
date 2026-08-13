@@ -48,7 +48,7 @@ class AuthController extends Controller
 
             return $this->twig->render(
                 $response,
-                'pages/auth.html',
+                'pages/auth.twig',
                 [
                     'TITLE' => 'Acessar',
                     'OLD_INPUT' => $this->getOldInput()
@@ -124,7 +124,7 @@ class AuthController extends Controller
 
             return $this->twig->render(
                 $response,
-                'pages/dashboard.html',
+                'pages/dashboard.twig',
                 [
                     'TITLE' => 'Lista de usuários',
                     'ERROR' => 'Não é possível atualizar o usuários'

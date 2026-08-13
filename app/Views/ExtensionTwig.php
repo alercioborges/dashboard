@@ -6,23 +6,24 @@ use Slim\Interfaces\RouteParserInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Slim\Csrf\Guard;
+use App\Services\RequestContext;
 
 class ExtensionTwig extends AbstractExtension
 {
     private RouteParserInterface $routeParser;
     private Guard $csrf;
-    private string $currentRoute;
+    private RequestContext $context;
     private string $baseDir;
 
     public function __construct(
         RouteParserInterface $routeParser,
         Guard $csrf,
-        string $currentRoute = '',
+        RequestContext $context,
         string $baseDir = ''
     ) {
         $this->routeParser = $routeParser;
         $this->csrf = $csrf;
-        $this->currentRoute = $currentRoute;
+        $this->context = $context;
         $this->baseDir = $baseDir;
     }
 
@@ -38,8 +39,11 @@ class ExtensionTwig extends AbstractExtension
         ];
     }
 
-    public function routeRedirect(string $routeName, array $params = [], array $queryParams = []): string
-    {
+    public function routeRedirect(
+        string $routeName,
+        array $params = [],
+        array $queryParams = []
+    ): string {
         return $this->routeParser->urlFor($routeName, $params, $queryParams);
     }
 
@@ -60,7 +64,12 @@ class ExtensionTwig extends AbstractExtension
             }
 
             $routePath = '/' . trim($routePath, '/');
-            $currentPath = '/' . trim($this->currentRoute, '/');
+
+            $currentPath = $this->context->path();
+            if ($this->baseDir && str_starts_with($currentPath, $this->baseDir)) {
+                $currentPath = substr($currentPath, strlen($this->baseDir));
+            }
+            $currentPath = '/' . trim($currentPath, '/');
 
             return $currentPath === $routePath;
         } catch (\Throwable $e) {

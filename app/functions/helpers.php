@@ -50,11 +50,6 @@ function back(): void
     exit;
 }
 
-function currentRoute()
-{
-    return $GLOBALS['app_config']['current_route'];
-}
-
 function loader(string $file): mixed
 {
     return \App\Services\LoadFileService::file($file);

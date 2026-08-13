@@ -54,7 +54,7 @@ class ForgotPasswordController extends Controller
 
             return $this->twig->render(
                 $response,
-                'pages/forgot.html',
+                'pages/forgot.twig',
                 [
                     'TITLE'     => 'Esqueceu a senha',
                     'OLD_INPUT' => $this->getOldInput(),
@@ -127,7 +127,7 @@ class ForgotPasswordController extends Controller
 
         return $this->twig->render(
             $response,
-            'pages/reset-password.html',
+            'pages/reset-password.twig',
             [
                 'OLD_INPUT' => $this->getOldInput(),
                 'TOKEN'     => $token,

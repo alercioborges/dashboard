@@ -5,6 +5,7 @@ use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Slim\App;
 use App\Views\ExtensionTwig;
+use App\Services\RequestContext;
 use Slim\Csrf\Guard;
 use App\Interfaces\AuthServiceInterface;
 
@@ -54,7 +55,6 @@ return [
 
         $twig->getEnvironment()->addGlobal('base_path', $appConfig['url']);
         $twig->getEnvironment()->addGlobal('get', $_GET ?? []);
-        $twig->getEnvironment()->addGlobal('current_route', $appConfig['current_route']);
         $twig->getEnvironment()->addGlobal('menu_items', $menu_items);
 
         $twig->addExtension($c->get(ExtensionTwig::class));
@@ -79,7 +79,7 @@ return [
         return new ExtensionTwig(
             $routeParser,
             $c->get(Guard::class),
-            $appConfig['current_route'],
+            $c->get(RequestContext::class),
             $appConfig['baseDir']
         );
     },

@@ -68,15 +68,18 @@ class AuthService implements AuthServiceInterface
 
         $this->rememberMeRepository->store($userId, $hash, $expiresAt);
 
-        if (!isset($_COOKIE['remember_me'])) {
+        $this->cookieService->setCookie(
+            'remember_me',
+            $token,
+            $expiresAt->getTimestamp(),
+            '/'
+        );
+    }
 
-            $this->cookieService->setCookie(
-                'remember_me',
-                $token,
-                $expiresAt->getTimestamp(),
-                '/'
-            );
-        }
+    private function rotateRememberMeToken(string $oldHash, int $userId): void
+    {
+        $this->rememberMeRepository->delete($oldHash);
+        $this->createRememberMeToken($userId);
     }
 
     /**
@@ -111,24 +114,24 @@ class AuthService implements AuthServiceInterface
             return false;
         }
 
+        $this->rotateRememberMeToken($hash, $user['id']);
+
         $this->createSessionUser($user['id'], $user['firstname'], $user['lastname'], $user['role_id']);
 
         return true;
     }
 
-    private function createSessionUser(int $id, string $firstname, string $lastname, int $roleId): array
+    private function createSessionUser(int $id, string $firstname, string $lastname, int $roleId): void
     {
-        $userSession = $_SESSION['user'] = [
+        session_regenerate_id(true);
+
+        $_SESSION['user'] = [
             'id'        => $id,
             'firstname' => $firstname,
             'lastname'  => $lastname,
             'role_id'   => $roleId,
             'logged'    => true
         ];
-
-        session_regenerate_id(true);
-
-        return $userSession;
     }
 
     /**

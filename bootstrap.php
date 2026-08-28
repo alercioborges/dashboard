@@ -47,6 +47,10 @@ require __DIR__ . '/app/config/global-vars.php';
 // Load container
 $container = require __DIR__ . '/app/config/container.php';
 
+// Restaura a sessão via remember-me ANTES de qualquer leitura de $_SESSION
+// (o Twig captura o $_SESSION em globals ao ser resolvido)
+$container->get(App\Interfaces\AuthServiceInterface::class)->isAuthenticated();
+
 // Create application
 AppFactory::setContainer($container);
 $app = AppFactory::create();

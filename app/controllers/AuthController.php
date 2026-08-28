@@ -42,7 +42,7 @@ class AuthController extends Controller
         try {
 
             // Redirect if already authenticated
-            if (isset($_SESSION['user'])) {
+            if ($this->authService->isAuthenticated()) {
                 return redirect('/');
             }
 

@@ -35,7 +35,7 @@ abstract class Validation extends Sanitize
     protected function max(string $field, int $max)
     {
         if (!empty($_POST[$field]) && isset($_POST[$field])) {
-            if (strlen($_POST[$field]) > $max) {
+            if (MB_strlen($_POST[$field]) > $max) {
                 $this->errors[$field][] = flash($field, error("O número de caracteres para este campo não pode ser maior que {$max}"));
             }
         }
@@ -44,7 +44,7 @@ abstract class Validation extends Sanitize
     protected function min(string $field, int $min)
     {
         if (!empty($_POST[$field]) && isset($_POST[$field])) {
-            if (strlen($_POST[$field]) < $min) {
+            if (mb_strlen($_POST[$field]) < $min) {
                 $this->errors[$field][] = flash($field, error("O número de caracteres para este campo deve ser maior ou igual a {$min}"));
             }
         }
@@ -52,7 +52,9 @@ abstract class Validation extends Sanitize
 
     protected function uppercase(string $field)
     {
-        $_POST[$field] = mb_strtoupper($_POST[$field]);
+        if (!empty($_POST[$field]) && isset($_POST[$field])) {
+            $_POST[$field] = mb_strtoupper($_POST[$field]);
+        }
     }
 
     protected function onlyLetter(string $field)

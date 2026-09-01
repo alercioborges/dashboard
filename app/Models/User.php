@@ -263,16 +263,18 @@ class User extends Model implements UserRepositoryInterface
     {
         $resets = $this->queryBuilder->select(
             'tbl_password_resets',
-            ['token_hash', 'user_id'],
+            ['*'], //['token_hash', 'user_id'],
             [
                 'id'           => $forgotId,
                 'expires_at >' => (new \DateTime())->format('Y-m-d H:i:s')
             ]
-        );
+        )[0];
 
-        $reset = $resets[0] ?? null;
 
-        if ($reset && $this->passwordService->verify($token, $reset['token_hash'])) {
+
+        if ( //ferificar se o array esta vazio
+            && $this->passwordService->verify($token, $reset['token_hash'])
+            && $resets['used_at'] == NULL ) {
             return $reset;
         }
 
@@ -282,19 +284,38 @@ class User extends Model implements UserRepositoryInterface
 
     public function updatePassword(int $forgotId, int $userId, string $password): bool
     {
-        $result = $this->queryBuilder->update(
-            $this->table,
-            ['password' => $this->passwordService->make($password)],
-            ['id' => $userId]
-        );
+        $this->queryBuilder->beginTransaction();
 
-        $this->queryBuilder->update(
-            'tbl_password_resets',
-            ['used_at' => (new \DateTime())->format('Y-m-d H:i:s')],
-            ['id' => $forgotId]
-        );
+        try {
+            $reset = $this->queryBuilder->update(
+                'tbl_password_resets',
+                ['used_at' => (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s')],
+                [
+                    'id'      => $forgotId,
+                    'user_id' => $userId,
+                    'used_at' => 'IS NULL',
+                ]
+            );
 
-        return $result > 0;
+            if ($reset === 0) {
+                $this->queryBuilder->rollback();
+                return false;
+            }
+
+            $this->queryBuilder->update(
+                $this->table,
+                ['password' => $this->passwordService->make($password)],
+                ['id' => $userId]
+            );
+
+            $this->queryBuilder->commit();
+            return true;
+
+        } catch (\Throwable $e) {
+            
+            $this->queryBuilder->rollback();
+            throw $e;
+        }
     }
 
 

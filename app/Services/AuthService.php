@@ -6,8 +6,10 @@ use App\Interfaces\AuthServiceInterface;
 use App\Interfaces\PermissionRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\RememberMeRepositoryInterface;
+
 use App\Services\TokenService;
 use App\Services\CookieService;
+use App\Services\PasswordService;
 
 /**
  * Authentication Service
@@ -22,19 +24,22 @@ class AuthService implements AuthServiceInterface
     private PermissionRepositoryInterface $permissionRepository;
     private TokenService $tokenService;
     private CookieService $cookieService;
+    private PasswordService  $passwordService;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
         RememberMeRepositoryInterface $rememberMeRepository,
         PermissionRepositoryInterface $permissionRepository,
         TokenService $tokenService,
-        CookieService $cookieService
+        CookieService $cookieService,
+        PasswordService $passwordService
     ) {
         $this->userRepository = $userRepository;
         $this->rememberMeRepository = $rememberMeRepository;
         $this->permissionRepository = $permissionRepository;
         $this->tokenService = $tokenService;
         $this->cookieService = $cookieService;
+        $this->passwordService = $passwordService;
     }
 
     /**
@@ -45,7 +50,10 @@ class AuthService implements AuthServiceInterface
         // Find user by email
         $user = $this->userRepository->findByEmail($email);
 
-        if (!$user || $user['is_active'] === 0 || !password_verify($password, $user['password'])) {
+        $hashToVerify = $user['password'] ?? $this->passwordService->dummyHash();
+        $passwordIsValid = $this->passwordService->verify($password, $hashToVerify);
+
+        if (!$user || $user['is_active'] === 0 || !$passwordIsValid) {
             return false;
         }
 

@@ -114,12 +114,12 @@ class Validator extends Validation
         return $value;
     }
 
-    private function hasOneValidation(string $validate): string
+    private function hasOneValidation(string $validate): bool
     {
-        return substr_count($validate, ':') == 0;
+        return substr_count($validate, ':') === 0;
     }
 
-    private function hasTwoOrMoreValidation(string $validate): string
+    private function hasTwoOrMoreValidation(string $validate): bool
     {
         return substr_count($validate, ':') >= 1;
     }

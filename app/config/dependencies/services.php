@@ -74,8 +74,8 @@ return [
         $c->get(RememberMeRepositoryInterface::class),
         $c->get(PermissionRepositoryInterface::class),
         $c->get(TokenService::class),
-        $c->get(CookieService::class)
-
+        $c->get(CookieService::class),
+        $c->get(PasswordService::class)
     ),
 
     ForgotPasswordServiceInterface::class =>

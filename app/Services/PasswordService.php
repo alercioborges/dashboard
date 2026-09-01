@@ -5,6 +5,7 @@ namespace App\Services;
 class PasswordService
 {
 	private int $cost;
+	private static ?string $dummyHash = null;
 
 	public function __construct(int $cost = 12)
 	{
@@ -13,12 +14,17 @@ class PasswordService
 
 	public function make(String $password): string
 	{
-		$options = ['cost' => $this->cost];		
+		$options = ['cost' => $this->cost];
 		return password_hash($password, PASSWORD_BCRYPT, $options);
 	}
 
 	public function verify(String $password, string $hash): bool
 	{
 		return password_verify($password, $hash);
+	}
+
+	public function dummyHash(): string
+	{
+		return self::$dummyHash ??= $this->make(bin2hex(random_bytes(16)));
 	}
 }

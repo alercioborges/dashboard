@@ -119,11 +119,17 @@ class User extends Model implements UserRepositoryInterface
      */
     public function create(array $data): int
     {
-        $readOnlyId = $this->queryBuilder->select(
+        $roles = $this->queryBuilder->select(
             'tbl_roles',
             ['id'],
             ['shortname' => 'readonly']
-        )[0];
+        );
+
+        if (empty($roles)) {
+            throw new \RuntimeException(
+                "Could not create the user: the default 'readonly' role is not registered."
+            );
+        }
 
         return $this->queryBuilder->insert(
             $this->table,
@@ -132,7 +138,7 @@ class User extends Model implements UserRepositoryInterface
                 'lastname'    => $data['lastname'],
                 'email'       => $data['email'],
                 'password'    => $this->passwordService->make($data['password']),
-                'role_id'     => $readOnlyId['id'],
+                'role_id'     => $roles[0]['id'],
                 'is_active'   => 1
             ]
         );
@@ -159,17 +165,19 @@ class User extends Model implements UserRepositoryInterface
 
     public function changeRole(int $userId, string $shortname_role): bool
     {
-        $role = $this->queryBuilder->select(
+        $roles = $this->queryBuilder->select(
             'tbl_roles',
             ['id'],
             ['shortname' => $shortname_role]
-        )[0];
+        );
+
+        if (empty($roles)) {
+            return false;
+        }
 
         $result = $this->queryBuilder->update(
             $this->table,
-            [
-                'role_id' => $role['id']
-            ],
+            ['role_id' => $roles[0]['id']],
             ['id' => $userId]
         );
 
@@ -189,12 +197,16 @@ class User extends Model implements UserRepositoryInterface
      */
     public function delete(int $id): bool
     {
-        $email = $this->findById($id)['email'];
+        $user = $this->findById($id);
 
+        if (!$user) {
+            return false;
+        }
+        
         $result = $this->queryBuilder->update(
             $this->table,
             [
-                'email'     => $email . '-(del)',
+                'email'     => $user['email'] . '-(del)',
                 'is_active' => 0
             ],
             ['id' => $id]
@@ -263,22 +275,22 @@ class User extends Model implements UserRepositoryInterface
     {
         $resets = $this->queryBuilder->select(
             'tbl_password_resets',
-            ['*'], //['token_hash', 'user_id'],
+            ['token_hash', 'user_id', 'used_at'],
             [
                 'id'           => $forgotId,
                 'expires_at >' => (new \DateTime())->format('Y-m-d H:i:s')
             ]
-        )[0];
+        );
 
-
-
-        if ( //ferificar se o array esta vazio
-            && $this->passwordService->verify($token, $reset['token_hash'])
-            && $resets['used_at'] == NULL ) {
-            return $reset;
+        if (
+            empty($resets)
+            || !$this->passwordService->verify($token, $resets[0]['token_hash'])
+            || $resets[0]['used_at'] !== NULL
+        ) {
+            return NULL;
         }
 
-        return NULL;
+        return $resets[0];
     }
 
 
@@ -310,9 +322,8 @@ class User extends Model implements UserRepositoryInterface
 
             $this->queryBuilder->commit();
             return true;
-
         } catch (\Throwable $e) {
-            
+
             $this->queryBuilder->rollback();
             throw $e;
         }

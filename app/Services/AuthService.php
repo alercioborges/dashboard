@@ -195,7 +195,7 @@ class AuthService implements AuthServiceInterface
         if (!$user) {
             return false;
         }
-
+        
         if (!isset($_SESSION['user']['permissions'])) {
 
             $permissions = $this->permissionRepository

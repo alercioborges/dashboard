@@ -42,10 +42,16 @@ class Setup implements SetupRepositoryInterface
     }
 
     $permissions = [
-      ['slug' => 'users.view',   'description' => 'Visualizar usuários'],
-      ['slug' => 'users.create', 'description' => 'Criar usuários'],
-      ['slug' => 'users.edit',   'description' => 'Editar usuários'],
-      ['slug' => 'users.delete', 'description' => 'Excluir usuários'],
+      ['slug' => 'users.view',      'description' => 'Visualizar usuários'],
+      ['slug' => 'users.create',    'description' => 'Criar usuários'],
+      ['slug' => 'users.edit',      'description' => 'Editar usuários'],
+      ['slug' => 'users.delete',    'description' => 'Excluir usuários'],
+      ['slug' => 'role.view',       'description' => 'Visualizar papéis de usuários'],
+      ['slug' => 'role.create',     'description' => 'Criar papéis de usuários'],
+      ['slug' => 'role.edit',       'description' => 'Editar papéis de usuários'],
+      ['slug' => 'role.delete',     'description' => 'Excluir papéis de usuários'],
+      ['slug' => 'role.assignment', 'description' => 'Atribuição de papéis para usuários'],
+      ['slug' => 'role.assign',     'description' => 'Atribuir papéi para usuário']
     ];
 
     foreach ($permissions as $permission) {

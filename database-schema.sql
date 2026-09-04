@@ -121,7 +121,14 @@ INSERT INTO tbl_permissions (slug, description) VALUES
 ('users.view', 'Visualizar usuários'),
 ('users.create', 'Criar usuários'),
 ('users.edit', 'Editar usuários'),
-('users.delete', 'Excluir usuários');
+('users.delete', 'Excluir usuários'),
+('role.view', 'Visualizar papéis de usuários'),
+('role.create', 'Criar papéis de usuários'),
+('role.edit', 'Editar papéis de usuários'),
+('role.delete', 'Excluir papéis de usuários'),
+('role.assignment', 'Atribuição de papéis para usuários'),
+('role.assign', 'Atribuir papéi para usuário');
+
 
 INSERT INTO tbl_role_permissions (role_id, permission_id)
 SELECT 2, id FROM tbl_permissions;

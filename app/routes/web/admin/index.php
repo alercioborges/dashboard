@@ -12,10 +12,10 @@ $app->group('/admin', function (Slim\Routing\RouteCollectorProxy $group) use ($c
     ->add($permission('users.view'));
 
     // Users routs
-    require 'users.php';
+    require __DIR__ . '/users.php';
 
     // Users routs
-    require 'roles-user.php';
+    require __DIR__ . '/roles-user.php';
     
 })
 ->add(AuthMiddleware::class);

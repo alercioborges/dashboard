@@ -79,16 +79,35 @@ class RoleService
         return $this->roleRepository->delete($id);
     }
 
-    public function countUsers(): ?int
+    private function countRoles(): ?int
     {
         return $this->roleRepository->countAll();
     }
 
-    public function getPaginatedRole(int $page, int $limit): array
+    private function countCreatedRoles(): ?int
     {
-        $total = $this->countUsers();
+        return $this->roleRepository->countAllCreated() ;
+    }
+
+    public function getPaginatedAll(int $page, int $limit): array
+    {
+        $total      = $this->countRoles();
         $pagination = $this->pagination->paginate($page, $limit, $total);
-        $data =  $this->roleRepository->getAll($limit, $pagination['offset']);
+        $data       = $this->roleRepository->getAll($limit, $pagination['offset']);
+
+        return [
+            'data'        => $data,
+            'numPages'    => $pagination['numPages'],
+            'currentPage' => $page,
+            'total'       => $total
+        ];
+    }
+
+    public function getPaginatedAllCreated(int $page, int $limit): array
+    {
+        $total      = $this->countCreatedRoles();
+        $pagination = $this->pagination->paginate($page, $limit, $total);
+        $data       = $this->roleRepository->getAllCreated($limit, $pagination['offset']);
 
         return [
             'data'        => $data,

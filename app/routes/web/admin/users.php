@@ -10,11 +10,11 @@ $group->group('/users', function (Slim\Routing\RouteCollectorProxy $group) use (
 
     $group->get('/create', [UserController::class, 'create'])
     ->setName('users.create')
-    ->add($permission('users.view'));
+    ->add($permission('users.create'));
 
     $group->post('/create', [UserController::class, 'store'])
     ->setName('users.store')
-    ->add($permission('users.view'));;
+    ->add($permission('users.create'));
 
     $group->get('/{id:[0-9]+}/profile', [UserController::class, 'profile'])
     ->setName('users.profile')
@@ -22,14 +22,14 @@ $group->group('/users', function (Slim\Routing\RouteCollectorProxy $group) use (
    
     $group->get('/{id:[0-9]+}/edit', [UserController::class, 'edit'])
     ->setName('users.edit')
-    ->add($permission('users.view'));
+    ->add($permission('users.edit'));
 
     $group->put('/{id:[0-9]+}', [UserController::class, 'update'])
     ->setName('users.update')
-    ->add($permission('users.view'));
+    ->add($permission('users.edit'));
 
     $group->delete('/{id:[0-9]+}', [UserController::class, 'destroy'])
     ->setName('users.destroy')
-    ->add($permission('users.view'));
+    ->add($permission('users.delete'));
     
 });

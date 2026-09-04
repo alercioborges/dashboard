@@ -30,7 +30,7 @@ class RoleController extends Controller
 
         try {
 
-            $pagination = $this->roleService->getPaginatedRole($page, $perPage);
+            $pagination = $this->roleService->getPaginatedAllCreated($page, $perPage);
 
             return $this->twig->render(
                 $response,
@@ -207,6 +207,38 @@ class RoleController extends Controller
                 [
                     'TITLE' => 'Lista de perfis de usuários',
                     'ERROR' => 'Ocorreu um erro ao tentar excluir perfil de usuário'
+                ]
+            );
+        }
+    }
+
+    public function assignment(Request $request, Response $response): Response
+    {
+        $page = (int) ($request->getQueryParams()['page'] ?? 1);
+        $perPage = 10;
+
+        try {
+
+            $pagination = $this->roleService->getPaginatedAll($page, $perPage);
+            
+            return $this->twig->render(
+                $response,
+                'pages/roles-assignment.twig',
+                [
+                    'TITLE'        => 'Atribuir papéis para usuário',
+                    'ROLES'        => $pagination['data'],
+                    'NUM_PAGES'    => $pagination['numPages'],
+                    'CURRENT_PAGE' => $pagination['currentPage']                    
+                ]
+            );
+        } catch (\Exception $e) {
+
+            return $this->twig->render(
+                $response,
+                'pages/roles-assignment.twig',
+                [
+                    'TITLE' => 'Lista de perfis de usuários',
+                    'ERROR' => 'Ocorreu um erro ao tentar carregar papéis de usuário'
                 ]
             );
         }

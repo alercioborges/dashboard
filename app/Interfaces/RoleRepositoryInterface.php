@@ -26,9 +26,14 @@ interface RoleRepositoryInterface
     public function findByShortname(string $shortname): ?array;
 
     /**
+     * Get all user roles that was created with pagination
+     */
+    public function getAllCreated(int $limit = 10, int $offset = 0): array;
+
+    /**
      * Get all user roles with pagination
      */
-    public function getAll(int $limit = 10, int $offset = 1): array;
+    public function getAll(int $limit = 10, int $offset = 0): array;
 
     /**
      * Create new user role
@@ -54,4 +59,9 @@ interface RoleRepositoryInterface
      * Get number of user roles
      */
     public function countAll(): int;
+
+    /**
+     * Get total number of user roles thar was created
+     */
+    public function countAllCreated(): int;
 }

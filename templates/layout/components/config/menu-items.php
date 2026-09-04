@@ -29,7 +29,7 @@ return [
                                 'label' => 'Adicionar usuário',
                                 'icon'  => 'nav-icon bi bi-plus-circle',
                                 'route' => 'users.create',
-                                'permission' => 'users.view'
+                                'permission' => 'users.create'
                             ],
                         ],
                     ],
@@ -41,13 +41,19 @@ return [
                                 'label' => 'Papeis de usuário',
                                 'icon'  => 'nav-icon bi bi-plus-circle',
                                 'route' => 'roles-user.show',
-                                'permission' => 'users.view'
+                                'permission' => 'role.view'
                             ],
                             [
                                 'label' => 'Criar perfil de usuário',
                                 'icon'  => 'nav-icon bi bi-plus-circle',
                                 'route' => 'roles-user.create',
-                                'permission' => 'users.view'
+                                'permission' => 'role.create'
+                            ],
+                            [
+                                'label' => 'Atribuir papéis',
+                                'icon'  => 'nav-icon bi bi-plus-circle',
+                                'route' => 'roles-user.assignment',
+                                'permission' => 'role.assignment'
                             ],                            
                         ],
                     ],

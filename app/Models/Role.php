@@ -80,9 +80,9 @@ class Role extends Model implements RoleRepositoryInterface
 
 
     /**
-     * Get all user roles with pagination
+     * Get all user roles that was created with pagination
      */
-    public function getAll(int $limit = 10, int $offset = 0): array
+    public function getAllCreated(int $limit = 10, int $offset = 0): array
     {
         return $this->queryBuilder->select(
             $this->table,
@@ -95,6 +95,26 @@ class Role extends Model implements RoleRepositoryInterface
             [
                 'shortname NOT IN' => ['readonly', 'admin']
             ],
+            [],
+            $limit,
+            $offset
+        );
+    }
+
+    /**
+     * Get all user roles with pagination
+     */
+    public function getAll(int $limit = 10, int $offset = 0): array
+    {
+        return $this->queryBuilder->select(
+            $this->table,
+            [
+                'id',
+                'name',
+                'description',
+                'created_at'
+            ],
+            [],
             [],
             $limit,
             $offset
@@ -174,6 +194,24 @@ class Role extends Model implements RoleRepositoryInterface
             $this->table,
             [
                 $this->queryBuilder->raw('COUNT(*) AS total')
+            ]
+        );
+
+        return (int) $result[0]['total'];
+    }
+
+    /**
+     * Get total number of user roles thar was created
+     */
+    public function countAllCreated(): int
+    {
+        $result = $this->queryBuilder->select(
+            $this->table,
+            [
+                $this->queryBuilder->raw('COUNT(*) AS total')
+            ],
+            [
+                'shortname NOT IN' => ['readonly', 'admin']
             ]
         );
 

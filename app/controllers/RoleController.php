@@ -220,7 +220,7 @@ class RoleController extends Controller
         try {
 
             $pagination = $this->roleService->getPaginatedAll($page, $perPage);
-            
+
             return $this->twig->render(
                 $response,
                 'pages/roles-assignment.twig',
@@ -228,7 +228,7 @@ class RoleController extends Controller
                     'TITLE'        => 'Atribuir papéis para usuário',
                     'ROLES'        => $pagination['data'],
                     'NUM_PAGES'    => $pagination['numPages'],
-                    'CURRENT_PAGE' => $pagination['currentPage']                    
+                    'CURRENT_PAGE' => $pagination['currentPage']
                 ]
             );
         } catch (\Exception $e) {
@@ -242,5 +242,16 @@ class RoleController extends Controller
                 ]
             );
         }
+    }
+
+    public function assignUser(Request $request, Response $response): Response
+    {
+        return $this->twig->render(
+            $response,
+            'pages/roles-assign-user.twig',
+            [
+                'TITLE'        => 'Atribuir papéis para usuário'
+            ]
+        );
     }
 }

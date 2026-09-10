@@ -28,12 +28,16 @@ $group->group('/roles', function (Slim\Routing\RouteCollectorProxy $group) use (
     ->setName('roles-user.destroy')
     ->add($permission('role.delete'));
 
-    $group->get('/assign', [RoleController::class, 'assignment'])
+    $group->get('/assignment', [RoleController::class, 'assignment'])
     ->setName('roles-user.assignment')
     ->add($permission('role.assignment'));
 
-    $group->post('/assign', [RoleController::class, 'assign'])
+    $group->get('/{id:[0-9]+}/assignment', [RoleController::class, 'assignUser'])
     ->setName('roles-user.assign')
+    ->add($permission('role.assignment'));
+
+    $group->post('/assign', [RoleController::class, 'assign'])
+    ->setName('roles-user.assigned')
     ->add($permission('role.assign'));
 
 });

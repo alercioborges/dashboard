@@ -9,7 +9,7 @@
                 <thead>
                     <tr>
                         <th scope="col">Nome</th>
-                        <th scope="col">Descrição</th>
+                        <th scope="col">Nome breve</th>
                         <th scope="col">Usuários com papel</th>
                     </tr>
                 </thead>
@@ -19,10 +19,13 @@
                     {% for data in ROLES %}
                         <tr class="align-middle">                            
                             <td>
-                                {{ data.name }}
+                                <a href="{{ route_redirect('roles-user.assign', {'id': data.id}) }}">{{ data.name }}</a>
                             </td>
                             <td>
-                                {{ data.description }}
+                                {{ data.shortname }}
+                            </td>
+                            <td>
+                                {{ data.total_user }}
                             </td>
 
                     {% endfor %}
@@ -37,7 +40,4 @@
             <strong>Nenhum perfil de usuário encontrado</strong>
         </div>
     {% endif %}
-
-    <pre>{{ dump(ROLES) }}</pre>
-
 {% endblock %}

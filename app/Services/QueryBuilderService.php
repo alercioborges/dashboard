@@ -308,19 +308,19 @@ class QueryBuilderService
         array $columns = ['*'],
         array $conditions = [],
         array $orderBy = [],
+        array $groupBy = [],
+        array $having = [],
         ?int $limit = null,
-        ?int $offset = null
+        ?int $offset = null        
     ): array {
         try {
             $qb = $this->connection->createQueryBuilder();
             $qb->select(...$this->prepareColumns($columns))
                 ->from($this->quoteTable($mainTable), 'm');
 
-            // Build the JOINs. The ON condition is trusted (hardcoded by dev),
-            // but table/alias are validated.
             foreach ($joins as $alias => [$type, $condition]) {
                 [$table, $joinAlias] = explode(' ', trim($alias));
-                $this->quoteTable($table);   // validate table name
+                $this->quoteTable($table);
                 if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $joinAlias)) {
                     throw new InvalidArgumentException("Invalid join alias: '{$joinAlias}'");
                 }
@@ -329,6 +329,15 @@ class QueryBuilderService
             }
 
             $this->applyConditions($qb, $conditions);
+
+            foreach ($groupBy as $column) {
+                $qb->addGroupBy($this->quoteIdentifier($column));
+            }
+
+            foreach ($having as $fragment) {
+                $qb->andHaving($fragment instanceof RawExpression ? (string) $fragment : $fragment);
+            }
+
             $this->applyOrderBy($qb, $orderBy);
 
             if ($limit !== null) {
@@ -343,6 +352,7 @@ class QueryBuilderService
             throw new Exception("SELECT with JOIN error: " . $e->getMessage(), 0, $e);
         }
     }
+
 
     /**
      * Verify data exists

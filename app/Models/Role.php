@@ -106,15 +106,19 @@ class Role extends Model implements RoleRepositoryInterface
      */
     public function getAll(int $limit = 10, int $offset = 0): array
     {
-        return $this->queryBuilder->select(
+        return $this->queryBuilder->selectWithJoin(
             $this->table,
+            ['tbl_users u' => ['LEFT', 'u.role_id = m.id AND u.is_active = 1']],
             [
-                'id',
-                'name',
-                'description',
-                'created_at'
+                'm.id',
+                'm.name',
+                'm.shortname',
+                'm.description',
+                $this->queryBuilder->raw('COUNT(u.id) AS total_user'),
             ],
             [],
+            ['m.name' => 'ASC'],
+            ['m.id', 'm.name', 'm.shortname', 'm.description'],
             [],
             $limit,
             $offset

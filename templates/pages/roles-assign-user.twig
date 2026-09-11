@@ -69,7 +69,7 @@
 				</div>
 			</div>
 
-			<!-- BOTÕES -->
+			<!-- Buttons -->
 			<div class="col-lg-2 d-flex flex-column justify-content-center gap-4">
 				<button class="btn btn-orange" id="btnAdd">&#9664; Adicionar</button>
 				<button class="btn btn-orange" id="btnRemove">Remover &#9654;</button>
@@ -90,65 +90,14 @@
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
+
+		const roles = {{ ROLES|json_encode|raw }};
+
 		const data = {
 			left: [],
-			right: [
-				{
-					id: 1,
-					name: "Daniel Albuquerque",
-					email: "daniel.albuquerque@grupodirectweb.com.br",
-				},
-				{ id: 2, name: "Marco Antonio", email: "marco@grupodirectweb.com.br" },
-				{
-					id: 3,
-					name: "Alercio Borges da Silva",
-					email: "alercio.borges@grupodirectweb.com.br",
-				},
-				{
-					id: 4,
-					name: "Eder Carvalho",
-					email: "eder.carvalho@grupodirectweb.com.br",
-				},
-				{
-					id: 5,
-					name: "Eder Carvalho",
-					email: "eder.carvalho@grupodirectweb.com.br",
-				},
-				{
-					id: 6,
-					name: "Francinerio Cordeiro",
-					email: "fcordeiro@grupodirectweb.com.br",
-				},
-				{ id: 7, name: "Estudante de Teste", email: "estudante@email.com" },
-				{ id: 8, name: "Estudante de Teste", email: "estudante2@email.com" },
-				{
-					id: 9,
-					name: "Equipe DIRECTWEB",
-					email: "alterar@grupodirectweb.com.br",
-				},
-				{
-					id: 10,
-					name: "Matheus Farina",
-					email: "matheus.farina@cloudsaude.com.br",
-				},
-				{
-					id: 11,
-					name: "Caue Felix Urbini",
-					email: "caue.urbini@grupodirectweb.com.br",
-				},
-				{ id: 12, name: "Mércia Luiz", email: "mercia@grupodirectweb.com.br" },
-				{
-					id: 13,
-					name: "Aline Martins",
-					email: "aline.silva@grupodirectweb.com.br",
-				},
-				{
-					id: 14,
-					name: "Juarez Rodrigues de Paula",
-					email: "juarez.depaula@grupodirectweb.com.br",
-				},
-			],
+			right: roles.map(r => ({ id: r.id, name: r.name}))
 		};
+
 		const sel = { left: new Set(), right: new Set() };
 		const anchor = { left: null, right: null }; // ponto fixo para Shift
 		const cursor = { left: null, right: null }; // item focado
@@ -290,6 +239,6 @@
 		);
 
 		render();
-	</script>
+	</script>	
 
 {% endblock %}

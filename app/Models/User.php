@@ -58,7 +58,10 @@ class User extends Model implements UserRepositoryInterface
                 'is_active',
                 'role_id'
             ],
-            ['email' => $email]
+            [
+                'email' => $email,
+                'is_active' => 1
+            ]
         );
 
         return $user[0] ?? NULL;
@@ -204,7 +207,7 @@ class User extends Model implements UserRepositoryInterface
         if (!$user) {
             return false;
         }
-        
+
         $result = $this->queryBuilder->update(
             $this->table,
             [
@@ -216,6 +219,25 @@ class User extends Model implements UserRepositoryInterface
 
         return $result > 0;
     }
+
+    public function assignedRole(int $role_id): ?array
+    {
+        $user = $this->queryBuilder->select(
+            $this->table,
+            [
+                'id',
+                $this->queryBuilder->raw("CONCAT(firstname, ' ', lastname) AS name"),
+                'email'
+            ],
+            [
+                'Role_id' => $role_id,
+                'is_active' => 1
+            ]
+        );
+
+        return $user ?? NULL;
+    }
+
 
     /**
      * Get number of active users

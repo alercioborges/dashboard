@@ -43,6 +43,11 @@ interface UserRepositoryInterface
     public function findFieldExists(string $field, string $value, string $key, int $id): ?array;
 
     /**
+     * Get users assigned in specific role
+     */
+    public function assignedRole(int $role_id): ?array;
+
+    /**
      * Delete user
      */
     public function delete(int $id): bool;

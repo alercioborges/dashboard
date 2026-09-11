@@ -20,6 +20,7 @@ use App\Services\{
 };
 
 use App\Interfaces\AuthServiceInterface;
+use App\Models\User;
 use App\Services\Validators\Validator;
 
 use Psr\Log\LoggerInterface;
@@ -55,7 +56,8 @@ return [
         return new RoleController(
             $c->get(Twig::class),
             $c->get(RoleService::class),
-            $c->get(Validator::class)
+            $c->get(Validator::class),
+            $c->get(UserService::class)
         );
     },
 

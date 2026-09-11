@@ -9,17 +9,24 @@ use Slim\Views\Twig;
 use App\Core\Controller;
 use App\Services\RoleService;
 use App\Services\Validators\Validator;
+use App\Services\UserService;
 
 class RoleController extends Controller
 {
     private RoleService $roleService;
     private Validator $validator;
+    private UserService $userService;
 
-    public function __construct(Twig $twig, RoleService $roleService, Validator $validator)
-    {
+    public function __construct(
+        Twig $twig,
+        RoleService $roleService,
+        Validator $validator,
+        UserService $userService
+    ) {
         parent::__construct($twig);
         $this->roleService = $roleService;
         $this->validator = $validator;
+        $this->userService = $userService;
     }
 
 
@@ -244,13 +251,17 @@ class RoleController extends Controller
         }
     }
 
-    public function assignUser(Request $request, Response $response): Response
+    public function assignUser(Request $request, Response $response, array $arg): Response
     {
+
+        $assignedUsers = $this->userService->getAssignedRole($arg['id']);
+
         return $this->twig->render(
             $response,
             'pages/roles-assign-user.twig',
             [
-                'TITLE'        => 'Atribuir papéis para usuário'
+                'TITLE' => 'Atribuir papéis para usuário',
+                'ASSIGNED_USERS' => $assignedUsers
             ]
         );
     }

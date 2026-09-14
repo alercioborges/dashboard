@@ -86,21 +86,19 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</div>	
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
 
-		const roles = {{ ROLES|json_encode|raw }};
-
 		const data = {
-			left: [],
-			right: roles.map(r => ({ id: r.id, name: r.name}))
+			left: {{ (ASSIGNED_USERS ?? [])|json_encode|raw }},
+			right: []
 		};
 
 		const sel = { left: new Set(), right: new Set() };
-		const anchor = { left: null, right: null }; // ponto fixo para Shift
-		const cursor = { left: null, right: null }; // item focado
+		const anchor = { left: null, right: null };
+		const cursor = { left: null, right: null };
 		const titles = { left: "Usuários existentes", right: "Usuários potenciais" };
 
 		const visible = (side) =>

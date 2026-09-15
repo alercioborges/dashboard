@@ -48,6 +48,11 @@ interface UserRepositoryInterface
     public function assignedRole(int $role_id): ?array;
 
     /**
+     * Get users unassigned in specific role
+     */
+    public function unassignedRole(int $role_id): ?array;
+
+    /**
      * Delete user
      */
     public function delete(int $id): bool;
@@ -70,7 +75,7 @@ interface UserRepositoryInterface
 
     public function findValidPasswordReset(int $forgotId, string $token): ?array;
 
-     public function updatePassword(int $forgotId, int $userId, string $password): bool;
+    public function updatePassword(int $forgotId, int $userId, string $password): bool;
 
     public function deleteExpiredToken(): bool;
 }

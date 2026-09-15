@@ -110,7 +110,7 @@ class RoleController extends Controller
                 back();
             }
 
-            $this->roleService->createUser($data);
+            $this->roleService->createRole($data);
 
             flash('message', success('Perfil criado com sucesso'));
 
@@ -132,7 +132,7 @@ class RoleController extends Controller
     {
         try {
 
-            $roleData = $this->roleService->getUserById((int) $arg['id']);
+            $roleData = $this->roleService->getRoleById((int) $arg['id']);
 
             return $this->twig->render(
                 $response,
@@ -179,7 +179,7 @@ class RoleController extends Controller
                 back();
             }
 
-            $this->roleService->updateUserRole((int) $arg['id'], $data);
+            $this->roleService->updateRole((int) $arg['id'], $data);
 
             flash('message', success('Perfil atualizado com sucesso'));
 
@@ -253,15 +253,16 @@ class RoleController extends Controller
 
     public function assignUser(Request $request, Response $response, array $arg): Response
     {
-
-        $assignedUsers = $this->userService->getAssignedRole($arg['id']);
+        $assignedUsers   = $this->userService->getAssignedRole($arg['id']);
+        $unassignedUsers = $this->userService->getUnassignedRole($arg['id']);
 
         return $this->twig->render(
             $response,
             'pages/roles-assign-user.twig',
             [
-                'TITLE' => 'Atribuir papéis para usuário',
-                'ASSIGNED_USERS' => $assignedUsers
+                'TITLE'            => 'Atribuir papéis para usuário',
+                'ASSIGNED_USERS'   => $assignedUsers,
+                'UNASSIGNED_USERS' => $unassignedUsers
             ]
         );
     }

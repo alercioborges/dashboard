@@ -73,10 +73,15 @@ class UserService
     {
         return $this->userRepository->findFieldExists('email', $email, 'id', $id);
     }
-    
+
     public function getAssignedRole(int $role_id): ?array
     {
         return $this->userRepository->assignedRole($role_id);
+    }
+
+    public function getUnassignedRole(int $role_id): ?array
+    {
+        return $this->userRepository->unassignedRole($role_id);
     }
 
     public function countUsers(): ?int

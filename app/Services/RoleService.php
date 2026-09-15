@@ -28,7 +28,7 @@ class RoleService
     /**
      * Create new user role
      */
-    public function createUser(array $data): array
+    public function createRole(array $data): array
     {
         $roleId = $this->roleRepository->create($data);
 
@@ -41,7 +41,7 @@ class RoleService
     /**
      * Get user role by ID
      */
-    public function getUserById(int $id): ?array
+    public function getRoleById(int $id): ?array
     {
         return $this->roleRepository->findById($id);
     }
@@ -59,7 +59,7 @@ class RoleService
         return $this->roleRepository->findByShortname($shortname);
     }
 
-    public function updateUserRole(int $id, array $data): bool
+    public function updateRole(int $id, array $data): bool
     {
         return $this->roleRepository->update($id, $data);
     }

@@ -239,6 +239,24 @@ class User extends Model implements UserRepositoryInterface
     }
 
 
+    public function unassignedRole(int $role_id): ?array
+    {
+        $user = $this->queryBuilder->select(
+            $this->table,
+            [
+                'id',
+                $this->queryBuilder->raw("CONCAT(firstname, ' ', lastname) AS name"),
+                'email'
+            ],
+            [
+                'Role_id != ' => $role_id,
+                'is_active' => 1
+            ]
+        );
+
+        return $user ?? NULL;
+    }
+
     /**
      * Get number of active users
      */

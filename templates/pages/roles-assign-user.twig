@@ -2,6 +2,15 @@
 
 {% block content %}
 
+	{{ message('message')|raw }}
+
+	<form id="assignForm" method="POST" action="{{ route_redirect('roles-user.assigned') }}" class="d-none">
+		{{ csrf_input() }}
+		<input type="hidden" name="role_id" value="{{ ROLE_ID }}">
+		<input type="hidden" name="action" value="">
+		<span id="assignIds"></span>
+	</form>
+
 	<style>
 		.panel {
 			background: #f2f2f2;
@@ -211,14 +220,24 @@
 		});
 
 		function move(from, to) {
-			const moved = data[from].filter((u) => sel[from].has(u.id));
-			if (!moved.length) return;
-			data[from] = data[from].filter((u) => !sel[from].has(u.id));
-			data[to] = data[to].concat(moved);
-			sel[from].clear();
-			anchor[from] = null;
-			cursor[from] = null;
-			render();
+			const ids = [...sel[from]];
+			if (!ids.length) return;
+
+			const form = document.getElementById("assignForm");
+			form.querySelector('[name="action"]').value =
+				from === "right" ? "assign" : "remove";
+
+			const holder = document.getElementById("assignIds");
+			holder.innerHTML = "";
+			ids.forEach((id) => {
+				const input = document.createElement("input");
+				input.type = "hidden";
+				input.name = "user_ids[]";
+				input.value = id;
+				holder.appendChild(input);
+			});
+
+			form.submit();
 		}
 		document.getElementById("btnAdd").onclick = () => move("right", "left");
 		document.getElementById("btnRemove").onclick = () => move("left", "right");

@@ -261,9 +261,53 @@ class RoleController extends Controller
             'pages/roles-assign-user.twig',
             [
                 'TITLE'            => 'Atribuir papéis para usuário',
+                'ROLE_ID'          => (int) $arg['id'],
                 'ASSIGNED_USERS'   => $assignedUsers,
                 'UNASSIGNED_USERS' => $unassignedUsers
             ]
         );
+    }
+
+    public function assign(Request $request, Response $response): Response
+    {
+        $data   = (array) $request->getParsedBody();
+        $roleId = (int) ($data['role_id'] ?? 0);
+        $action = (string) ($data['action'] ?? '');
+        $ids    = array_values(array_unique(array_map('intval', (array) ($data['user_ids'] ?? []))));
+        $role   = $this->roleService->getRoleById($roleId) ?? [];
+        $target = $role ? '/admin/roles/' . $roleId . '/assignment' : '/admin/roles/assignment';
+
+        try {
+
+            if (!$role || empty($ids)) {
+                flash('message', error('Selecione ao menos um usuário para atualizar'));
+                return redirect($target);
+            }
+
+            $roleIdToApply = $roleId;
+
+            if ($action === 'remove') {
+                $defaultRole   = $this->roleService->getRoleByShortname('readonly');
+                $roleIdToApply = (int) ($defaultRole['id'] ?? 0);
+            }
+
+            if ($action !== 'assign' && $action !== 'remove' || $roleIdToApply < 1) {
+                flash('message', error('Não foi possível atualizar os usuários do perfil'));
+                return redirect($target);
+            }
+
+            foreach ($ids as $userId) {
+                $this->userService->assignUserRole($userId, $roleIdToApply);
+            }
+
+            flash('message', success('Usuários atualizados com sucesso'));
+
+            return redirect($target);
+        } catch (\Exception $e) {
+
+            flash('message', error('Ocorreu um erro ao atualizar os usuários do perfil'));
+
+            return redirect($target);
+        }
     }
 }

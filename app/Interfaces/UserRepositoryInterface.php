@@ -38,6 +38,11 @@ interface UserRepositoryInterface
     public function changeRole(int $userId, string $sgortname_role): bool;
 
     /**
+     * Assign a user to a role by role ID
+     */
+    public function assignRole(int $userId, int $roleId): bool;
+
+    /**
      * find user by field
      */
     public function findFieldExists(string $field, string $value, string $key, int $id): ?array;

@@ -21,6 +21,11 @@ interface UserRepositoryInterface
     public function findByEmail(string $email): ?array;
 
     /**
+     * Find user by user role ID
+     */
+    public function findByRoleId(int $roleId): ?array;
+
+    /**
      * Get all active users with pagination
      */
     public function getAll(int $limit = 10, int $offset = 0, array $search = []): array;

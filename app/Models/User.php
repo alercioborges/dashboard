@@ -66,6 +66,27 @@ class User extends Model implements UserRepositoryInterface
 
         return $user[0] ?? NULL;
     }
+    
+
+    /**
+     * Find user by user role ID
+     */
+    public function findByRoleId(int $roleId): ?array
+    {
+        $user = $this->queryBuilder->select(
+            $this->table,
+            [
+                'id',
+                'role_id'
+            ],
+            [
+                'role_id' => $roleId,
+                'is_active' => 1
+            ]
+        );
+
+        return $user ?? NULL;
+    }
 
 
     private function buildConditions(array $search): array

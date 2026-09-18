@@ -71,7 +71,9 @@ class ExtensionTwig extends AbstractExtension
             }
             $currentPath = '/' . trim($currentPath, '/');
 
-            return $currentPath === $routePath;
+            // Rotas com segmento dinâmico (ex.: /admin/roles/9/assignment) não
+            // podem ser geradas por urlFor sem parâmetros; ignora os numéricos.
+            return preg_replace('#/\d+#', '', $currentPath) === $routePath;
         } catch (\Throwable $e) {
             return false;
         }

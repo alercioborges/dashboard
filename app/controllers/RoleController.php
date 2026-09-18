@@ -200,8 +200,19 @@ class RoleController extends Controller
     public function destroy(Request $request, Response $response, array $arg): Response
     {
         try {
+            
+            $roleId = (int) $arg['id'];
+            $readOlyRolyId = $this->roleService->getRoleByShortname('readonly');
 
-            $this->roleService->deleteRole((int) $arg['id']);
+            $users = $this->userService->getUserByRoleId($roleId);
+
+            if (!empty($users)) {
+                foreach ($users as $user) {
+                    $this->userService->assignUserRole($user['id'], $readOlyRolyId['id']);
+                }
+            }
+            
+            $this->roleService->deleteRole($roleId);
 
             flash('message', success('Perfil excluído com sucesso'));
 
@@ -253,15 +264,18 @@ class RoleController extends Controller
 
     public function assignUser(Request $request, Response $response, array $arg): Response
     {
+        $roleId = (int) $arg['id'];
         $assignedUsers   = $this->userService->getAssignedRole($arg['id']);
         $unassignedUsers = $this->userService->getUnassignedRole($arg['id']);
+        $roleData = $this->roleService->getRoleById($roleId);
 
         return $this->twig->render(
             $response,
             'pages/roles-assign-user.twig',
             [
                 'TITLE'            => 'Atribuir papéis para usuário',
-                'ROLE_ID'          => (int) $arg['id'],
+                'ROLE_ID'          => $roleId,
+                'ROLE_SHORTNAME'   => $roleData['shortname'],
                 'ASSIGNED_USERS'   => $assignedUsers,
                 'UNASSIGNED_USERS' => $unassignedUsers
             ]
@@ -270,7 +284,7 @@ class RoleController extends Controller
 
     public function assign(Request $request, Response $response): Response
     {
-        $data   = (array) $request->getParsedBody();
+        $data   = (array) $request->getParsedBody();        
         $roleId = (int) ($data['role_id'] ?? 0);
         $action = (string) ($data['action'] ?? '');
         $ids    = array_values(array_unique(array_map('intval', (array) ($data['user_ids'] ?? []))));

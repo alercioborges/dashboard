@@ -54,6 +54,14 @@ class UserService
         return $this->userRepository->findByEmail($email);
     }
 
+    /**
+     * Get users by user role ID
+     */
+    public function getUserByRoleId(int $roleId): ?array
+    {
+        return $this->userRepository->findByRoleId($roleId);
+    }
+
     public function deleteUser(int $id): bool
     {
         return $this->userRepository->delete($id);

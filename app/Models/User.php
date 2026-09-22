@@ -221,6 +221,17 @@ class User extends Model implements UserRepositoryInterface
         return $result > 0;
     }
 
+    public function switchRole(array $usersId, int $roleId): bool
+    {
+        $result = $this->queryBuilder->update(
+            $this->table,
+            ['role_id' => $roleId],
+            ['id IN' => $usersId]
+        );
+
+        return $result > 0;
+    }
+
     /**
      * Get specific users data
      */
@@ -395,10 +406,13 @@ class User extends Model implements UserRepositoryInterface
             );
 
             $this->queryBuilder->commit();
+
             return true;
+
         } catch (\Throwable $e) {
 
             $this->queryBuilder->rollback();
+            
             throw $e;
         }
     }

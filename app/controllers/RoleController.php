@@ -204,12 +204,10 @@ class RoleController extends Controller
             $roleId = (int) $arg['id'];
             $readOlyRolyId = $this->roleService->getRoleByShortname('readonly');
 
-            $users = $this->userService->getUserByRoleId($roleId);
-
+            $users = $this->userService->getUserByRoleId($roleId);            
+            
             if (!empty($users)) {
-                foreach ($users as $user) {
-                    $this->userService->assignUserRole($user['id'], $readOlyRolyId['id']);
-                }
+                $this->userService->switchUsersRole(array_column($users, 'id'), $readOlyRolyId['id']);
             }
             
             $this->roleService->deleteRole($roleId);
@@ -284,10 +282,10 @@ class RoleController extends Controller
 
     public function assign(Request $request, Response $response): Response
     {
-        $data   = (array) $request->getParsedBody();        
+        $data   = (array) $request->getParsedBody();
         $roleId = (int) ($data['role_id'] ?? 0);
         $action = (string) ($data['action'] ?? '');
-        $ids    = array_values(array_unique(array_map('intval', (array) ($data['user_ids'] ?? []))));
+        $ids    = (array) ($data['user_ids'] ?? []);
         $role   = $this->roleService->getRoleById($roleId) ?? [];
         $target = $role ? '/admin/roles/' . $roleId . '/assignment' : '/admin/roles/assignment';
 

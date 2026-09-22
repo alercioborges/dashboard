@@ -82,6 +82,13 @@ class UserService
         return $this->userRepository->assignRole($userId, $roleId);
     }
 
+     public function switchUsersRole(array $users, int $roleId): bool
+    {
+        return $this->userRepository->switchRole($users, $roleId);
+    }
+
+
+
     public function emailExists(string $email, int $id): ?array
     {
         return $this->userRepository->findFieldExists('email', $email, 'id', $id);

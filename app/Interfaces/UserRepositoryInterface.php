@@ -48,6 +48,11 @@ interface UserRepositoryInterface
     public function assignRole(int $userId, int $roleId): bool;
 
     /**
+     * Switch user role
+     */
+    public function switchRole(array $users, int $roleId): bool;
+
+    /**
      * find user by field
      */
     public function findFieldExists(string $field, string $value, string $key, int $id): ?array;

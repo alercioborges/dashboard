@@ -215,6 +215,7 @@ class RoleController extends Controller
             flash('message', success('Perfil excluído com sucesso'));
 
             return redirect('/admin/roles');
+
         } catch (\Exception $e) {
 
             return $this->twig->render(
@@ -262,10 +263,10 @@ class RoleController extends Controller
 
     public function assignUser(Request $request, Response $response, array $arg): Response
     {
-        $roleId = (int) $arg['id'];
-        $assignedUsers   = $this->userService->getAssignedRole($arg['id']);
+        $roleId          = (int) $arg['id'];
+        $assignedUsers   = $this->userService->getAssignedRole($roleId);
         $unassignedUsers = $this->userService->getUnassignedRole($arg['id']);
-        $roleData = $this->roleService->getRoleById($roleId);
+        $roleData        = $this->roleService->getRoleById($roleId);
 
         return $this->twig->render(
             $response,
@@ -307,18 +308,15 @@ class RoleController extends Controller
                 flash('message', error('Não foi possível atualizar os usuários do perfil'));
                 return redirect($target);
             }
-
-            foreach ($ids as $userId) {
-                $this->userService->assignUserRole($userId, $roleIdToApply);
-            }
+            
+            $this->userService->switchUsersRole($ids, $roleIdToApply);
 
             flash('message', success('Usuários atualizados com sucesso'));
-
             return redirect($target);
+
         } catch (\Exception $e) {
 
             flash('message', error('Ocorreu um erro ao atualizar os usuários do perfil'));
-
             return redirect($target);
         }
     }

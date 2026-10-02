@@ -30,47 +30,63 @@ class CookieService
     /**
      * Cria (define) um cookie de forma segura.
      *
-     * @param string      $name     Nome do cookie.
-     * @param string      $value    Valor do cookie.
-     * @param int         $duration de duração.
-     * @param string      $path     Caminho de validade.
+     * @param string   $name     Nome do cookie.
+     * @param string   $value    Valor do cookie.
+     * @param int|null $duration Duração em segundos (padrão: 7 dias; 0 = cookie de sessão).
+     * @param string   $path     Caminho de validade.
+     * @param string   $sameSite 'Lax', 'Strict' ou 'None'.
      *
-     * @return bool  Resultado do setcookie().
+     * @return bool Resultado do setcookie().
      * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     public function setCookie(
         string $name,
         string $value,
-        int $duration = 3000,
-        string $path = '/'
+        ?int $duration = null,
+        string $path = '/',
+        string $sameSite = 'Lax'
     ): bool {
-
-        // Validação do nome.
-        if ($name === '' || preg_match('/[=,; \t\r\n\013\014]/', $name)) {
+        // Validação do nome (token RFC 6265)
+        if ($name === '' || !preg_match('/^[!#$%&\'*+\-.^_`|~0-9A-Za-z]+$/', $name)) {
             throw new InvalidArgumentException("Nome de cookie inválido: '{$name}'.");
         }
 
-        // Não permite enviar cookie após o output já ter começado.
+        if ($duration !== null && $duration < 0) {
+            throw new InvalidArgumentException('A duração não pode ser negativa.');
+        }
+
+        $sameSite = ucfirst(strtolower($sameSite));
+        if (!in_array($sameSite, ['Lax', 'Strict', 'None'], true)) {
+            throw new InvalidArgumentException("SameSite inválido: '{$sameSite}'.");
+        }
+
+        $secure = self::isSecureConnection();
+
+        // SameSite=None exige Secure nos navegadores modernos
+        if ($sameSite === 'None' && !$secure) {
+            throw new RuntimeException('SameSite=None exige conexão HTTPS.');
+        }
+
         if (headers_sent($file, $line)) {
             throw new RuntimeException("Headers já enviados em {$file}:{$line}.");
         }
 
-        return setcookie(
-            $name,
-            $value,
-            [
-                'expires'  => $duration,
-                'path'     => $path,
-                'domain'   => '',
-                'secure'   => self::isSecureConnection(),
-                'httponly' => true,
-                'samesite' => 'Lax'
-            ]
-        );
+        $duration ??= 7 * 24 * 60 * 60; // 7 dias
+        $expires  = $duration === 0 ? 0 : time() + $duration;
+
+        return setcookie($name, $value, [
+            'expires'  => $expires,
+            'path'     => $path,
+            'domain'   => '',
+            'secure'   => $secure,
+            'httponly' => true,
+            'samesite' => $sameSite,
+        ]);
     }
 
     /**
-     * Recupera o valor de um cookie.
+     * Retrieves the value of a cookie.
      */
     public function getCookie(string $name): ?string
     {
@@ -78,7 +94,7 @@ class CookieService
     }
 
     /**
-     * Remove um cookie definindo expiração no passado.
+     * Removes a cookie by setting its expiration date in the past.
      */
     public function deleteCookie(string $name, string $path = '/'): bool
     {

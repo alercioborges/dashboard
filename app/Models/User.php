@@ -101,14 +101,14 @@ class User extends Model implements UserRepositoryInterface
                 $filterField[$key] = trim($value ?? '');
             }
 
-            if ($filterField['name'] !== '') {
+            if ($filterField['name'] ?? '') {
                 $conditions['name_search'] = $this->queryBuilder->rawCondition(
                     "CONCAT(m.firstname, ' ', m.lastname) LIKE",
                     '%' . $filterField['name'] . '%'
                 );
             }
 
-            if ($filterField['email'] !== '') {
+            if ($filterField['email'] ?? '') {
                 $conditions['m.email LIKE'] = '%' . $filterField['email'] . '%';
             }
         }
@@ -273,7 +273,7 @@ class User extends Model implements UserRepositoryInterface
                 'email'
             ],
             [
-                'Role_id' => $role_id,
+                'role_id' => $role_id,
                 'is_active' => 1
             ]
         );
@@ -292,7 +292,7 @@ class User extends Model implements UserRepositoryInterface
                 'email'
             ],
             [
-                'Role_id != ' => $role_id,
+                'role_id !=' => $role_id,
                 'is_active' => 1
             ]
         );

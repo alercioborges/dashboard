@@ -47,6 +47,8 @@ class RememberMe extends Model implements RememberMeRepositoryInterface
                 'm.expires_at >' => date('Y-m-d H:i:s')
             ],
             [],
+            [],
+            [],
             1
         );
 

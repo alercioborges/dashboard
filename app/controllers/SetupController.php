@@ -43,6 +43,11 @@ class SetupController extends Controller
     {
         try {
 
+            // Redirect if already authenticated
+            if ($this->authService->isAuthenticated()) {
+                return redirect('/');
+            }
+
             return $this->twig->render(
                 $response,
                 'pages/setup-user.twig',
@@ -79,15 +84,19 @@ class SetupController extends Controller
             $this->setOldInput($data);
             back();
         }
-        
+
         $this->SetupService->setupInitialDataInsert();
-        
+
         $user = $this->userService->createUser($data);
 
         $this->userService->changeUserRole($user['user_id'], 'admin');
 
         $logged = $this->authService->authenticate($data['email'], $data['password'], true);
 
-        return redirect('/');
+        if ($logged) {
+            return redirect('/');
+        }
+
+         return redirect('/setup');
     }
 }

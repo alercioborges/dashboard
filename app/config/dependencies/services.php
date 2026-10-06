@@ -12,7 +12,6 @@ use Monolog\Level;
 use PHPMailer\PHPMailer\PHPMailer;
 
 use App\Services\{
-    SetupService,
     QueryBuilderService,
     UserService,
     RoleService,
@@ -27,7 +26,6 @@ use App\Services\{
 };
 
 use App\Interfaces\{
-    SetupRepositoryInterface,
     UserRepositoryInterface,
     RoleRepositoryInterface,
     RememberMeRepositoryInterface,
@@ -37,11 +35,6 @@ use App\Interfaces\{
 };
 
 return [
-
-    SetupService::class =>
-    fn(ContainerInterface $c) => new SetupService(
-        $c->get(SetupRepositoryInterface::class)
-    ),
 
     QueryBuilderService::class =>
     fn(ContainerInterface $c) => new QueryBuilderService(

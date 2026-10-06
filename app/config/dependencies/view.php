@@ -20,7 +20,7 @@ return [
 
         $twig = Twig::create(__DIR__ . '/../../../templates/', [
             'cache' => $appConfig['env'] === 'production'
-                ? loader('/storage/localcache')
+                ? __DIR__ . '/../../../storage/localcache'
                 : false,
             'debug' => $appConfig['debug'],
             'auto_reload' => $appConfig['debug']

@@ -21,22 +21,19 @@ class SetupController extends Controller
     private Validator $validator;
     private LoggerInterface $logger;
     private AuthService $authService;
-    private SetupService $SetupService;
 
     public function __construct(
         Twig $twig,
         UserService $userService,
         Validator $validator,
         LoggerInterface $logger,
-        AuthService $authService,
-        SetupService $SetupService
+        AuthService $authService
     ) {
         parent::__construct($twig);
         $this->userService = $userService;
         $this->validator   = $validator;
         $this->logger      = $logger;
         $this->authService = $authService;
-        $this->SetupService = $SetupService;
     }
 
     public function index(Request $request, Response $response): Response
@@ -44,8 +41,8 @@ class SetupController extends Controller
         try {
 
             // Redirect if already authenticated
-            if ($this->authService->isAuthenticated()) {
-                return redirect('/');
+            if ($this->authService->isAuthenticated() === true) {
+                $this->authService->logout($_SESSION['user']['id']);
             }
 
             return $this->twig->render(
@@ -84,8 +81,6 @@ class SetupController extends Controller
             $this->setOldInput($data);
             back();
         }
-
-        $this->SetupService->setupInitialDataInsert();
 
         $user = $this->userService->createUser($data);
 

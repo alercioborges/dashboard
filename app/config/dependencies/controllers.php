@@ -91,8 +91,7 @@ return [
             $c->get(UserService::class),
             $c->get(Validator::class),
             $c->get(LoggerInterface::class),
-            $c->get(AuthServiceInterface::class),
-            $c->get(SetupService::class)            
+            $c->get(AuthServiceInterface::class)  
         );
     }
 

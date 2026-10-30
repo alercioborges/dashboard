@@ -13,12 +13,16 @@ use App\Interfaces\AuthServiceInterface;
 
 use App\Services\AuthService;
 use App\Services\RequestContext;;
+use App\Services\RateLimiterService;
+
+
 
 use App\Middlewares\{
     AuthMiddleware,
     PermissionMiddleware,
     SetupMiddleware,
-    RequestContextMiddleware
+    RequestContextMiddleware,
+    RateLimitMiddleware
 };
 
 
@@ -143,5 +147,25 @@ return [
         return new RequestContextMiddleware(
             $c->get(RequestContext::class)
         );
+    },
+
+    /**
+     * Rate Limit Middleware Factory
+     *
+     */
+    RateLimitMiddleware::class => function (ContainerInterface $c): callable {
+
+        return function (string $action, int $maxAttempts, int $decayMinutes) use ($c): RateLimitMiddleware {
+
+            $trustedProxies = $c->get('appConfig')['trusted_proxies'] ?? [];
+
+            return new RateLimitMiddleware(
+                $c->get(RateLimiterService::class),
+                $action,
+                $maxAttempts,
+                $decayMinutes,
+                $trustedProxies
+            );
+        };
     },
 ];

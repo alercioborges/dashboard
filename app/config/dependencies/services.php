@@ -22,7 +22,8 @@ use App\Services\{
     PaginationService,
     TokenService,
     CookieService,
-    RequestContext
+    RequestContext,
+    RateLimiterService
 };
 
 use App\Interfaces\{
@@ -94,7 +95,7 @@ return [
         return new PHPMailer(true);
     },
 
-    RequestContext::class => function(): RequestContext {
+    RequestContext::class => function (): RequestContext {
         return new RequestContext();
     },
 
@@ -132,6 +133,12 @@ return [
             $c->get('mailer_twig'),
             $c->get(PHPMailer::class),
             $appConfig['env'] === 'development'
+        );
+    },
+
+    RateLimiterService::class => function (ContainerInterface $c): RateLimiterService {
+        return new RateLimiterService(
+            $c->get(QueryBuilderService::class)
         );
     },
 

@@ -16,3 +16,12 @@ composer require doctrine/sql-formatter
 
 // Excexutar dump do schema do bd
 vendor/bin/doctrine-migrations dump-schema --formatted
+
+
+____________________________________________
+
+// Executar nova migration
+vendor/bin/doctrine-migrations version 'App\Migrations\{versão atual}' --delete -n
+vendor/bin/doctrine-migrations version 'App\Migrations\{nova versão}' --add -n
+vendor/bin/doctrine-migrations status
+vendor/bin/doctrine-migrations migrate

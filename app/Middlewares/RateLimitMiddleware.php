@@ -41,6 +41,7 @@ class RateLimitMiddleware implements MiddlewareInterface
                 flash('error', error("Muitas tentativas. Tente novamente em {$minutes} minuto(s)."));
 
                 return redirect($request->getUri()->getPath())->withStatus(429);
+                //return redirect('/login');
             }
         }
 

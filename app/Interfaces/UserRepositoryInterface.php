@@ -93,4 +93,9 @@ interface UserRepositoryInterface
     public function updatePassword(int $forgotId, int $userId, string $password): bool;
 
     public function deleteExpiredToken(): bool;
+
+    /**
+     * Number of active users with the 'admin' role, ignoring the given user IDs.
+     */
+    public function countActiveAdmins(array $excludeIds = []): int;
 }

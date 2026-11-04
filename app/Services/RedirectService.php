@@ -14,12 +14,11 @@ class RedirectService
         $this->response = $response;
     }
 
-    public static function redirect(string $target): Response
+    public static function redirect(string $target, int $status): Response
     {
-        $response = new Response;
-        return $response
+        return (new Response)
             ->withHeader('Location', getUrl() . $target)
-            ->withStatus(302);
+            ->withStatus($status);
     }
 
     public static function back(): void

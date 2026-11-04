@@ -39,9 +39,9 @@ function getDir(): string
     return $GLOBALS['app_config']['baseDir'];
 }
 
-function redirect(string $target): Slim\Psr7\Response
+function redirect(string $target, int $status = 302): Slim\Psr7\Response
 {
-    return \App\Services\RedirectService::redirect($target);
+    return \App\Services\RedirectService::redirect($target, $status);
 }
 
 function back(): void

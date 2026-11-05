@@ -38,42 +38,47 @@
                                         <i class="fa fa-edit"></i> Editar
                                     </a>
 
-                                    {# Botão que abre o modal de exclusão #}
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#confirm-delete-{{ data.id }}" class="btn btn-danger btn-xs m-1">
-                                        <i class="fa fa-trash"></i> Excluir
-                                    </a>
+                                    {% if (data.id != CURRENT_ID) and (data.shortname_role != "admin") %}
+                                        {# Botão que abre o modal de exclusão #}
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#confirm-delete-{{ data.id }}" class="btn btn-danger btn-xs m-1">
+                                            <i class="fa fa-trash"></i> Excluir
+                                        </a>
 
-                                    {# Modal de confirmação de exclusão #}
-                                    <div class="modal fade" id="confirm-delete-{{ data.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ data.id }}" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered modal-lg">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h3 id="modalLabel-{{ data.id }}" class="mb-0">
-                                                        <b>Exclusão de usuário</b>
-                                                    </h3>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <h6>
-                                                        Deseja realmente excluir o usuário de nome
-                                                        {{ data.name }}
-                                                        <br>
-                                                        e de e-mail
-                                                        {{ data.email }}?
-                                                    </h6>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        {# Modal de confirmação de exclusão #}                                    
+                                        <div class="modal fade" id="confirm-delete-{{ data.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ data.id }}" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h3 id="modalLabel-{{ data.id }}" class="mb-0">
+                                                            <b>Exclusão de usuário</b>
+                                                        </h3>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <h6>
+                                                            Deseja realmente excluir o usuário de nome
+                                                            {{ data.name }}
+                                                            <br>
+                                                            e de e-mail
+                                                            {{ data.email }}?
+                                                        </h6>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
 
-                                                    <form method="POST" action="{{ route_redirect('users.destroy', {'id': data.id}) }}" enctype="application/x-www-form-urlencoded">
-                                                        {{ csrf_input() }}
-                                                        <input type="hidden" name="_METHOD" value="DELETE">
-                                                        <button type="submit" class="btn btn-danger">Excluir</button>
-                                                    </form>
+                                                        <form method="POST" action="{{ route_redirect('users.destroy', {'id': data.id}) }}" enctype="application/x-www-form-urlencoded">
+                                                            {{ csrf_input() }}
+                                                            <input type="hidden" name="_METHOD" value="DELETE">
+                                                            <button type="submit" class="btn btn-danger">Excluir</button>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                        <!-- end modal user delete  -->
+                                    {% endif %}
+
+
                                 </td>
                             </tr>
                         {% endfor %}

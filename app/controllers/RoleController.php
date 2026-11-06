@@ -200,22 +200,28 @@ class RoleController extends Controller
     public function destroy(Request $request, Response $response, array $arg): Response
     {
         try {
-            
-            $roleId = (int) $arg['id'];
-            $readOlyRolyId = $this->roleService->getRoleByShortname('readonly');
 
-            $users = $this->userService->getUserByRoleId($roleId);            
-            
-            if (!empty($users)) {
-                $this->userService->switchUsersRole(array_column($users, 'id'), $readOlyRolyId['id']);
+            $roleId = (int) $arg['id'];
+            $role   = $this->roleService->getRoleById($roleId);
+
+            if (!$role || in_array($role['shortname'], ['admin', 'readonly'], true)) {
+                flash('message', error('Este perfil é protegido e não pode ser excluído.'));
+                return redirect('/admin/roles');
             }
-            
+
+            $readOnlyRole = $this->roleService->getRoleByShortname('readonly');
+
+            $users = $this->userService->getUserByRoleId($roleId);
+
+            if (!empty($users)) {
+                $this->userService->switchUsersRole(array_column($users, 'id'), $readOnlyRole['id']);
+            }
+
             $this->roleService->deleteRole($roleId);
 
             flash('message', success('Perfil excluído com sucesso'));
 
             return redirect('/admin/roles');
-
         } catch (\Exception $e) {
 
             return $this->twig->render(
@@ -286,17 +292,27 @@ class RoleController extends Controller
         $data   = (array) $request->getParsedBody();
         $roleId = (int) ($data['role_id'] ?? 0);
         $action = (string) ($data['action'] ?? '');
-        $ids    = (array) ($data['user_ids'] ?? []);
-        $role   = $this->roleService->getRoleById($roleId) ?? [];
-        $target = $role ? '/admin/roles/' . $roleId . '/assignment' : '/admin/roles/assignment';
+
+        // POST envia strings; normaliza para inteiros positivos únicos
+        $ids = array_values(array_unique(array_filter(
+            array_map('intval', (array) ($data['user_ids'] ?? [])),
+            fn(int $id): bool => $id > 0
+        )));
+
+        $target = $roleId > 0
+            ? '/admin/roles/' . $roleId . '/assignment'
+            : '/admin/roles/assignment';
 
         try {
+
+            $role = $this->roleService->getRoleById($roleId) ?? [];
 
             if (!$role || empty($ids)) {
                 flash('message', error('Selecione ao menos um usuário para atualizar'));
                 return redirect($target);
             }
 
+            $adminRoleId   = (int) ($this->roleService->getRoleByShortname('admin')['id'] ?? 0);
             $roleIdToApply = $roleId;
 
             if ($action === 'remove') {
@@ -304,16 +320,31 @@ class RoleController extends Controller
                 $roleIdToApply = (int) ($defaultRole['id'] ?? 0);
             }
 
-            if ($action !== 'assign' && $action !== 'remove' || $roleIdToApply < 1) {
+            if (($action !== 'assign' && $action !== 'remove') || $roleIdToApply < 1) {
                 flash('message', error('Não foi possível atualizar os usuários do perfil'));
                 return redirect($target);
             }
-            
+
+            // Proteção contra lockout: só importa quando o perfil aplicado NÃO é admin
+            if ($roleIdToApply !== $adminRoleId) {
+
+                $currentUserId = (int) ($_SESSION['user']['id'] ?? 0);
+
+                if (in_array($currentUserId, $ids, true)) {
+                    flash('message', error('Você não pode alterar o seu próprio perfil de acesso.'));
+                    return redirect($target);
+                }
+
+                if ($this->userService->wouldLeaveNoAdmin($ids)) {
+                    flash('message', error('Operação bloqueada: o sistema precisa ter ao menos um administrador.'));
+                    return redirect($target);
+                }
+            }
+
             $this->userService->switchUsersRole($ids, $roleIdToApply);
 
             flash('message', success('Usuários atualizados com sucesso'));
             return redirect($target);
-
         } catch (\Exception $e) {
 
             flash('message', error('Ocorreu um erro ao atualizar os usuários do perfil'));

@@ -96,4 +96,17 @@ class RateLimiterService
             'action'     => $action
         ]);
     }
+
+    /**
+     * Delete expired attempts 
+     */
+    public function deleteExpired(): void
+    {
+        $this->queryBuilder->delete(
+            self::TABLE,
+            [
+                'created_at <' => (new \DateTime())->format('Y-m-d H:i:s')
+            ]
+        );
+    }
 }

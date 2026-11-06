@@ -16,7 +16,7 @@ use App\Services\{
     UserService,
     RoleService,
     ForgotPasswordService,
-    SetupService
+    RateLimiterService
 };
 
 use App\Interfaces\AuthServiceInterface;
@@ -71,7 +71,8 @@ return [
             $c->get(Twig::class),
             $c->get(AuthServiceInterface::class),
             $c->get(LoggerInterface::class),
-            $c->get(Validator::class)
+            $c->get(Validator::class),
+            $c->get(RateLimiterService::class)
         );
     },
 

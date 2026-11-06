@@ -66,7 +66,7 @@ class User extends Model implements UserRepositoryInterface
 
         return $user[0] ?? NULL;
     }
-    
+
 
     /**
      * Find user by user role ID
@@ -129,7 +129,8 @@ class User extends Model implements UserRepositoryInterface
                 "m.id",
                 $this->queryBuilder->raw("CONCAT(m.firstname, ' ', m.lastname) AS name"),
                 "m.email",
-                "r.name AS role"
+                "r.name AS role",
+                "r.shortname AS shortname_role"
             ],
             $this->buildConditions($search),
             ['m.id' => 'ASC'],
@@ -301,6 +302,29 @@ class User extends Model implements UserRepositoryInterface
     }
 
     /**
+     * Number of active users with the 'admin' role, ignoring the given user IDs.
+     */
+    public function countActiveAdmins(array $excludeIds = []): int
+    {
+        // NOT IN () vazio gera SQL inválido, então só entra se houver ids
+        if (!empty($excludeIds)) {
+            $conditions['m.id NOT IN'] = array_map('intval', $excludeIds);
+        }
+
+        $result = $this->queryBuilder->selectWithJoin(
+            $this->table,
+            ['tbl_roles r' => ['INNER', 'r.id = m.role_id']],
+            [$this->queryBuilder->raw('COUNT(*) AS total')],
+            [
+                'r.shortname' => 'admin',
+                'm.is_active' => 1
+            ]
+        );
+
+        return (int) ($result[0]['total'] ?? 0);
+    }
+
+    /**
      * Get number of active users
      */
     public function countAll(): int
@@ -408,11 +432,10 @@ class User extends Model implements UserRepositoryInterface
             $this->queryBuilder->commit();
 
             return true;
-
         } catch (\Throwable $e) {
 
             $this->queryBuilder->rollback();
-            
+
             throw $e;
         }
     }

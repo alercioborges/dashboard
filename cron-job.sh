@@ -41,6 +41,7 @@ fi
 SCRIPTS=(
     "${SCRIPT_DIR}/app/cli/remember_me.php"
     "${SCRIPT_DIR}/app/cli/forgot_password.php"
+    "${SCRIPT_DIR}/app/cli/rate_limit.php"
 )
 
 LOG_FILE="${LOG_FILE:-${SCRIPT_DIR}/storage/logs/cron-job.log}"

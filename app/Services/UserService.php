@@ -82,16 +82,19 @@ class UserService
         return $this->userRepository->assignRole($userId, $roleId);
     }
 
-     public function switchUsersRole(array $users, int $roleId): bool
+    public function switchUsersRole(array $users, int $roleId): bool
     {
         return $this->userRepository->switchRole($users, $roleId);
     }
 
-
-
     public function emailExists(string $email, int $id): ?array
     {
         return $this->userRepository->findFieldExists('email', $email, 'id', $id);
+    }
+
+    public function wouldLeaveNoAdmin(array $affectedUserIds): bool
+    {
+        return $this->userRepository->countActiveAdmins($affectedUserIds) < 1;
     }
 
     public function getAssignedRole(int $role_id): ?array

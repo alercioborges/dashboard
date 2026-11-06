@@ -1,0 +1,6 @@
+[2026-11-06 16:45:42] Starting record cleanup...
+[2026-11-06 16:45:42] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-06 16:45:43] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-06 16:45:43] Process finished.

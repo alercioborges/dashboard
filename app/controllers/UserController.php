@@ -48,10 +48,10 @@ class UserController extends Controller
                     'NUM_PAGES'     => $pagination['numPages'],
                     'CURRENT_PAGE'  => $pagination['currentPage'],
                     'SEARCH_PARAMS' => $this->getSearchUrlParams($search),
-                    'SEARCH_VALUES' => $search
+                    'SEARCH_VALUES' => $search,
+                    'CURRENT_ID'    => $_SESSION['user']['id'] ?? NULL
                 ]
             );
-            
         } catch (\Exception $e) {
 
             return $this->twig->render(
@@ -221,18 +221,29 @@ class UserController extends Controller
                 ]
             );
         }
-    }   
+    }
 
     public function destroy(Request $request, Response $response, array $arg): Response
     {
         try {
+
+            $id = (int) $arg['id'];
+
+            if ($id === (int) ($_SESSION['user']['id'] ?? 0)) {
+                flash('message', error('Você não pode excluir o seu próprio usuário.'));
+                return redirect('/admin/users');
+            }
+
+            if ($this->userService->wouldLeaveNoAdmin([$id])) {
+                flash('message', error('Não é possível excluir o último administrador do sistema.'));
+                return redirect('/admin/users');
+            }
 
             $this->userService->deleteUser((int) $arg['id']);
 
             flash('message', success('Usuário excluído com sucesso'));
 
             return redirect('/admin/users');
-
         } catch (\Exception $e) {
 
             return $this->twig->render(

@@ -9,6 +9,7 @@ use Slim\Views\Twig;
 use App\Core\Controller;
 use App\Interfaces\AuthServiceInterface;
 use App\Services\Validators\Validator;
+use App\Services\RateLimiterService;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -20,18 +21,21 @@ class AuthController extends Controller
 {
     private AuthServiceInterface $authService;
     private Validator $validator;
+    private RateLimiterService $rateLimiter;
     private LoggerInterface $logger;
 
     public function __construct(
         Twig $twig,
         AuthServiceInterface $authService,
         LoggerInterface $logger,
-        Validator $validator
+        Validator $validator,
+        RateLimiterService $rateLimiter
     ) {
         parent::__construct($twig);
         $this->authService = $authService;
         $this->logger = $logger;
         $this->validator = $validator;
+        $this->rateLimiter = $rateLimiter;
     }
 
     /**
@@ -87,6 +91,11 @@ class AuthController extends Controller
             $logged = $this->authService->authenticate($data['email'], $data['password'], $remember);
 
             if ($logged) {
+                
+                // Clears rate limit for this account
+                $ip = \App\Support\ClientIp::resolve($request);
+                $this->rateLimiter->clear("email:" . mb_strtolower($data['email']) . ":login", 'login');
+                $this->rateLimiter->clear("ip:{$ip}", 'login');
 
                 if (isset($_SESSION['redirect'])) {
                     $redirect = $_SESSION['redirect'];
@@ -119,7 +128,6 @@ class AuthController extends Controller
             }
 
             return redirect('/login');
-            
         } catch (\Exception $e) {
 
             return $this->twig->render(

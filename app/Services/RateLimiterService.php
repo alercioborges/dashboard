@@ -105,7 +105,7 @@ class RateLimiterService
         $this->queryBuilder->delete(
             self::TABLE,
             [
-                'created_at <' => (new \DateTime())->format('Y-m-d H:i:s')
+                'created_at <' => (new \DateTime('-24 hour'))->format('Y-m-d H:i:s')
             ]
         );
     }

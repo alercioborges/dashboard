@@ -4,3 +4,321 @@
 [2026-11-06 16:45:43] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
     Expired tokens successfully removed
 [2026-11-06 16:45:43] Process finished.
+[2026-11-11 10:09:31] Starting record cleanup...
+[2026-11-11 10:09:31] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    
+Fatal error: Uncaught Error: Call to undefined method App\Services\RememberMeService::deleteExpired() in C:\wamp64\www\dashboard\app\cli\remember_me.php on line 8
+
+Error: Call to undefined method App\Services\RememberMeService::deleteExpired() in C:\wamp64\www\dashboard\app\cli\remember_me.php on line 8
+
+Call Stack:
+    0.0005     402544   1. {main}() C:\wamp64\www\dashboard\app\cli\remember_me.php:0
+
+[2026-11-11 10:09:32] ❌ Failed: /c/wamp64/www/dashboard/app/cli/remember_me.php
+[2026-11-11 10:09:32] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 10:09:33] ⚠️  Script not found, skipping: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+[2026-11-11 10:09:33] Process finished.
+[2026-11-11 10:15:59] Starting record cleanup...
+[2026-11-11 10:15:59] ⚠️  Script not found, skipping: /c/wamp64/www/dashboard/app/cli/remember_me.php
+[2026-11-11 10:15:59] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 10:16:00] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    
+Fatal error: Uncaught Error: Call to undefined method App\Services\RememberMeService::deleteExpired() in C:\wamp64\www\dashboard\app\cli\rate_limit.php on line 8
+
+Error: Call to undefined method App\Services\RememberMeService::deleteExpired() in C:\wamp64\www\dashboard\app\cli\rate_limit.php on line 8
+
+Call Stack:
+    0.0005     402544   1. {main}() C:\wamp64\www\dashboard\app\cli\rate_limit.php:0
+
+[2026-11-11 10:16:01] ❌ Failed: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+[2026-11-11 10:16:01] Process finished.
+[2026-11-11 10:41:02] Starting record cleanup...
+[2026-11-11 10:41:03] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 10:41:03] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 10:41:04] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 10:41:04] Process finished.
+[2026-11-11 11:05:55] Starting record cleanup...
+[2026-11-11 11:05:55] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:05:56] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:05:56] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:05:57] Process finished.
+[2026-11-11 11:06:59] Starting record cleanup...
+[2026-11-11 11:06:59] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:06:59] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:07:00] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:07:00] Process finished.
+[2026-11-11 11:08:25] Starting record cleanup...
+[2026-11-11 11:08:25] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:08:25] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:08:26] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:08:26] Process finished.
+[2026-11-11 11:09:27] Starting record cleanup...
+[2026-11-11 11:09:27] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:09:27] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:09:28] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:09:28] Process finished.
+[2026-11-11 11:10:17] Starting record cleanup...
+[2026-11-11 11:10:17] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:10:17] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:10:18] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:10:18] Process finished.
+[2026-11-11 11:10:41] Starting record cleanup...
+[2026-11-11 11:10:41] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:10:41] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:10:42] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:10:42] Process finished.
+[2026-11-11 11:11:24] Starting record cleanup...
+[2026-11-11 11:11:24] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:11:24] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:11:25] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:11:25] Process finished.
+[2026-11-11 11:13:03] Starting record cleanup...
+[2026-11-11 11:13:03] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:13:03] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:13:04] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:13:04] Process finished.
+[2026-11-11 11:14:10] Starting record cleanup...
+[2026-11-11 11:14:10] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:14:11] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:14:11] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:14:12] Process finished.
+[2026-11-11 11:16:21] Starting record cleanup...
+[2026-11-11 11:16:21] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:16:21] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:16:22] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:16:22] Process finished.
+[2026-11-11 11:17:57] Starting record cleanup...
+[2026-11-11 11:17:57] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:17:58] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:17:58] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:17:59] Process finished.
+[2026-11-11 11:19:47] Starting record cleanup...
+[2026-11-11 11:19:47] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:19:47] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:19:48] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:19:48] Process finished.
+[2026-11-11 11:20:17] Starting record cleanup...
+[2026-11-11 11:20:17] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:20:18] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:20:18] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:20:19] Process finished.
+[2026-11-11 11:21:42] Starting record cleanup...
+[2026-11-11 11:21:42] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:21:43] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:21:43] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:21:44] Process finished.
+[2026-11-11 11:22:25] Starting record cleanup...
+[2026-11-11 11:22:25] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:22:26] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:22:26] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:22:27] Process finished.
+[2026-11-11 11:25:51] Starting record cleanup...
+[2026-11-11 11:25:51] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:25:51] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:25:52] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:25:52] Process finished.
+[2026-11-11 11:26:24] Starting record cleanup...
+[2026-11-11 11:26:24] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:26:25] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:26:25] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:26:26] Process finished.
+[2026-11-11 11:27:20] Starting record cleanup...
+[2026-11-11 11:27:20] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:27:21] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:27:21] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:27:22] Process finished.
+[2026-11-11 11:30:31] Starting record cleanup...
+[2026-11-11 11:30:31] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:30:31] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:30:32] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:30:32] Process finished.
+[2026-11-11 11:31:48] Starting record cleanup...
+[2026-11-11 11:31:48] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:31:49] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:31:49] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:31:50] Process finished.
+[2026-11-11 11:32:44] Starting record cleanup...
+[2026-11-11 11:32:44] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:32:45] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:32:45] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:32:46] Process finished.
+[2026-11-11 11:34:03] Starting record cleanup...
+[2026-11-11 11:34:03] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 11:34:03] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 11:34:04] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 11:34:04] Process finished.
+[2026-11-11 15:35:48] Starting record cleanup...
+[2026-11-11 15:35:48] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 15:35:49] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 15:35:49] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 15:35:50] Process finished.
+[2026-11-11 15:44:47] Starting record cleanup...
+[2026-11-11 15:44:48] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 15:44:48] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 15:44:48] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 15:44:49] Process finished.
+[2026-11-11 15:52:14] Starting record cleanup...
+[2026-11-11 15:52:14] Starting record cleanup...
+[2026-11-11 15:52:14] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 15:52:15] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 15:52:15] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+g: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 15:52:15] Process finished.
+[2026-11-11 15:52:15] Process finished.
+[2026-11-11 15:53:52] Starting record cleanup...
+[2026-11-11 15:53:52] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 15:53:52] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 15:53:53] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 15:53:53] Process finished.
+[2026-11-11 16:02:01] Starting record cleanup...
+[2026-11-11 16:02:01] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 16:02:02] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 16:02:02] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 16:02:03] Process finished.
+[2026-11-11 16:30:33] Starting record cleanup...
+[2026-11-11 16:30:33] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 16:30:34] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 16:30:34] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 16:30:35] Process finished.
+[2026-11-11 16:50:28] Starting record cleanup...
+[2026-11-11 16:50:28] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 16:50:29] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 16:50:29] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 16:50:30] Process finished.
+[2026-11-11 16:54:10] Starting record cleanup...
+[2026-11-11 16:54:11] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 16:54:11] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 16:54:11] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 16:54:12] Process finished.
+[2026-11-11 16:54:43] Starting record cleanup...
+[2026-11-11 16:54:43] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 16:54:43] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 16:54:44] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 16:54:44] Process finished.
+[2026-11-11 16:55:11] Starting record cleanup...
+[2026-11-11 16:55:11] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 16:55:12] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 16:55:12] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 16:55:13] Process finished.
+[2026-11-11 16:55:35] Starting record cleanup...
+[2026-11-11 16:55:35] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 16:55:35] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 16:55:36] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 16:55:36] Process finished.
+[2026-11-11 16:57:12] Starting record cleanup...
+[2026-11-11 16:57:12] ➡️  Running: /c/wamp64/www/dashboard/app/cli/remember_me.php
+    Expired tokens successfully removed.
+[2026-11-11 16:57:13] ➡️  Running: /c/wamp64/www/dashboard/app/cli/forgot_password.php
+    Expired tokens successfully removed
+[2026-11-11 16:57:13] ➡️  Running: /c/wamp64/www/dashboard/app/cli/rate_limit.php
+    Expired login attempts removed.
+[2026-11-11 16:57:14] Process finished.

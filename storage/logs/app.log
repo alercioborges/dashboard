@@ -8818,3 +8818,4 @@
 [2026-11-06T18:15:36.338813+00:00] app.DEBUG: [SMTP] CLIENT -> SERVER: QUIT [] []
 [2026-11-06T18:15:36.558862+00:00] app.DEBUG: [SMTP] SERVER -> CLIENT: 221 2.0.0 closing connection 956f58d0204a3-67c13635b27sm2429621d50.22 - gsmtp [] []
 [2026-11-06T18:15:36.559848+00:00] app.INFO: Password reset email sent {"email":"alercio1@email.com"} []
+[2026-11-11T15:30:35.236651-03:00] app.WARNING: [CSRF] Token validation failed. {"method":"POST","uri":"/login","had_session":false} []

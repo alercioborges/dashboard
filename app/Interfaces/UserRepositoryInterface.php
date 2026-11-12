@@ -40,7 +40,7 @@ interface UserRepositoryInterface
      */
     public function update(int $id, array $data): bool;
 
-    public function changeRole(int $userId, string $sgortname_role): bool;
+    public function changeRole(int $userId, string $shortname_role): bool;
 
     /**
      * Assign a user to a role by role ID

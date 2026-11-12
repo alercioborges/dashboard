@@ -23,9 +23,6 @@ class RoleService
     }
 
     /**
-     * Create new user with validation
-     */
-    /**
      * Create new user role
      */
     public function createRole(array $data): array

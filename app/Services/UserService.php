@@ -25,9 +25,6 @@ class UserService
     /**
      * Create new user with validation
      */
-    /**
-     * Create new user with validation
-     */
     public function createUser(array $data): array
     {
         $userId = $this->userRepository->create($data);

@@ -40,6 +40,11 @@ interface UserRepositoryInterface
      */
     public function update(int $id, array $data): bool;
 
+    /**
+     * Records the moment of the user's last successful login.
+     */
+    public function updateLastLogin(int $id): void;
+
     public function changeRole(int $userId, string $shortname_role): bool;
 
     /**

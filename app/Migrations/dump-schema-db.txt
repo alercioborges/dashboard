@@ -25,3 +25,9 @@ vendor/bin/doctrine-migrations version 'App\Migrations\{versão atual}' --delete
 vendor/bin/doctrine-migrations version 'App\Migrations\{nova versão}' --add -n
 vendor/bin/doctrine-migrations status
 vendor/bin/doctrine-migrations migrate
+
+
+______________________________
+
+//Criar um novo arquivo de mivration
+vendor/bin/doctrine-migrations migrations:generate

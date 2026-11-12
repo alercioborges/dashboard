@@ -1,5 +1,4 @@
 <?php
-// app/config/migrations-db.php
 
 $dbConfig = require __DIR__ . '/../database.php';
 

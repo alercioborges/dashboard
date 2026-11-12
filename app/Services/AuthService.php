@@ -58,6 +58,7 @@ class AuthService implements AuthServiceInterface
         }
 
         $this->createSessionUser($user['id'], $user['firstname'], $user['lastname'], $user['role_id']);
+        $this->registerLogin($user['id']);
 
         if ($remember) {
             $this->createRememberMeToken($user['id']);
@@ -125,8 +126,18 @@ class AuthService implements AuthServiceInterface
         $this->rotateRememberMeToken($hash, $user['id']);
 
         $this->createSessionUser($user['id'], $user['firstname'], $user['lastname'], $user['role_id']);
+        $this->registerLogin($user['id']);
 
         return true;
+    }
+
+    private function registerLogin(int $userId): void
+    {
+        try {
+            $this->userRepository->updateLastLogin($userId);
+        } catch (\Throwable $e) {
+            error_log('[LAST_LOGIN_ERROR]: ' . $e->getMessage());
+        }
     }
 
     private function createSessionUser(int $id, string $firstname, string $lastname, int $roleId): void
@@ -195,7 +206,7 @@ class AuthService implements AuthServiceInterface
         if (!$user) {
             return false;
         }
-        
+
         if (!isset($_SESSION['user']['permissions'])) {
 
             $permissions = $this->permissionRepository

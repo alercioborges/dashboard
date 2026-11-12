@@ -189,6 +189,18 @@ class User extends Model implements UserRepositoryInterface
         return $result > 0;
     }
 
+    /**
+     * Records the moment of the user's last successful login.
+     */
+    public function updateLastLogin(int $id): void
+    {
+        $this->queryBuilder->update(
+            $this->table,
+            ['last_login' => (new \DateTime())->format('Y-m-d H:i:s')],
+            ['id' => $id]
+        );
+    }
+
 
     public function changeRole(int $userId, string $shortname_role): bool
     {

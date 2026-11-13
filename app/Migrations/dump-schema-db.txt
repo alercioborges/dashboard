@@ -25,9 +25,20 @@ vendor/bin/doctrine-migrations version 'App\Migrations\{versão atual}' --delete
 vendor/bin/doctrine-migrations version 'App\Migrations\{nova versão}' --add -n
 vendor/bin/doctrine-migrations status
 vendor/bin/doctrine-migrations migrate
-
-
 ______________________________
+
+
+//Repetir a execução de uma migration
+vendor/bin/doctrine-migrations migrations:version 'App\Migrations\{versão atual}' --delete -n
+vendor/bin/doctrine-migrations migrate --no-interaction
+______________________
+
 
 //Criar um novo arquivo de mivration
 vendor/bin/doctrine-migrations migrations:generate
+
+
+
+
+
+

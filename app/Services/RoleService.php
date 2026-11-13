@@ -91,7 +91,7 @@ class RoleService
         $total      = $this->countRoles();
         $pagination = $this->pagination->paginate($page, $limit, $total);
         $data       = $this->roleRepository->getAll($limit, $pagination['offset']);
-
+        
         return [
             'data'        => $data,
             'numPages'    => $pagination['numPages'],
@@ -105,7 +105,7 @@ class RoleService
         $total      = $this->countCreatedRoles();
         $pagination = $this->pagination->paginate($page, $limit, $total);
         $data       = $this->roleRepository->getAllCreated($limit, $pagination['offset']);
-
+        
         return [
             'data'        => $data,
             'numPages'    => $pagination['numPages'],

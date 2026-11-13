@@ -30,7 +30,10 @@ class Role extends Model implements RoleRepositoryInterface
                 'created_at',
                 'updated_at'
             ],
-            ['id' => $id]
+            [
+                'is_active' => 1,
+                'id' => $id
+            ]
         );
 
         return $roleData[0] ?? NULL;
@@ -51,7 +54,10 @@ class Role extends Model implements RoleRepositoryInterface
                 'created_at',
                 'updated_at'
             ],
-            ['name' => $name]
+            [
+                'is_active' => 1,
+                'name' => $name
+            ]
         );
 
         return $roleData[0] ?? NULL;
@@ -72,7 +78,10 @@ class Role extends Model implements RoleRepositoryInterface
                 'created_at',
                 'updated_at'
             ],
-            ['shortname' => $shortname]
+            [
+                'is_active' => 1,
+                'shortname' => $shortname
+            ]
         );
 
         return $roleData[0] ?? NULL;
@@ -93,6 +102,7 @@ class Role extends Model implements RoleRepositoryInterface
                 'created_at'
             ],
             [
+                'is_active' => 1,
                 'shortname NOT IN' => ['readonly', 'admin']
             ],
             [],
@@ -116,7 +126,7 @@ class Role extends Model implements RoleRepositoryInterface
                 'm.description',
                 $this->queryBuilder->raw('COUNT(u.id) AS total_user'),
             ],
-            [],
+            ['m.is_active' => 1],
             ['m.name' => 'ASC'],
             ['m.id', 'm.name', 'm.shortname', 'm.description'],
             [],
@@ -137,6 +147,7 @@ class Role extends Model implements RoleRepositoryInterface
                 'name'        => $data['name'],
                 'shortname'   => $data['shortname'],
                 'description' => $data['description'],
+                'is_active'   => 1,
                 'created_at'  => date('Y-m-d H:i:s'),
                 'updated_at'  => NULL
             ]
@@ -157,6 +168,7 @@ class Role extends Model implements RoleRepositoryInterface
                 'updated_at'  => date('Y-m-d H:i:s')
             ],
             [
+                'is_active' => 1,
                 'shortname NOT IN' => ['readonly', 'admin'],
                 'id' => $id
             ]
@@ -178,9 +190,21 @@ class Role extends Model implements RoleRepositoryInterface
      */
     public function delete(int $id): bool
     {
-        $result = $this->queryBuilder->delete(
+        $role = $this->findById($id);
+
+        if (!$role) {
+            return false;
+        }
+
+        $result = $this->queryBuilder->update(
             $this->table,
             [
+                'name'      => $role['name'] . '-(del)',
+                'shortname' => $role['shortname'] . '-(del)',
+                'is_active' => 0
+            ],
+            [
+                'is_active' => 1,
                 'shortname NOT IN' => ['readonly', 'admin'],
                 'id' => $id
             ]
@@ -198,6 +222,9 @@ class Role extends Model implements RoleRepositoryInterface
             $this->table,
             [
                 $this->queryBuilder->raw('COUNT(*) AS total')
+            ],
+            [
+                'is_active' => 1
             ]
         );
 
@@ -215,6 +242,7 @@ class Role extends Model implements RoleRepositoryInterface
                 $this->queryBuilder->raw('COUNT(*) AS total')
             ],
             [
+                'is_active' => 1,
                 'shortname NOT IN' => ['readonly', 'admin']
             ]
         );

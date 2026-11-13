@@ -19,4 +19,7 @@ if ($GLOBALS['app_config']['env'] === 'production') {
     $containerBuilder->enableCompilation(__DIR__ . '/../../storage/cache');
 }
 
+//Tests
+$containerBuilder->addDefinitions(__DIR__ . '/dependencies/tests/services.php');
+
 return $containerBuilder->build();

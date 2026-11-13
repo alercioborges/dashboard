@@ -7,7 +7,7 @@
    <!-- Onde estão os testes? -->
    <testsuites>
     <testsuite name="Minha Suite de Testes">
-        <directory>tests</directory>
+        <directory suffix="Teste.php">tests</directory>
     </testsuite>
 </testsuites>
 

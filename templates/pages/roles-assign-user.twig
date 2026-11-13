@@ -98,10 +98,12 @@
 			</div>
 		</div>
 	</div>
+	<pre>{{ dump(UNASSIGNED_USERS2) }}</pre>
 	
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	
 	<script>
+
 	const data = {
 		left: {{ (ASSIGNED_USERS ?? [])|json_encode|raw }},
 		right: {{ (UNASSIGNED_USERS ?? [])|json_encode|raw }}
@@ -134,8 +136,8 @@
 			boxEl(side).innerHTML = list.length
 				? `<div class="group-title">${titles[side]} (${list.length})</div>` +
 					list
-						.map(
-							(u) =>
+						.map(							
+							(u) =>							
 								`<div class="item ${sel[side].has(u.id) ? "sel" : ""}" data-id="${u.id}" data-side="${side}">${u.name} (<span class="mail">${u.email}</span>)</div>`
 						)
 						.join("")

@@ -282,7 +282,11 @@ class RoleController extends Controller
                 'ROLE_ID'          => $roleId,
                 'ROLE_SHORTNAME'   => $roleData['shortname'],
                 'ASSIGNED_USERS'   => $assignedUsers,
-                'UNASSIGNED_USERS' => $unassignedUsers
+                'UNASSIGNED_USERS' => $unassignedUsers,
+                'UNASSIGNED_USERS2' => array_values(array_filter(
+                    $unassignedUsers,
+                    fn($u) => (int) $u['id'] !== (int) $_SESSION['user']['id']
+                ))
             ]
         );
     }

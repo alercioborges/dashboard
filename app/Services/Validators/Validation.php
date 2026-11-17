@@ -16,7 +16,7 @@ abstract class Validation extends Sanitize
 
     protected function required(string $field)
     {
-        if (empty($_POST[$field]) || !isset($_POST[$field]) || $_POST[$field] === '') {
+        if (!isset($_POST[$field]) || trim((string)$_POST[$field]) === '') {
             $this->errors[$field][] = flash($field, error('Campo obrigatório'));
         } else if (trim($_POST[$field]) === '') {
             $this->errors[$field][] = flash($field, error('O campo contém apenas espaços'));

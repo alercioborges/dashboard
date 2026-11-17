@@ -269,26 +269,47 @@ class RoleController extends Controller
 
     public function assignUser(Request $request, Response $response, array $arg): Response
     {
-        $roleId          = (int) $arg['id'];
-        $assignedUsers   = $this->userService->getAssignedRole($roleId);
-        $unassignedUsers = $this->userService->getUnassignedRole($arg['id']);
-        $roleData        = $this->roleService->getRoleById($roleId);
+        $roleId         = (int) $arg['id'];
+        $roleData       = $this->roleService->getRoleById($roleId);
+        $currentUserId  = (int) ($_SESSION['user']['id'] ?? 0);
+
+        // Carrega 1 registro a mais que o limite (20): se passar, entra em modo
+        // "busca" e os dados só são carregados sob demanda, evitando sobrecarga.
+        $assignedUsers   = $this->userService->getAssignedRole($roleId, '', 21) ?? [];
+        $unassignedUsers = $this->userService->getUnassignedRole($roleId, '', 21, $currentUserId) ?? [];
+
+        $assignedExceeds   = count($assignedUsers) > 20;
+        $unassignedExceeds = count($unassignedUsers) > 20;
 
         return $this->twig->render(
             $response,
             'pages/roles-assign-user.twig',
             [
-                'TITLE'            => 'Atribuir papéis para usuário',
-                'ROLE_ID'          => $roleId,
-                'ROLE_SHORTNAME'   => $roleData['shortname'],
-                'ASSIGNED_USERS'   => $assignedUsers,
-                'UNASSIGNED_USERS' => $unassignedUsers,
-                'UNASSIGNED_USERS2' => array_values(array_filter(
-                    $unassignedUsers,
-                    fn($u) => (int) $u['id'] !== (int) $_SESSION['user']['id']
-                ))
+                'TITLE'              => 'Atribuir papéis para usuário',
+                'ROLE_ID'            => $roleId,
+                'ROLE_SHORTNAME'     => $roleData['shortname'],
+                'ASSIGNED_USERS'     => $assignedExceeds ? [] : $assignedUsers,
+                'UNASSIGNED_USERS'   => $unassignedExceeds ? [] : $unassignedUsers,
+                'ASSIGNED_EXCEEDS'   => $assignedExceeds,
+                'UNASSIGNED_EXCEEDS' => $unassignedExceeds
             ]
         );
+    }
+
+    public function assignmentSearch(Request $request, Response $response, array $arg): Response
+    {
+        $roleId        = (int) $arg['id'];
+        $side          = (string) ($request->getQueryParams()['side'] ?? 'assigned');
+        $search        = trim((string) ($request->getQueryParams()['q'] ?? ''));
+        $currentUserId = (int) ($_SESSION['user']['id'] ?? 0);
+
+        $users = $side === 'unassigned'
+            ? ($this->userService->getUnassignedRole($roleId, $search, 100, $currentUserId) ?? [])
+            : ($this->userService->getAssignedRole($roleId, $search, 100) ?? []);
+
+        $response->getBody()->write(json_encode($users));
+
+        return $response->withHeader('Content-Type', 'application/json');
     }
 
     public function assign(Request $request, Response $response): Response
@@ -326,6 +347,13 @@ class RoleController extends Controller
 
             if (($action !== 'assign' && $action !== 'remove') || $roleIdToApply < 1) {
                 flash('message', error('Não foi possível atualizar os usuários do perfil'));
+                return redirect($target);
+            }
+
+            $currentUserRoleId = (int) ($_SESSION['user']['role_id']);
+
+            if ($roleIdToApply === $adminRoleId and $currentUserRoleId !== $adminRoleId) {
+                flash('message', error('Somente usuários com papel de administrador podem definir o papel de administrador para outro usuário.'));
                 return redirect($target);
             }
 

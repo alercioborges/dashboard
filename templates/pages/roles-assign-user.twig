@@ -98,12 +98,17 @@
 			</div>
 		</div>
 	</div>
-	<pre>{{ dump(UNASSIGNED_USERS2) }}</pre>
-	
+		
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	
 	<script>
 
+	const ROLE_ID = {{ ROLE_ID }};
+	const BASE = {{ base_path|json_encode|raw }};
+	const EXCEEDS = {
+		left: {{ ASSIGNED_EXCEEDS ? 'true' : 'false' }},
+		right: {{ UNASSIGNED_EXCEEDS ? 'true' : 'false' }}
+	};
 	const data = {
 		left: {{ (ASSIGNED_USERS ?? [])|json_encode|raw }},
 		right: {{ (UNASSIGNED_USERS ?? [])|json_encode|raw }}
@@ -125,14 +130,25 @@
 
 	const visible = (side) => {
 		const t = searchEl(side).value.trim().toLowerCase();
+		if (!t) {
+			return EXCEEDS[side] ? [] : data[side];
+		}
 		return data[side].filter(
-			(u) => !t || (u.name + " " + u.email).toLowerCase().includes(t)
+			(u) => (u.name + " " + u.email).toLowerCase().includes(t)
 		);
 	};
 
 	function render() {
 		["left", "right"].forEach((side) => {
 			const list = visible(side);
+
+			if (EXCEEDS[side] && !searchEl(side).value.trim()) {
+				boxEl(side).innerHTML =
+					`<div class="group-title">${titles[side]}</div>` +
+					`<div class="text-muted px-2">Muitos usuários. Digite no campo de busca para filtrar.</div>`;
+				return;
+			}
+
 			boxEl(side).innerHTML = list.length
 				? `<div class="group-title">${titles[side]} (${list.length})</div>` +
 					list
@@ -236,13 +252,46 @@
 	if (btnAdd) btnAdd.onclick = () => move("right", "left");
 	if (btnRemove) btnRemove.onclick = () => move("left", "right");
 
-	["searchLeft", "searchRight"].forEach((i) =>
-		document.getElementById(i).addEventListener("input", render)
-	);
+	const timers = { left: null, right: null };
+
+	async function fetchSide(side) {
+		const q = searchEl(side).value.trim();
+		if (!q) {
+			data[side] = [];
+			render();
+			return;
+		}
+		try {
+			const sideParam = side === "left" ? "assigned" : "unassigned";
+			const res = await fetch(
+				`${BASE}/admin/roles/${ROLE_ID}/assignment/search?side=${sideParam}&q=${encodeURIComponent(q)}`
+			);
+			data[side] = await res.json();
+			render();
+		} catch (e) {
+			data[side] = [];
+			render();
+		}
+	}
+
+	["searchLeft", "searchRight"].forEach((i) => {
+		const side = i === "searchLeft" ? "left" : "right";
+		document.getElementById(i).addEventListener("input", () => {
+			if (EXCEEDS[side]) {
+				clearTimeout(timers[side]);
+				timers[side] = setTimeout(() => fetchSide(side), 300);
+			} else {
+				render();
+			}
+		});
+	});
+
 	document.querySelectorAll("[data-clear]").forEach((b) => {
 		b.type = "button";
 		b.onclick = () => {
-			searchEl(b.dataset.clear).value = "";
+			const side = b.dataset.clear;
+			searchEl(side).value = "";
+			if (EXCEEDS[side]) data[side] = [];
 			render();
 		};
 	});

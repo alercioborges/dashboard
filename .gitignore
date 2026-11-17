@@ -17,3 +17,6 @@ storage/localcache/*
 !storage/localcache/.gitkeep
 storage/log/*
 !storage/log/.gitkeep
+
+#phpunit cache file
+.phpunit.cache/

@@ -1,6 +1,6 @@
 <?php
 
-namespace Services\Tests;
+namespace Tests\Unit\Services;
 
 use App\Interfaces\PermissionRepositoryInterface;
 use App\Interfaces\RememberMeRepositoryInterface;
@@ -9,11 +9,12 @@ use App\Services\AuthService;
 use App\Services\CookieService;
 use App\Services\PasswordService;
 use App\Services\TokenService;
+
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-class AuthServiceTeste extends TestCase
+class AuthServiceTest extends TestCase
 {
     private UserRepositoryInterface $userRepository;
     private RememberMeRepositoryInterface $rememberMeRepository;

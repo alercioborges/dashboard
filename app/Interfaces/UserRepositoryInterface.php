@@ -65,12 +65,12 @@ interface UserRepositoryInterface
     /**
      * Get users assigned in specific role
      */
-    public function assignedRole(int $role_id): ?array;
+    public function assignedRole(int $role_id, string $search = '', int $limit = 0): ?array;
 
     /**
      * Get users unassigned in specific role
      */
-    public function unassignedRole(int $role_id): ?array;
+    public function unassignedRole(int $role_id, string $search = '', int $limit = 0, int $excludeId = 0): ?array;
 
     /**
      * Delete user

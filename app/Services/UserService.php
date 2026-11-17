@@ -94,14 +94,14 @@ class UserService
         return $this->userRepository->countActiveAdmins($affectedUserIds) < 1;
     }
 
-    public function getAssignedRole(int $role_id): ?array
+    public function getAssignedRole(int $role_id, string $search = '', int $limit = 0): ?array
     {
-        return $this->userRepository->assignedRole($role_id);
+        return $this->userRepository->assignedRole($role_id, $search, $limit);
     }
 
-    public function getUnassignedRole(int $role_id): ?array
+    public function getUnassignedRole(int $role_id, string $search = '', int $limit = 0, int $excludeId = 0): ?array
     {
-        return $this->userRepository->unassignedRole($role_id);
+        return $this->userRepository->unassignedRole($role_id, $search, $limit, $excludeId);
     }
 
     public function countUsers(): ?int

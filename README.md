@@ -8,4 +8,8 @@ vendor/bin/doctrine-migrations status -vv
 # Executar as migrations
 vendor/bin/doctrine-migrations migrate --no-interaction
 
+%PHP Unit execute Tests
+/vendor/bin/phpunit
+
+
 #

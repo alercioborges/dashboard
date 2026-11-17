@@ -276,8 +276,20 @@ class User extends Model implements UserRepositoryInterface
         return $result > 0;
     }
 
-    public function assignedRole(int $role_id): ?array
+    public function assignedRole(int $role_id, string $search = '', int $limit = 0): ?array
     {
+        $conditions = [
+            'role_id'   => $role_id,
+            'is_active' => 1
+        ];
+
+        if ($search !== '') {
+            $conditions['search'] = $this->queryBuilder->rawCondition(
+                "CONCAT(CONCAT(firstname, ' ', lastname), ' ', email) LIKE",
+                '%' . $search . '%'
+            );
+        }
+
         $user = $this->queryBuilder->select(
             $this->table,
             [
@@ -285,18 +297,33 @@ class User extends Model implements UserRepositoryInterface
                 $this->queryBuilder->raw("CONCAT(firstname, ' ', lastname) AS name"),
                 'email'
             ],
-            [
-                'role_id' => $role_id,
-                'is_active' => 1
-            ]
+            $conditions,
+            ['firstname' => 'ASC', 'lastname' => 'ASC'],
+            $limit > 0 ? $limit : null
         );
 
-        return $user ?? NULL;
+        return $user ?: NULL;
     }
 
 
-    public function unassignedRole(int $role_id): ?array
+    public function unassignedRole(int $role_id, string $search = '', int $limit = 0, int $excludeId = 0): ?array
     {
+        $conditions = [
+            'role_id !=' => $role_id,
+            'is_active'  => 1
+        ];
+
+        if ($excludeId > 0) {
+            $conditions['id !='] = $excludeId;
+        }
+
+        if ($search !== '') {
+            $conditions['search'] = $this->queryBuilder->rawCondition(
+                "CONCAT(CONCAT(firstname, ' ', lastname), ' ', email) LIKE",
+                '%' . $search . '%'
+            );
+        }
+
         $user = $this->queryBuilder->select(
             $this->table,
             [
@@ -304,13 +331,12 @@ class User extends Model implements UserRepositoryInterface
                 $this->queryBuilder->raw("CONCAT(firstname, ' ', lastname) AS name"),
                 'email'
             ],
-            [
-                'role_id !=' => $role_id,
-                'is_active' => 1
-            ]
+            $conditions,
+            ['firstname' => 'ASC', 'lastname' => 'ASC'],
+            $limit > 0 ? $limit : null
         );
 
-        return $user ?? NULL;
+        return $user ?: NULL;
     }
 
     /**

@@ -36,6 +36,10 @@ $group->group('/roles', function (Slim\Routing\RouteCollectorProxy $group) use (
     ->setName('roles-user.assign')
     ->add($permission('role.assignment'));
 
+    $group->get('/{id:[0-9]+}/assignment/search', [RoleController::class, 'assignmentSearch'])
+    ->setName('roles-user.assignment-search')
+    ->add($permission('role.assignment'));
+
     $group->post('/assign', [RoleController::class, 'assign'])
     ->setName('roles-user.assigned')
     ->add($permission('role.assign'));

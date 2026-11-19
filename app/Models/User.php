@@ -467,6 +467,13 @@ class User extends Model implements UserRepositoryInterface
                 ['id' => $userId]
             );
 
+            $this->queryBuilder->delete(
+                'tbl_user_remember_tokens',
+                [
+                    'user_id' => $userId
+                ]
+            );
+
             $this->queryBuilder->commit();
 
             return true;

@@ -50,7 +50,8 @@ return [
     UserService::class =>
     fn(ContainerInterface $c) => new UserService(
         $c->get(UserRepositoryInterface::class),
-        $c->get(PaginationService::class)
+        $c->get(PaginationService::class),
+        $c->get(RememberMeRepositoryInterface::class)
     ),
 
     RoleService::class =>

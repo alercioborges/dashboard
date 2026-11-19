@@ -9,7 +9,7 @@ vendor/bin/doctrine-migrations status -vv
 vendor/bin/doctrine-migrations migrate --no-interaction
 
 %PHP Unit execute Tests
-/vendor/bin/phpunit
+vendor/bin/phpunit
 
 
 #

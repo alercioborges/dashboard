@@ -120,6 +120,7 @@ class AuthService implements AuthServiceInterface
         $user = $this->rememberMeRepository->findValidUserByToken($hash);
 
         if (!$user) {
+            $this->cookieService->deleteCookie('remember_me', '/');
             return false;
         }
 
@@ -193,7 +194,7 @@ class AuthService implements AuthServiceInterface
             session_destroy();
         }
 
-        $this->rememberMeRepository->deleteOnLogout($userId);
+        $this->rememberMeRepository->deleteByUserId($userId);
     }
 
     /**

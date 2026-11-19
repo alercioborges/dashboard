@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Interfaces\UserRepositoryInterface;
+use App\Interfaces\RememberMeRepositoryInterface;
 use App\Services\PaginationService;
 
 /**
@@ -14,11 +15,13 @@ use App\Services\PaginationService;
 class UserService
 {
     private UserRepositoryInterface $userRepository;
+    private RememberMeRepositoryInterface $rememberMeRepository;
     private PaginationService $pagination;
 
-    public function __construct(UserRepositoryInterface $userRepository, PaginationService $pagination)
+    public function __construct(UserRepositoryInterface $userRepository, PaginationService $pagination, RememberMeRepositoryInterface $rememberMeRepository)
     {
         $this->userRepository = $userRepository;
+        $this->rememberMeRepository = $rememberMeRepository;
         $this->pagination = $pagination;
     }
 
@@ -61,7 +64,13 @@ class UserService
 
     public function deleteUser(int $id): bool
     {
-        return $this->userRepository->delete($id);
+        $deleted = $this->userRepository->delete($id);
+
+        if ($deleted) {
+            $this->rememberMeRepository->deleteByUserId($id);
+        }
+
+        return $deleted;
     }
 
     public function updateUser(int $id, array $data): bool

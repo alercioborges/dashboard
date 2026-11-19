@@ -44,7 +44,8 @@ class RememberMe extends Model implements RememberMeRepositoryInterface
             ],
             [
                 'm.token_hash' => $hash,
-                'm.expires_at >' => date('Y-m-d H:i:s')
+                'm.expires_at >' => date('Y-m-d H:i:s'),
+                'u.is_active'
             ],
             [],
             [],
@@ -72,7 +73,7 @@ class RememberMe extends Model implements RememberMeRepositoryInterface
         );
     }
 
-    public function deleteOnLogout(int $userId): bool
+    public function deleteByUserId(int $userId): bool
     {
         return $this->queryBuilder->delete(
             $this->table,

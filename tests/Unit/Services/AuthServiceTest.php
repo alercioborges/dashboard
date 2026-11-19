@@ -10,18 +10,19 @@ use App\Services\CookieService;
 use App\Services\PasswordService;
 use App\Services\TokenService;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 class AuthServiceTest extends TestCase
 {
-    private UserRepositoryInterface $userRepository;
-    private RememberMeRepositoryInterface $rememberMeRepository;
-    private PermissionRepositoryInterface $permissionRepository;
-    private TokenService $tokenService;
-    private CookieService $cookieService;
-    private PasswordService $passwordService;
+    private UserRepositoryInterface&MockObject $userRepository;
+    private RememberMeRepositoryInterface&MockObject $rememberMeRepository;
+    private PermissionRepositoryInterface&MockObject $permissionRepository;
+    private TokenService&MockObject $tokenService;
+    private CookieService&MockObject $cookieService;
+    private PasswordService&MockObject $passwordService;
     private AuthService $authService;
 
     protected function setUp(): void
@@ -78,7 +79,7 @@ class AuthServiceTest extends TestCase
         $this->passwordService->method('dummyHash')->willReturn('dummy');
         $this->passwordService->method('verify')->willReturn(false);
 
-        $this->assertFalse($this->authService->authenticate ('nobody@example.com', 'secret'));
+        $this->assertFalse($this->authService->authenticate('nobody@example.com', 'secret'));
     }
 
     public function testAuthenticateReturnsFalseWhenPasswordIsInvalid(): void
@@ -193,14 +194,14 @@ class AuthServiceTest extends TestCase
         $this->tokenService->method('hashToken')->willReturn('hashed_token');
         $this->rememberMeRepository->expects($this->once())->method('delete')->with('hashed_token');
         $this->cookieService->expects($this->once())->method('deleteCookie')->with('remember_me', '/');
-        $this->rememberMeRepository->expects($this->once())->method('deleteOnLogout')->with(1);
+        $this->rememberMeRepository->expects($this->once())->method('deleteByUserId')->with(1);
 
         $this->authService->logout(1);
     }
 
-    public function testLogoutWithoutCookieOnlyCallsDeleteOnLogout(): void
+    public function testLogoutWithoutCookieOnlyCallsDeleteByUserId(): void
     {
-        $this->rememberMeRepository->expects($this->once())->method('deleteOnLogout')->with(1);
+        $this->rememberMeRepository->expects($this->once())->method('deleteByUserId')->with(1);
 
         $this->authService->logout(1);
     }
